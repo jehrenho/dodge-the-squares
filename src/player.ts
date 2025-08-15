@@ -1,31 +1,38 @@
 import { keys, KEYS } from './input.js';
 import { canvasHeight, canvasWidth } from './game.js';
 
-const NORMALCOLOUR: string = "green";
-const COLLISIONCOLOUR: string = "black"
+const PLAYER_INIT_X = 50;
+const PLAYER_INIT_Y = 50;
+const PLAYER_INIT_W = 30;
+const PLAYER_INIT_H = 30;
+const PLAYER_MAX_SPEED = 5;
+const PLAYER_INIT_ACCEL = 0.1;
+const PLAYER_NOMINAL_COLOUR: string = "green";
+const COLLISIONCOLOUR: string = "black";
 
 export class Player {
-    rectHeight: number;
-    rectWidth: number;
-    maxSpeed: number;
-    accel: number;
     x: number;
     y: number;
+    h: number;
+    w: number;
     xspeed: number;
     yspeed: number;
+    maxSpeed: number;
+    accel: number;
     COLOUR: string;
 
     constructor() {
-        this.rectHeight = 30;
-        this.rectWidth = 30;
-        this.maxSpeed = 5;
-        this.accel = 0.1;
-        this.x = 50;
-        this.y = 50;
+        this.x = PLAYER_INIT_X;
+        this.y = PLAYER_INIT_Y;
+        this.w = PLAYER_INIT_W;
+        this.h = PLAYER_INIT_H;
         this.xspeed = 0;
         this.yspeed = 0;
-        this.COLOUR = NORMALCOLOUR;
+        this.maxSpeed = PLAYER_MAX_SPEED;
+        this.accel = PLAYER_INIT_ACCEL;
+        this.COLOUR = PLAYER_NOMINAL_COLOUR;
     }
+    // update the player position based on the arrow keys
     updatePosition() {
         // increase the rectangle speed based on the arrow keys
         if (keys[KEYS.UP] && this.yspeed > -this.maxSpeed)    this.yspeed -= this.accel;
@@ -33,7 +40,7 @@ export class Player {
         if (keys[KEYS.LEFT] && this.xspeed > -this.maxSpeed)  this.xspeed -= this.accel;
         if (keys[KEYS.RIGHT] && this.xspeed < this.maxSpeed) this.xspeed += this.accel;
 
-        // decellerate when the arrow keys are released
+        // decelerate when the arrow keys are released
         if (!keys[KEYS.UP] && !keys[KEYS.DOWN] && this.yspeed != 0) {
             if (this.yspeed > this.accel) this.yspeed -= this.accel;
             else if (this.yspeed < -this.accel) this.yspeed += this.accel;
@@ -55,25 +62,25 @@ export class Player {
             this.y = 0;
             this.yspeed = 0;
         }
-        if (this.y > canvasHeight - this.rectHeight) {
-            this.y = canvasHeight - this.rectHeight;
+        if (this.y > canvasHeight - this.h) {
+            this.y = canvasHeight - this.h;
             this.yspeed = 0;
         } 
         if (this.x < 0) {
             this.x = 0;
             this.xspeed = 0;
         }
-        if (this.x > canvasWidth - this.rectWidth) {
-            this.x = canvasWidth - this.rectWidth;
+        if (this.x > canvasWidth - this.w) {
+            this.x = canvasWidth - this.w;
             this.xspeed = 0;
         } 
     }
-    updateColour(isCollision:boolean) {
-        if (!isCollision) this.COLOUR = NORMALCOLOUR;
+    updateColour(isCollision: boolean) {
+        if (!isCollision) this.COLOUR = PLAYER_NOMINAL_COLOUR;
         else this.COLOUR = COLLISIONCOLOUR;
     }
-    draw(ctx:CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = this.COLOUR;
-        ctx.fillRect(this.x, this.y, this.rectWidth, this.rectHeight);
+        ctx.fillRect(this.x, this.y, this.w, this.h);
     }
 }

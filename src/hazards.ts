@@ -1,9 +1,9 @@
 import { canvasHeight, canvasWidth } from './game.js';
 import { Player } from './player.js';
 
-const HAZARDCOLOUR = "red";
-const initHazardDensity = 0.02;
-const initHazardSpeed = 2.0;
+const HAZARD_COLOUR = "red";
+const HAZARD_INIT_DENSITY = 0.02;
+const HAZARD_INIT_SPEED = 2.0;
 
 class HazardRectangle {
     x: number;
@@ -23,57 +23,54 @@ export class HazardsObj {
     COLOUR: string;
     hazardDensity: number;
     hazardSpeed: number;
-    rectangles: HazardRectangle[];
-    rand: number;
+    hazards: HazardRectangle[];
 
     constructor () {
-        this.COLOUR = HAZARDCOLOUR;
-        this.hazardDensity = initHazardDensity;
-        this.hazardSpeed = initHazardSpeed;
-        this.rectangles = [];
-        this.rand = 1.0;
+        this.COLOUR = HAZARD_COLOUR;
+        this.hazardDensity = HAZARD_INIT_DENSITY;
+        this.hazardSpeed = HAZARD_INIT_SPEED;
+        this.hazards = [];
         
-        //testing: create a simple test hazard
-        this.rectangles[0] = new HazardRectangle(150, 30, 50, 40);
-        this.rectangles[1] = new HazardRectangle(67, 230, 70, 20);
-        this.rectangles[2] = new HazardRectangle(450, 550, 30, 90);
+        // testing: create a simple test hazard
+        this.hazards[0] = new HazardRectangle(150, 30, 50, 40);
+        this.hazards[1] = new HazardRectangle(67, 230, 70, 20);
+        this.hazards[2] = new HazardRectangle(450, 550, 30, 90);
     }
     updatePositions() {
         this.generateNewHazards();
         this.moveHazards();
     }
     generateNewHazards() {
-        // generate a random number 
-        this.rand = Math.random();
-        if (this.rand < this.hazardDensity) {
+        // randomly generate a new hazard based on the hazard density
+        const rand = Math.random();
+        if (rand < this.hazardDensity) {
             // map the new rectangle location to the canvas dimensions in pixels
-            let newRecty = (canvasHeight * this.rand) / this.hazardDensity;
+            const newHazardy = (canvasHeight * rand) / this.hazardDensity;
             // create a new rectangle
-            this.rectangles.push(new HazardRectangle(canvasWidth, newRecty, 50, 50));
+            this.hazards.push(new HazardRectangle(canvasWidth, newHazardy, 50, 50));
         }
     }
     moveHazards() {
-        for (let i = 0; i < this.rectangles.length; i++) {
-            this.rectangles[i].x -= this.hazardSpeed;
-            // delete old rectangles
-            if (this.rectangles[i].x < 0)
-                this.rectangles.splice(i, 1);
+        for (let i = this.hazards.length - 1; i >= 0; i--) {
+            this.hazards[i].x -= this.hazardSpeed;
+            // remove rectangles that have moved off the left side of the canvas
+            if (this.hazards[i].x < 0)
+                this.hazards.splice(i, 1);
         }
     }
-    detectCollisions(player:Player) {
-        for (let i = 0; i < this.rectangles.length; i++) {
-            if ( this.rectangles[i].x - player.rectWidth < player.x
-            && player.x < this.rectangles[i].x + this.rectangles[i].w
-            && this.rectangles[i].y - player.rectHeight < player.y
-            && player.y < this.rectangles[i].y + this.rectangles[i].h) return true;
+    detectCollisions(player: Player) {
+        for (let hazard of this.hazards) {
+            if ( hazard.x - player.w < player.x
+            && player.x < hazard.x + hazard.w
+            && hazard.y - player.h < player.y
+            && player.y < hazard.y + hazard.h) return true;
         }
         return false;
     }
     draw(ctx:CanvasRenderingContext2D) {
         ctx.fillStyle = this.COLOUR;
-        for (let i = 0; i < this.rectangles.length; i++){
-            ctx.fillRect(this.rectangles[i].x, this.rectangles[i].y, this.rectangles[i].w, this.rectangles[i].h);
+        for (let hazard of this.hazards){
+            ctx.fillRect(hazard.x, hazard.y, hazard.w, hazard.h);
         }
     }
 }
-
