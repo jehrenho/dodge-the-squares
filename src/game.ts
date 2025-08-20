@@ -1,7 +1,7 @@
-import { GameState, GAME_CONFIG } from './gameConfig.js';
+import { GameState, GAME_CONFIG } from './config.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
-import { HazardManager } from './hazards.js';
+import { HazardManager } from './hazardManager.js';
 import { ModifierManager } from './modifierManager.js';
 
 export const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
