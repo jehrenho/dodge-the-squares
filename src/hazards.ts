@@ -1,4 +1,4 @@
-import { HAZ_GEN_INITS } from './gameConfig.js';
+import { HAZ_GEN_INITS, MOD_EFFECT_CONFIG } from './gameConfig.js';
 import { canvas } from './game.js';
 import { Player } from './player.js';
 
@@ -8,12 +8,16 @@ class HazardRectangle {
     y: number;
     w: number;
     h: number;
+    initw: number;
+    inith: number;
 
     constructor(x:number, y:number, w:number, h:number){
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+        this.initw = HAZ_GEN_INITS.w;
+        this.inith = HAZ_GEN_INITS.h;
     }
 }
 
@@ -26,20 +30,24 @@ function logBase(x: number, base: number): number {
 export class HazardManager {
     hazardSpeed: number;
     hazardDensity: number;
-    COLOUR: string;
+    colour: string;
+    currentSizeFactor: number;
+    targetSizeFactor: number;
+    rateOfSizeFactorChange: number;
+    minShrinkFactor: number;
+    maxEnlargeFactor: number;
     hazards: HazardRectangle[];
 
     constructor () {
         this.hazardSpeed = HAZ_GEN_INITS.speed;
         this.hazardDensity = HAZ_GEN_INITS.density;
-        this.COLOUR = HAZ_GEN_INITS.colour;
+        this.colour = HAZ_GEN_INITS.colour;
+        this.currentSizeFactor = 1.0;
+        this.targetSizeFactor = 1.0;
+        this.rateOfSizeFactorChange = 0;
+        this.minShrinkFactor = MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor;
+        this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
         this.hazards = [];
-    }
-
-    // generates new hazards, destroys old ones, and moves all hazards
-    updateHazards(): void {
-        this.generateNewHazards();
-        this.moveHazards();
     }
 
     // generates new hazards based on the hazard density
@@ -51,19 +59,65 @@ export class HazardManager {
             // create a new rectangle
             this.hazards.push(new HazardRectangle(canvas.width, 
                 newHazardy - HAZ_GEN_INITS.h, 
-                HAZ_GEN_INITS.w, 
-                HAZ_GEN_INITS.h));
+                HAZ_GEN_INITS.w * this.currentSizeFactor, 
+                HAZ_GEN_INITS.h * this.currentSizeFactor));
         }
     }
 
-    // moves all hazards to the left and destroys hazards that have moved off screen
+    // moves all hazards to the left, destroys hazards that have moved off screen, and sets their size
     moveHazards(): void {
         for (let i = this.hazards.length - 1; i >= 0; i--) {
             this.hazards[i].x -= this.hazardSpeed;
             // remove rectangles that have moved off the left side of the canvas
-            if (this.hazards[i].x < -HAZ_GEN_INITS.w)
+            if (this.hazards[i].x < -this.hazards[i].w) {
                 this.hazards.splice(i, 1);
+                continue;
+            } 
+
+            // update the size of the hazards if we need to
+            if (this.rateOfSizeFactorChange === 0) continue;
+            this.hazards[i].w = this.hazards[i].initw * this.currentSizeFactor;
+            this.hazards[i].h = this.hazards[i].inith * this.currentSizeFactor;
         }
+    }
+
+    // updates the size of the hazards
+    updateHazardSizes() {
+        // check if we have reached the target size
+        if ((this.rateOfSizeFactorChange > 0 && this.currentSizeFactor > this.targetSizeFactor)
+        || (this.rateOfSizeFactorChange < 0 && this.currentSizeFactor < this.targetSizeFactor)) {
+            if (this.targetSizeFactor != 1) {
+                // a new size is now active, decay back to the initial size
+                this.currentSizeFactor = this.targetSizeFactor;
+                this.targetSizeFactor = 1;
+                this.rateOfSizeFactorChange = (this.targetSizeFactor - this.currentSizeFactor) / HAZ_GEN_INITS.sizeModDecayFrames;
+            }
+            else {
+                // initial size has been reached
+                this.currentSizeFactor = 1;
+                this.rateOfSizeFactorChange = 0;
+            }
+        }
+        this.currentSizeFactor += this.rateOfSizeFactorChange;
+    }
+
+    // generates new hazards, destroys old ones, and moves all hazards
+    updateHazards(): void {
+        this.generateNewHazards();
+        this.moveHazards();
+        this.updateHazardSizes();
+    }
+
+    // applies a new size scale factor to all hazards 
+    applySizeScaleFactor(scaleFactor: number): void {
+        this.targetSizeFactor = this.currentSizeFactor * scaleFactor;
+        if (this.targetSizeFactor < this.minShrinkFactor) {
+            this.targetSizeFactor = this.minShrinkFactor;
+        } else if (this.targetSizeFactor > this.maxEnlargeFactor) {
+            this.targetSizeFactor = this.maxEnlargeFactor;
+        }
+        // calculate the rate of size change given the target size factor and the initial transition frames
+        this.rateOfSizeFactorChange = (this.targetSizeFactor - this.currentSizeFactor) / HAZ_GEN_INITS.sizeModInitTransFrames;
     }
 
     // detects collisions between the player and hazard rectangles
@@ -81,9 +135,15 @@ export class HazardManager {
 
     // draws all hazards on the canvas
     draw(ctx:CanvasRenderingContext2D): void {
-        ctx.fillStyle = this.COLOUR;
+        ctx.fillStyle = this.colour;
         for (let hazard of this.hazards){
+            // Draw the hazard rectangle's fill colour
             ctx.fillRect(hazard.x, hazard.y, hazard.w, hazard.h);
+
+            // Draw border
+            ctx.strokeStyle = HAZ_GEN_INITS.borderColour;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(hazard.x, hazard.y, hazard.w, hazard.h);
         }
     }
 
@@ -96,8 +156,14 @@ export class HazardManager {
 
     // resets all hazards (clears them)
     reset(): void {
-        this.hazards = [];
-        this.hazardDensity = HAZ_GEN_INITS.density;
         this.hazardSpeed = HAZ_GEN_INITS.speed;
+        this.hazardDensity = HAZ_GEN_INITS.density;
+        this.colour = HAZ_GEN_INITS.colour;
+        this.currentSizeFactor = 1.0;
+        this.targetSizeFactor = 1.0;
+        this.rateOfSizeFactorChange = 0;
+        this.minShrinkFactor = MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor;
+        this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
+        this.hazards = [];
     }
 }

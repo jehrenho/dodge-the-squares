@@ -4,6 +4,7 @@ import { MODIFIER_TYPE,
 import { canvas } from './game.js';
 import { Player } from './player.js';
 import { handleModifierCollisions } from './modifierEffect.js';
+import { HazardManager } from './hazards.js';
 
 // represents an individual modifier circle in the game
 class Modifier {
@@ -24,19 +25,22 @@ class ModifierGroup {
     speed: number;
     density: number;
     radius: number;
-    colour: string;
+    fillColour: string;
+    outlineColour: string;
     modifiers: Modifier[];
     
     constructor(modifierType: MODIFIER_TYPE, 
         speed: number,  
         density: number,
         radius: number, 
-        colour: string) {
+        fillColour: string,
+        outlineColour: string) {
         this.modifierType = modifierType;
         this.speed = speed;
         this.density = density;
         this.radius = radius;
-        this.colour = colour;
+        this.fillColour = fillColour;
+        this.outlineColour = outlineColour;
         this.modifiers = [];
     }
 }
@@ -53,13 +57,33 @@ export class ModifierManager {
             MOD_GEN_INITS.INVINCIBILITY.speed, 
             MOD_GEN_INITS.INVINCIBILITY.density, 
             MOD_GEN_INITS.INVINCIBILITY.radius,
-            MOD_GEN_INITS.INVINCIBILITY.colour));
+            MOD_GEN_INITS.INVINCIBILITY.fillColour,
+            MOD_GEN_INITS.INVINCIBILITY.outlineColour
+        ));
         this.modifierGroups.push(new ModifierGroup(
             MODIFIER_TYPE.ICE_RINK, 
             MOD_GEN_INITS.ICE_RINK.speed, 
             MOD_GEN_INITS.ICE_RINK.density, 
             MOD_GEN_INITS.ICE_RINK.radius,
-            MOD_GEN_INITS.ICE_RINK.colour)); 
+            MOD_GEN_INITS.ICE_RINK.fillColour,
+            MOD_GEN_INITS.ICE_RINK.outlineColour
+        ));
+        this.modifierGroups.push(new ModifierGroup(
+            MODIFIER_TYPE.SHRINK_HAZ,
+            MOD_GEN_INITS.SHRINK_HAZ.speed,
+            MOD_GEN_INITS.SHRINK_HAZ.density,
+            MOD_GEN_INITS.SHRINK_HAZ.radius,
+            MOD_GEN_INITS.SHRINK_HAZ.fillColour,
+            MOD_GEN_INITS.SHRINK_HAZ.outlineColour
+        ));
+        this.modifierGroups.push(new ModifierGroup(
+            MODIFIER_TYPE.ENLARGE_HAZ,
+            MOD_GEN_INITS.ENLARGE_HAZ.speed,
+            MOD_GEN_INITS.ENLARGE_HAZ.density,
+            MOD_GEN_INITS.ENLARGE_HAZ.radius,
+            MOD_GEN_INITS.ENLARGE_HAZ.fillColour,
+            MOD_GEN_INITS.ENLARGE_HAZ.outlineColour
+        ));
     }
 
     // generates new modifiers based on modifier group densities
@@ -69,10 +93,10 @@ export class ModifierManager {
             rand = Math.random();
             if (rand < modg.density) {
                 // map the new modifier location to the canvas dimensions in pixels
-                const newModifierY = ((canvas.height + 50) * rand) / modg.density;
-                // create a new modifier
-                modg.modifiers.push(new Modifier(canvas.width + 25, 
-                    newModifierY - 50, 
+                const newModifierY = ((canvas.height + modg.radius) * rand) / modg.density;
+                // create a new modifier just to the right of the canvas boundry
+                modg.modifiers.push(new Modifier(canvas.width + modg.radius, 
+                    newModifierY - modg.radius, 
                     modg.radius, 
                     modg.speed));
             }   
@@ -99,7 +123,7 @@ export class ModifierManager {
     }
 
     // detects collisions between the player and modifier circles
-    detectModifierCollisions(player: Player): void {
+    detectModifierCollisions(player: Player, hazardManager: HazardManager): void {
         let closestX: number = 0;
         let closestY: number = 0;
         let dx: number = 0;
@@ -119,7 +143,7 @@ export class ModifierManager {
 
                 // If distance < radius, collision!
                 if ((dx * dx + dy * dy) <= (mod.r * mod.r)) {
-                    handleModifierCollisions(modg.modifierType, player); 
+                    handleModifierCollisions(modg.modifierType, player, hazardManager); 
                     modg.modifiers.splice(i, 1); // destroy the modifier after collision
                 }
             }
@@ -130,10 +154,15 @@ export class ModifierManager {
     drawModifiers(ctx: CanvasRenderingContext2D): void {
         for (let modg of this.modifierGroups) {
             for (let mod of modg.modifiers) {
-                ctx.fillStyle = modg.colour;
+                // Draw fill
+                ctx.fillStyle = modg.fillColour;
                 ctx.beginPath();
                 ctx.arc(mod.x, mod.y, mod.r, 0, Math.PI * 2);
                 ctx.fill();
+                // Draw outline
+                ctx.strokeStyle = modg.outlineColour;
+                ctx.lineWidth = 2; // You can adjust the thickness
+                ctx.stroke();
             }
         }
     }

@@ -4,6 +4,15 @@ export const enum GameState {
     GAMEOVER 
 };
 
+// game configuration constants
+export const GAME_CONFIG = {
+    backgroundColour: "lightgreen",
+    fontColour: "black",
+    gameOverFontColour: "darkred",
+    menuFont: "25px Arial",
+    statusBarFont: "25px Arial",
+};
+
 // player configuration constants
 export const PLAYER_INITS = {
     x: 50,
@@ -14,13 +23,8 @@ export const PLAYER_INITS = {
     yspeed: 0,
     maxSpeed: 7.0,
     Accel: 0.25,
-    colour: "green"
-};
-
-// modifier type constants
-export const enum MODIFIER_TYPE {
-    INVINCIBILITY,
-    ICE_RINK
+    fillColour: "green",
+    borderColour: "black"
 };
 
 // hazard generation constants
@@ -30,22 +34,49 @@ export const HAZ_GEN_INITS = {
     speed: 4,
     density: 0.02,
     colour: "red",
-    difficultyLogBase: 3
+    borderColour: "darkred",
+    difficultyLogBase: 3,
+    sizeModInitTransFrames: 60,
+    sizeModDecayFrames: 900,
+};
+
+// modifier type constants
+export const enum MODIFIER_TYPE {
+    INVINCIBILITY,
+    ICE_RINK,
+    SHRINK_HAZ,
+    ENLARGE_HAZ
 };
 
 // modifier generation constants
 export const MOD_GEN_INITS = {
     INVINCIBILITY: {
-        density: 0.004, // 0.0008 is a good start
+        density: 0.00028, // 0.0008 is a good start
         speed: 9,
         radius: 25,
-        colour: "gold"
+        fillColour: "gold",
+        outlineColour: "yellow"
     },
     ICE_RINK: {
-        density: 0.01,
+        density: 0.0065,
+        speed: 5,
+        radius: 80,
+        fillColour: "lightskyblue",
+        outlineColour: "skyblue"
+    },
+    SHRINK_HAZ: {
+        density: 0.002,
+        speed: 6.0,
+        radius: 30,
+        fillColour: "coral",
+        outlineColour: "indianred"
+    },
+    ENLARGE_HAZ: {
+        density: 0.006,
         speed: 4,
-        radius: 60,
-        colour: "skyblue"
+        radius: 100,
+        fillColour: "darkred",
+        outlineColour: "maroon"
     }
 };
 
@@ -59,5 +90,11 @@ export const MOD_EFFECT_CONFIG = {
         colour: "skyblue",
         frames: 900,
         accel: 0.09
+    },
+    SHRINK_HAZ: {
+        scaleFactor: 0.5
+    },
+    ENLARGE_HAZ: {
+        scaleFactor: 2
     }
 };

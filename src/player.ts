@@ -16,7 +16,7 @@ export class Player {
     yspeed: number;
     maxSpeed: number;
     accel: number;
-    COLOUR: string;
+    colour: string;
     effects: ModifierEffect[]; // array of active modifier effects
     isInvincible: boolean;
 
@@ -29,7 +29,7 @@ export class Player {
         this.yspeed = PLAYER_INITS.yspeed;
         this.maxSpeed = PLAYER_INITS.maxSpeed;
         this.accel = PLAYER_INITS.Accel;
-        this.COLOUR = PLAYER_INITS.colour;
+        this.colour = PLAYER_INITS.fillColour;
         this.effects = [];
         this.isInvincible = false;
     }
@@ -87,15 +87,15 @@ export class Player {
     // updated the player's abilities based on the currently active effects
     updateEffectsAbilities(): void {
         this.isInvincible = false;
-        this.COLOUR = PLAYER_INITS.colour;
+        this.colour = PLAYER_INITS.fillColour;
         this.accel = PLAYER_INITS.Accel;
 
         for (let effect of this.effects) {
             if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
                 this.isInvincible = true;
-                this.COLOUR = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
+                this.colour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
             } else if (effect.type === MODIFIER_TYPE.ICE_RINK) {
-                this.COLOUR = MOD_EFFECT_CONFIG.ICE_RINK.colour;
+                this.colour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
                 this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
             }
         }
@@ -116,13 +116,19 @@ export class Player {
 
     // draw the player rectangle on the canvas
     draw(ctx: CanvasRenderingContext2D): void {
-        ctx.fillStyle = this.COLOUR;
+        // Draw the player rectangle's fill colour
+        ctx.fillStyle = this.colour;
         ctx.fillRect(this.x, this.y, this.w, this.h);
+
+        // Draw border
+        ctx.strokeStyle = PLAYER_INITS.borderColour;        // Border color
+        ctx.lineWidth = 1;                // Border thickness
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
     }
 
     // set the player colour
     setColour(colour: string): void {
-        this.COLOUR = colour;
+        this.colour = colour;
     }
 
     // reset the player to the initial state

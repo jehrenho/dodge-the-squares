@@ -1,4 +1,4 @@
-import { GameState } from './gameConfig.js';
+import { GameState, GAME_CONFIG } from './gameConfig.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { HazardManager } from './hazards.js';
@@ -57,22 +57,22 @@ class GameTimer {
 
 // draws the game background
 function drawBackground(): void {
-  ctx.fillStyle = "LightGreen";
+  ctx.fillStyle = GAME_CONFIG.backgroundColour;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 // draws the in-game text
 function drawInGameText(): void {
   // print the time survived
-  ctx.fillStyle = "black";
-  ctx.font = "25px Arial";
+  ctx.fillStyle = GAME_CONFIG.fontColour;
+  ctx.font = GAME_CONFIG.statusBarFont;
   ctx.fillText(`Time: ${gameTimer.getSecondsSurvived().toFixed(2)}s`, 10, 20);
 }
 
 // draws the menu
 function drawMenu(): void {
-  ctx.fillStyle = "black";
-  ctx.font = "30px Arial";
+  ctx.fillStyle = GAME_CONFIG.fontColour;
+  ctx.font = GAME_CONFIG.menuFont;
   ctx.fillText("Press Enter to Start", canvas.width / 2 - 100, canvas.height / 2);
 
   if (inputManager.isEnterPressedAndReleased()) currentGameState = GameState.INGAME;
@@ -86,7 +86,7 @@ function drawGame(): void {
   player.updatePosition(inputManager);
   
   // handle player-modifier collisions
-  modifierManager.detectModifierCollisions(player);
+  modifierManager.detectModifierCollisions(player, hazardManager);
   player.updateEffects();
 
   // end the game if player collides with a hazard
@@ -109,8 +109,8 @@ function drawGame(): void {
 // draws the game over screen
 function drawGameOver(): void {
   // print the game over screen
-  ctx.fillStyle = "black";
-  ctx.font = "30px Arial";
+  ctx.fillStyle = GAME_CONFIG.gameOverFontColour;
+  ctx.font = GAME_CONFIG.menuFont;
   ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2);
   ctx.fillText(`You Survived for: ${gameTimer.getSecondsSurvived().toFixed(2)}s`, 
     canvas.width / 2 - 70, canvas.height / 2 + 40);

@@ -1,5 +1,6 @@
 import { MODIFIER_TYPE, MOD_EFFECT_CONFIG } from "./gameConfig.js";
 import { Player } from "./player.js";
+import { HazardManager } from "./hazards.js";
 
 // defines the base class for all modifier effects
 export abstract class ModifierEffect {
@@ -40,7 +41,7 @@ export class IceRinkEffect extends ModifierEffect {
 
 // handles logic for applying and resolving modifier effect collisions
 // IN DEV.
-export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, player: Player): void {
+export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, player: Player, hazardManager: HazardManager): void {
     
     // see if the new effect is already active
     for (let effect of player.effects) {
@@ -59,7 +60,7 @@ export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, p
    if (contactedModifierType === MODIFIER_TYPE.INVINCIBILITY) {
         // invincibility deactivates ice rink
         for (let i = player.effects.length - 1; i >= 0; i--) {
-            if (player.effects[i].type === MODIFIER_TYPE.ICE_RINK) {
+            if (player.effects[i].type != MODIFIER_TYPE.INVINCIBILITY) {
                 player.effects.splice(i, 1);
                 break;
             }
@@ -73,6 +74,12 @@ export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, p
             break;
         case MODIFIER_TYPE.ICE_RINK:
             player.effects.push(new IceRinkEffect(player));
+            break;
+        case MODIFIER_TYPE.SHRINK_HAZ:
+            hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor);
+            break;
+        case MODIFIER_TYPE.ENLARGE_HAZ:
+            hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
             break;
     }
 
