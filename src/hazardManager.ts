@@ -1,4 +1,6 @@
-import { HAZ_GEN_INITS, MOD_EFFECT_CONFIG } from './config.js';
+import { GAME_CONFIG,
+    HAZ_GEN_INITS, 
+    MOD_EFFECT_CONFIG } from './config.js';
 import { canvas } from './game.js';
 import { Player } from './player.js';
 
@@ -55,9 +57,9 @@ export class HazardManager {
         const rand = Math.random();
         if (rand < this.hazardDensity) {
             // map the new rectangle location to the canvas dimensions in pixels
-            const newHazardy = ((canvas.height + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
+            const newHazardy = ((GAME_CONFIG.VIRTUAL_HEIGHT + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
             // create a new rectangle
-            this.hazards.push(new HazardRectangle(canvas.width, 
+            this.hazards.push(new HazardRectangle(GAME_CONFIG.VIRTUAL_WIDTH, 
                 newHazardy - HAZ_GEN_INITS.h, 
                 HAZ_GEN_INITS.w * this.currentSizeFactor, 
                 HAZ_GEN_INITS.h * this.currentSizeFactor));

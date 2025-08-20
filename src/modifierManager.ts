@@ -1,4 +1,5 @@
-import { MODIFIER_TYPE,
+import { GAME_CONFIG,
+    MODIFIER_TYPE,
     MOD_GEN_INITS
 } from './config.js';
 import { canvas } from './game.js';
@@ -93,9 +94,9 @@ export class ModifierManager {
             rand = Math.random();
             if (rand < modg.density) {
                 // map the new modifier location to the canvas dimensions in pixels
-                const newModifierY = ((canvas.height + modg.radius) * rand) / modg.density;
+                const newModifierY = ((GAME_CONFIG.VIRTUAL_HEIGHT + modg.radius) * rand) / modg.density;
                 // create a new modifier just to the right of the canvas boundry
-                modg.modifiers.push(new Modifier(canvas.width + modg.radius, 
+                modg.modifiers.push(new Modifier(GAME_CONFIG.VIRTUAL_WIDTH + modg.radius, 
                     newModifierY - modg.radius, 
                     modg.radius, 
                     modg.speed));

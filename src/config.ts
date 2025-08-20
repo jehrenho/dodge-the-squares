@@ -1,3 +1,4 @@
+// game states
 export const enum GameState { 
     MENU,
     INGAME,
@@ -11,6 +12,24 @@ export const GAME_CONFIG = {
     gameOverFontColour: "darkred",
     menuFont: "25px Arial",
     statusBarFont: "25px Arial",
+    VIRTUAL_WIDTH: 1912,
+    VIRTUAL_HEIGHT: 954
+};
+
+// input event types
+export enum InputEventType {
+    KEYDOWN = "keydown",
+    KEYUP = "keyup",
+    RESIZE = "resize"
+}
+
+// keyboard keys
+export enum Keys {
+    UP = "ArrowUp",
+    DOWN = "ArrowDown",
+    LEFT = "ArrowLeft",
+    RIGHT = "ArrowRight",
+    ENTER = "Enter"
 };
 
 // player configuration constants

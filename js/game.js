@@ -47,7 +47,7 @@ class GameTimer {
 // draws the game background
 function drawBackground() {
     ctx.fillStyle = GAME_CONFIG.backgroundColour;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, GAME_CONFIG.VIRTUAL_WIDTH, GAME_CONFIG.VIRTUAL_HEIGHT);
 }
 // draws the in-game text
 function drawInGameText() {
@@ -60,7 +60,7 @@ function drawInGameText() {
 function drawMenu() {
     ctx.fillStyle = GAME_CONFIG.fontColour;
     ctx.font = GAME_CONFIG.menuFont;
-    ctx.fillText("Press Enter to Start", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.fillText("Press Enter to Start", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 100, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
     if (inputManager.isEnterPressedAndReleased())
         currentGameState = 1 /* GameState.INGAME */;
 }
@@ -92,9 +92,9 @@ function drawGameOver() {
     // print the game over screen
     ctx.fillStyle = GAME_CONFIG.gameOverFontColour;
     ctx.font = GAME_CONFIG.menuFont;
-    ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2);
-    ctx.fillText(`You Survived for: ${gameTimer.getSecondsSurvived().toFixed(2)}s`, canvas.width / 2 - 70, canvas.height / 2 + 40);
-    ctx.fillText("Press Enter to continue", canvas.width / 2 - 70, canvas.height / 2 + 80);
+    ctx.fillText("Game Over", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
+    ctx.fillText(`You Survived for: ${gameTimer.getSecondsSurvived().toFixed(2)}s`, GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 40);
+    ctx.fillText("Press Enter to continue", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 80);
     // listen for Enter key to continue to menu
     if (inputManager.isEnterPressedAndReleased()) {
         currentGameState = 0 /* GameState.MENU */;
@@ -107,7 +107,14 @@ function drawGameOver() {
 }
 // main game loop: generates a single frame in the game
 function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, GAME_CONFIG.VIRTUAL_WIDTH, GAME_CONFIG.VIRTUAL_HEIGHT);
+    // setup the window scaling
+    const windowScaleX = canvas.width / GAME_CONFIG.VIRTUAL_WIDTH;
+    const windowScaleY = canvas.height / GAME_CONFIG.VIRTUAL_HEIGHT;
+    console.log(`windowScaleX: ${windowScaleX}, windowScaleY: ${windowScaleY}, canvas.width: ${canvas.width}, canvas.height: ${canvas.height}`);
+    ctx.save();
+    ctx.scale(windowScaleX, windowScaleY);
+    // draw the game
     if (currentGameState === 0 /* GameState.MENU */) {
         drawMenu();
     }
@@ -117,8 +124,11 @@ function gameLoop() {
     else if (currentGameState === 2 /* GameState.GAMEOVER */) {
         drawGameOver();
     }
-    requestAnimationFrame(gameLoop); // schedule next frame
+    ctx.restore();
+    // schedule next frame
+    requestAnimationFrame(gameLoop);
 }
+// initialize canvas size
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 // create instances of the game objects
@@ -128,7 +138,7 @@ const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
 const gameTimer = new GameTimer();
 // start tracking keyboard input
-inputManager.startKeyboardListening();
+inputManager.startListening();
 // start generating frames
 let currentGameState = 0 /* GameState.MENU */;
 gameLoop();

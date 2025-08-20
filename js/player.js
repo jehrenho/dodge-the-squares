@@ -1,6 +1,4 @@
-import { PLAYER_INITS, MOD_EFFECT_CONFIG } from './config.js';
-import { KEYS } from './input.js';
-import { canvas } from './game.js';
+import { GAME_CONFIG, Keys, PLAYER_INITS, MOD_EFFECT_CONFIG } from './config.js';
 // represents the player square and it's state
 export class Player {
     constructor() {
@@ -19,16 +17,16 @@ export class Player {
     // handles player input and updates it's speed accordingly
     handleInput(input) {
         // increase speed if the arrow keys are pressed
-        if (input.keys[KEYS.UP] && this.yspeed > -this.maxSpeed)
+        if (input.keys[Keys.UP] && this.yspeed > -this.maxSpeed)
             this.yspeed -= this.accel;
-        if (input.keys[KEYS.DOWN] && this.yspeed < this.maxSpeed)
+        if (input.keys[Keys.DOWN] && this.yspeed < this.maxSpeed)
             this.yspeed += this.accel;
-        if (input.keys[KEYS.LEFT] && this.xspeed > -this.maxSpeed)
+        if (input.keys[Keys.LEFT] && this.xspeed > -this.maxSpeed)
             this.xspeed -= this.accel;
-        if (input.keys[KEYS.RIGHT] && this.xspeed < this.maxSpeed)
+        if (input.keys[Keys.RIGHT] && this.xspeed < this.maxSpeed)
             this.xspeed += this.accel;
         // decrease speed when the arrow keys are released
-        if (!input.keys[KEYS.UP] && !input.keys[KEYS.DOWN] && this.yspeed != 0) {
+        if (!input.keys[Keys.UP] && !input.keys[Keys.DOWN] && this.yspeed != 0) {
             if (this.yspeed > this.accel)
                 this.yspeed -= this.accel;
             else if (this.yspeed < -this.accel)
@@ -36,7 +34,7 @@ export class Player {
             else
                 this.yspeed = 0;
         }
-        if (!input.keys[KEYS.LEFT] && !input.keys[KEYS.RIGHT] && this.xspeed != 0) {
+        if (!input.keys[Keys.LEFT] && !input.keys[Keys.RIGHT] && this.xspeed != 0) {
             if (this.xspeed > this.accel)
                 this.xspeed -= this.accel;
             else if (this.xspeed < -this.accel)
@@ -51,16 +49,16 @@ export class Player {
             this.y = 0;
             this.yspeed = 0;
         }
-        if (this.y > canvas.height - this.h) {
-            this.y = canvas.height - this.h;
+        if (this.y > GAME_CONFIG.VIRTUAL_HEIGHT - this.h) {
+            this.y = GAME_CONFIG.VIRTUAL_HEIGHT - this.h;
             this.yspeed = 0;
         }
         if (this.x < 0) {
             this.x = 0;
             this.xspeed = 0;
         }
-        if (this.x > canvas.width - this.w) {
-            this.x = canvas.width - this.w;
+        if (this.x > GAME_CONFIG.VIRTUAL_WIDTH - this.w) {
+            this.x = GAME_CONFIG.VIRTUAL_WIDTH - this.w;
             this.xspeed = 0;
         }
     }

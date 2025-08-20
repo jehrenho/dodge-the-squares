@@ -1,13 +1,5 @@
-export const KEYDOWN = "keydown";
-export const KEYUP = "keyup";
-export var KEYS;
-(function (KEYS) {
-    KEYS["UP"] = "ArrowUp";
-    KEYS["DOWN"] = "ArrowDown";
-    KEYS["LEFT"] = "ArrowLeft";
-    KEYS["RIGHT"] = "ArrowRight";
-})(KEYS || (KEYS = {}));
-;
+import { canvas } from "./game.js";
+import { InputEventType } from "./config.js";
 // manages keyboard input for the game
 export class InputManager {
     constructor() {
@@ -22,10 +14,18 @@ export class InputManager {
     onKeyUp(event) {
         this.keys[event.key] = false;
     }
-    // starts listening for keyboard events
-    startKeyboardListening() {
-        window.addEventListener(KEYDOWN, this.onKeyDown.bind(this));
-        window.addEventListener(KEYUP, this.onKeyUp.bind(this));
+    // handle window resize events
+    onResize(event) {
+        canvas.width = window.innerWidth - 1;
+        canvas.height = window.innerHeight - 1;
+    }
+    // starts listening for events
+    startListening() {
+        // start keyboard listening
+        window.addEventListener(InputEventType.KEYDOWN, this.onKeyDown.bind(this));
+        window.addEventListener(InputEventType.KEYUP, this.onKeyUp.bind(this));
+        // start listening for resizes
+        window.addEventListener(InputEventType.RESIZE, this.onResize.bind(this));
     }
     // checks if the Enter key has been pressed and released
     isEnterPressedAndReleased() {

@@ -6,7 +6,26 @@ export const GAME_CONFIG = {
     gameOverFontColour: "darkred",
     menuFont: "25px Arial",
     statusBarFont: "25px Arial",
+    VIRTUAL_WIDTH: 1912,
+    VIRTUAL_HEIGHT: 954
 };
+// input event types
+export var InputEventType;
+(function (InputEventType) {
+    InputEventType["KEYDOWN"] = "keydown";
+    InputEventType["KEYUP"] = "keyup";
+    InputEventType["RESIZE"] = "resize";
+})(InputEventType || (InputEventType = {}));
+// keyboard keys
+export var Keys;
+(function (Keys) {
+    Keys["UP"] = "ArrowUp";
+    Keys["DOWN"] = "ArrowDown";
+    Keys["LEFT"] = "ArrowLeft";
+    Keys["RIGHT"] = "ArrowRight";
+    Keys["ENTER"] = "Enter";
+})(Keys || (Keys = {}));
+;
 // player configuration constants
 export const PLAYER_INITS = {
     x: 50,
