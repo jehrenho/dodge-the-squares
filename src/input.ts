@@ -7,16 +7,50 @@ export enum KEYS {
     RIGHT = "ArrowRight"
 };
 
-// tracks which keys are being held down
-export const keys: Record<string, boolean> = {};
+// manages keyboard input for the game
+export class InputManager {
+    keys: Record<string, boolean> = {};
+    isEnterPressedYet: boolean = false;
 
-// function to start listening to keyboard events
-export function startKeyboardListening(): void {
-    window.addEventListener(KEYDOWN, (e: KeyboardEvent) => {
-        keys[e.key] = true;
-    });
+    // handles key down events
+    onKeyDown(event: KeyboardEvent): void {
+        this.keys[event.key] = true;
+    }
 
-    window.addEventListener(KEYUP, (e: KeyboardEvent) => {
-        keys[e.key] = false;
-    });
+    // handles key up events
+    onKeyUp(event: KeyboardEvent): void {
+        this.keys[event.key] = false;
+    }
+
+    // starts listening for keyboard events
+    startKeyboardListening(): void {
+        window.addEventListener(KEYDOWN, this.onKeyDown.bind(this));
+        window.addEventListener(KEYUP, this.onKeyUp.bind(this));
+    }
+
+    // checks if the Enter key has been pressed and released
+    isEnterPressedAndReleased(): boolean {
+        // enter hasn't been pressed yet
+        if (!this.keys["Enter"] && !this.isEnterPressedYet) {
+            return false;
+        }
+        // enter has just been pressed
+        else if (this.keys["Enter"] && !this.isEnterPressedYet){
+            this.isEnterPressedYet = true;
+            return false;
+        }
+        // enter is being held down
+        else if (this.keys["Enter"] && this.isEnterPressedYet) {
+            return false;
+        }
+        else {
+            // !this.keys["Enter"] && this.isEnterPressed
+            // enter has been pressed and released
+            // reset state
+            this.isEnterPressedYet = false;
+            return true;
+        }
+    }
 }
+
+

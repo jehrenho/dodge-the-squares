@@ -1,15 +1,12 @@
-import { keys, KEYS } from './input.js';
-import { canvasHeight, canvasWidth } from './game.js';
+import { PLAYER_INITS,
+    MODIFIER_TYPE,
+    MOD_EFFECT_CONFIG
+ } from './gameConfig.js';
+import { KEYS, InputManager } from './input.js';
+import { canvas } from './game.js';
+import { ModifierEffect } from './modifierEffect.js';
 
-const PLAYER_INIT_X = 50;
-const PLAYER_INIT_Y = 50;
-const PLAYER_INIT_W = 30;
-const PLAYER_INIT_H = 30;
-const PLAYER_MAX_SPEED = 5;
-const PLAYER_INIT_ACCEL = 0.1;
-const PLAYER_NOMINAL_COLOUR: string = "green";
-const COLLISIONCOLOUR: string = "black";
-
+// represents the player square and it's state
 export class Player {
     x: number;
     y: number;
@@ -20,67 +17,123 @@ export class Player {
     maxSpeed: number;
     accel: number;
     COLOUR: string;
+    effects: ModifierEffect[]; // array of active modifier effects
+    isInvincible: boolean;
 
     constructor() {
-        this.x = PLAYER_INIT_X;
-        this.y = PLAYER_INIT_Y;
-        this.w = PLAYER_INIT_W;
-        this.h = PLAYER_INIT_H;
-        this.xspeed = 0;
-        this.yspeed = 0;
-        this.maxSpeed = PLAYER_MAX_SPEED;
-        this.accel = PLAYER_INIT_ACCEL;
-        this.COLOUR = PLAYER_NOMINAL_COLOUR;
+        this.x = PLAYER_INITS.x;
+        this.y = PLAYER_INITS.y;
+        this.w = PLAYER_INITS.w;
+        this.h = PLAYER_INITS.h;
+        this.xspeed = PLAYER_INITS.xspeed;
+        this.yspeed = PLAYER_INITS.yspeed;
+        this.maxSpeed = PLAYER_INITS.maxSpeed;
+        this.accel = PLAYER_INITS.Accel;
+        this.COLOUR = PLAYER_INITS.colour;
+        this.effects = [];
+        this.isInvincible = false;
     }
-    // update the player position based on the arrow keys
-    updatePosition() {
-        // increase the rectangle speed based on the arrow keys
-        if (keys[KEYS.UP] && this.yspeed > -this.maxSpeed)    this.yspeed -= this.accel;
-        if (keys[KEYS.DOWN] && this.yspeed < this.maxSpeed)  this.yspeed += this.accel;
-        if (keys[KEYS.LEFT] && this.xspeed > -this.maxSpeed)  this.xspeed -= this.accel;
-        if (keys[KEYS.RIGHT] && this.xspeed < this.maxSpeed) this.xspeed += this.accel;
 
-        // decelerate when the arrow keys are released
-        if (!keys[KEYS.UP] && !keys[KEYS.DOWN] && this.yspeed != 0) {
+    // handles player input and updates it's speed accordingly
+    handleInput(input: InputManager): void {
+        // increase speed if the arrow keys are pressed
+        if (input.keys[KEYS.UP] && this.yspeed > -this.maxSpeed)    this.yspeed -= this.accel;
+        if (input.keys[KEYS.DOWN] && this.yspeed < this.maxSpeed)  this.yspeed += this.accel;
+        if (input.keys[KEYS.LEFT] && this.xspeed > -this.maxSpeed)  this.xspeed -= this.accel;
+        if (input.keys[KEYS.RIGHT] && this.xspeed < this.maxSpeed) this.xspeed += this.accel;
+
+        // decrease speed when the arrow keys are released
+        if (!input.keys[KEYS.UP] && !input.keys[KEYS.DOWN] && this.yspeed != 0) {
             if (this.yspeed > this.accel) this.yspeed -= this.accel;
             else if (this.yspeed < -this.accel) this.yspeed += this.accel;
             else this.yspeed = 0;
         }
-        if (!keys[KEYS.LEFT] && !keys[KEYS.RIGHT] && this.xspeed != 0) {
+        if (!input.keys[KEYS.LEFT] && !input.keys[KEYS.RIGHT] && this.xspeed != 0) {
             if (this.xspeed > this.accel) this.xspeed -= this.accel;
             else if (this.xspeed < -this.accel) this.xspeed += this.accel;
             else this.xspeed = 0;
         }
+    }
 
-        // change the rectangle position based on it's speed
-        this.y += this.yspeed;
-        this.x += this.xspeed;
-
-        // don't leave the boundary of the canvas
-        // kill speed when the rectangle hits the boundary 
+    // ensures the player stays within the canvas boundaries
+    enforceBoundaries(): void {
         if (this.y < 0) {
             this.y = 0;
             this.yspeed = 0;
         }
-        if (this.y > canvasHeight - this.h) {
-            this.y = canvasHeight - this.h;
+        if (this.y > canvas.height - this.h) {
+            this.y = canvas.height - this.h;
             this.yspeed = 0;
         } 
         if (this.x < 0) {
             this.x = 0;
             this.xspeed = 0;
         }
-        if (this.x > canvasWidth - this.w) {
-            this.x = canvasWidth - this.w;
+        if (this.x > canvas.width - this.w) {
+            this.x = canvas.width - this.w;
             this.xspeed = 0;
         } 
     }
-    updateColour(isCollision: boolean) {
-        if (!isCollision) this.COLOUR = PLAYER_NOMINAL_COLOUR;
-        else this.COLOUR = COLLISIONCOLOUR;
+
+    // update the player position based on speed, accel, and input
+    updatePosition(input: InputManager): void {
+        this.handleInput(input);
+        // change the rectangle position based on it's speed
+        this.y += this.yspeed;
+        this.x += this.xspeed;
+        this.enforceBoundaries();
     }
-    draw(ctx: CanvasRenderingContext2D) {
+
+    // updated the player's abilities based on the currently active effects
+    updateEffectsAbilities(): void {
+        this.isInvincible = false;
+        this.COLOUR = PLAYER_INITS.colour;
+        this.accel = PLAYER_INITS.Accel;
+
+        for (let effect of this.effects) {
+            if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
+                this.isInvincible = true;
+                this.COLOUR = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
+            } else if (effect.type === MODIFIER_TYPE.ICE_RINK) {
+                this.COLOUR = MOD_EFFECT_CONFIG.ICE_RINK.colour;
+                this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
+            }
+        }
+    }
+
+    // update the player's effects and remove any that have expired
+    updateEffects(): void {
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+            const effect = this.effects[i];
+            if (effect.update(this) <= 0) {
+                // remove the ModifierEffect from the player's effects array
+                this.effects.splice(i, 1);
+            }
+        }
+        // update the player's abilities based on the remaining effects
+        this.updateEffectsAbilities();
+    }
+
+    // draw the player rectangle on the canvas
+    draw(ctx: CanvasRenderingContext2D): void {
         ctx.fillStyle = this.COLOUR;
         ctx.fillRect(this.x, this.y, this.w, this.h);
+    }
+
+    // set the player colour
+    setColour(colour: string): void {
+        this.COLOUR = colour;
+    }
+
+    // reset the player to the initial state
+    reset(): void {
+        this.x = PLAYER_INITS.x;
+        this.y = PLAYER_INITS.y;
+        this.w = PLAYER_INITS.w;
+        this.h = PLAYER_INITS.h;
+        this.xspeed = PLAYER_INITS.xspeed;
+        this.yspeed = PLAYER_INITS.yspeed;
+        this.effects = [];
+        this.updateEffectsAbilities();
     }
 }

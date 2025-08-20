@@ -1,10 +1,8 @@
-import { canvasHeight, canvasWidth } from './game.js';
+import { HAZ_GEN_INITS } from './gameConfig.js';
+import { canvas } from './game.js';
 import { Player } from './player.js';
 
-const HAZARD_COLOUR = "red";
-const HAZARD_INIT_DENSITY = 0.02;
-const HAZARD_INIT_SPEED = 2.0;
-
+// represents a single hazard rectangle in the game
 class HazardRectangle {
     x: number;
     y: number;
@@ -19,58 +17,87 @@ class HazardRectangle {
     }
 }
 
-export class HazardsObj {
-    COLOUR: string;
-    hazardDensity: number;
+// helper logarithm function with a user specified base
+function logBase(x: number, base: number): number {
+    return Math.log(x) / Math.log(base);
+}
+
+// represents the collection of hazards in the game
+export class HazardManager {
     hazardSpeed: number;
+    hazardDensity: number;
+    COLOUR: string;
     hazards: HazardRectangle[];
 
     constructor () {
-        this.COLOUR = HAZARD_COLOUR;
-        this.hazardDensity = HAZARD_INIT_DENSITY;
-        this.hazardSpeed = HAZARD_INIT_SPEED;
+        this.hazardSpeed = HAZ_GEN_INITS.speed;
+        this.hazardDensity = HAZ_GEN_INITS.density;
+        this.COLOUR = HAZ_GEN_INITS.colour;
         this.hazards = [];
-        
-        // testing: create a simple test hazard
-        this.hazards[0] = new HazardRectangle(150, 30, 50, 40);
-        this.hazards[1] = new HazardRectangle(67, 230, 70, 20);
-        this.hazards[2] = new HazardRectangle(450, 550, 30, 90);
     }
-    updatePositions() {
+
+    // generates new hazards, destroys old ones, and moves all hazards
+    updateHazards(): void {
         this.generateNewHazards();
         this.moveHazards();
     }
-    generateNewHazards() {
-        // randomly generate a new hazard based on the hazard density
+
+    // generates new hazards based on the hazard density
+    generateNewHazards(): void {
         const rand = Math.random();
         if (rand < this.hazardDensity) {
             // map the new rectangle location to the canvas dimensions in pixels
-            const newHazardy = (canvasHeight * rand) / this.hazardDensity;
+            const newHazardy = ((canvas.height + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
             // create a new rectangle
-            this.hazards.push(new HazardRectangle(canvasWidth, newHazardy, 50, 50));
+            this.hazards.push(new HazardRectangle(canvas.width, 
+                newHazardy - HAZ_GEN_INITS.h, 
+                HAZ_GEN_INITS.w, 
+                HAZ_GEN_INITS.h));
         }
     }
-    moveHazards() {
+
+    // moves all hazards to the left and destroys hazards that have moved off screen
+    moveHazards(): void {
         for (let i = this.hazards.length - 1; i >= 0; i--) {
             this.hazards[i].x -= this.hazardSpeed;
             // remove rectangles that have moved off the left side of the canvas
-            if (this.hazards[i].x < 0)
+            if (this.hazards[i].x < -HAZ_GEN_INITS.w)
                 this.hazards.splice(i, 1);
         }
     }
-    detectCollisions(player: Player) {
+
+    // detects collisions between the player and hazard rectangles
+    detectCollisions(player: Player): boolean {
+        if (player.isInvincible) return false;
         for (let hazard of this.hazards) {
-            if ( hazard.x - player.w < player.x
-            && player.x < hazard.x + hazard.w
-            && hazard.y - player.h < player.y
-            && player.y < hazard.y + hazard.h) return true;
+            if (hazard.x < player.x + player.w &&
+            hazard.x + hazard.w > player.x &&
+            hazard.y < player.y + player.h &&
+            hazard.y + hazard.h > player.y
+            ) return true;
         }
         return false;
     }
-    draw(ctx:CanvasRenderingContext2D) {
+
+    // draws all hazards on the canvas
+    draw(ctx:CanvasRenderingContext2D): void {
         ctx.fillStyle = this.COLOUR;
         for (let hazard of this.hazards){
             ctx.fillRect(hazard.x, hazard.y, hazard.w, hazard.h);
         }
+    }
+
+    // updates the difficulty of hazards logarithmically based on the time survived
+    updateDifficulty(numMinutesSurvived: number): void {
+        let difficultyFactor = logBase(numMinutesSurvived + 1, HAZ_GEN_INITS.difficultyLogBase);
+        this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * 2;
+        this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
+    }
+
+    // resets all hazards (clears them)
+    reset(): void {
+        this.hazards = [];
+        this.hazardDensity = HAZ_GEN_INITS.density;
+        this.hazardSpeed = HAZ_GEN_INITS.speed;
     }
 }
