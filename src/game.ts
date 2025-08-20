@@ -2,7 +2,7 @@ import { GameState } from './gameConfig.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { HazardManager } from './hazards.js';
-import { ModifierManager } from './modifiers.js';
+import { ModifierManager } from './modifierManager.js';
 
 export const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
 if (!canvas) throw new Error("Canvas element with id 'gameCanvas' not found.");
