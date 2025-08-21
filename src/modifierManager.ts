@@ -109,6 +109,14 @@ export class ModifierManager {
             MOD_GEN_INITS.ENLARGE_HAZ.fillColour,
             MOD_GEN_INITS.ENLARGE_HAZ.outlineColour
         ));
+        this.modifierGroups.push(new ModifierGroup(
+            MODIFIER_TYPE.EXTRA_LIFE,
+            MOD_GEN_INITS.EXTRA_LIFE.speed,
+            MOD_GEN_INITS.EXTRA_LIFE.density,
+            MOD_GEN_INITS.EXTRA_LIFE.radius,
+            MOD_GEN_INITS.EXTRA_LIFE.fillColour,
+            MOD_GEN_INITS.EXTRA_LIFE.outlineColour
+        ));
     }
 
     // generates new modifiers based on modifier group densities

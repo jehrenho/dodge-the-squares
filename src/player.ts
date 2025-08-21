@@ -131,6 +131,8 @@ export class Player {
     // updates the player's health
     modifyHealth(amount: number): void {
         this.health += amount;
+        // cap health at a maximum
+        if (this.health > PLAYER_INITS.num_lives) this.health = PLAYER_INITS.num_lives;
         this.updateColour();
     }
 

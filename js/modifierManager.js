@@ -43,6 +43,7 @@ export class ModifierManager {
         this.modifierGroups.push(new ModifierGroup(1 /* MODIFIER_TYPE.ICE_RINK */, MOD_GEN_INITS.ICE_RINK.speed, MOD_GEN_INITS.ICE_RINK.density, MOD_GEN_INITS.ICE_RINK.radius, MOD_GEN_INITS.ICE_RINK.fillColour, MOD_GEN_INITS.ICE_RINK.outlineColour));
         this.modifierGroups.push(new ModifierGroup(2 /* MODIFIER_TYPE.SHRINK_HAZ */, MOD_GEN_INITS.SHRINK_HAZ.speed, MOD_GEN_INITS.SHRINK_HAZ.density, MOD_GEN_INITS.SHRINK_HAZ.radius, MOD_GEN_INITS.SHRINK_HAZ.fillColour, MOD_GEN_INITS.SHRINK_HAZ.outlineColour));
         this.modifierGroups.push(new ModifierGroup(3 /* MODIFIER_TYPE.ENLARGE_HAZ */, MOD_GEN_INITS.ENLARGE_HAZ.speed, MOD_GEN_INITS.ENLARGE_HAZ.density, MOD_GEN_INITS.ENLARGE_HAZ.radius, MOD_GEN_INITS.ENLARGE_HAZ.fillColour, MOD_GEN_INITS.ENLARGE_HAZ.outlineColour));
+        this.modifierGroups.push(new ModifierGroup(4 /* MODIFIER_TYPE.EXTRA_LIFE */, MOD_GEN_INITS.EXTRA_LIFE.speed, MOD_GEN_INITS.EXTRA_LIFE.density, MOD_GEN_INITS.EXTRA_LIFE.radius, MOD_GEN_INITS.EXTRA_LIFE.fillColour, MOD_GEN_INITS.EXTRA_LIFE.outlineColour));
     }
     // generates new modifiers based on modifier group densities
     generateNewModifiers() {

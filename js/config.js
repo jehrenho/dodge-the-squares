@@ -61,7 +61,7 @@ export const HAZ_GEN_INITS = {
 // modifier generation constants
 export const MOD_GEN_INITS = {
     INVINCIBILITY: {
-        density: 0.00028, // 0.0008 is a good start
+        density: 0.0003, // 0.0008 is a good start
         speed: 9,
         radius: 25,
         fillColour: "gold",
@@ -87,6 +87,13 @@ export const MOD_GEN_INITS = {
         radius: 100,
         fillColour: "darkred",
         outlineColour: "maroon"
+    },
+    EXTRA_LIFE: {
+        density: 0.0003,
+        speed: 9,
+        radius: 20,
+        fillColour: "lawngreen",
+        outlineColour: "darkgreen"
     }
 };
 // modifier effect constants

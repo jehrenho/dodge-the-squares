@@ -76,6 +76,9 @@ export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, p
         case MODIFIER_TYPE.ENLARGE_HAZ:
             hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
             break;
+        case MODIFIER_TYPE.EXTRA_LIFE:
+            player.modifyHealth(1);
+            break;
     }
     // update the player's abilities based on the new effects
     player.updateEffectsAbilities();
