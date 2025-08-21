@@ -11,8 +11,9 @@ export class Player {
         this.maxSpeed = PLAYER_INITS.maxSpeed;
         this.accel = PLAYER_INITS.Accel;
         this.colour = PLAYER_INITS.fillColour;
-        this.effects = [];
         this.isInvincible = false;
+        this.health = 3;
+        this.effects = [];
     }
     // handles player input and updates it's speed accordingly
     handleInput(input) {
@@ -99,9 +100,9 @@ export class Player {
         this.updateEffectsAbilities();
     }
     // draw the player rectangle on the canvas
-    draw(ctx) {
+    draw(ctx, colour) {
         // Draw the player rectangle's fill colour
-        ctx.fillStyle = this.colour;
+        ctx.fillStyle = colour;
         ctx.fillRect(this.x, this.y, this.w, this.h);
         // Draw border
         ctx.strokeStyle = PLAYER_INITS.borderColour; // Border color
@@ -112,6 +113,14 @@ export class Player {
     setColour(colour) {
         this.colour = colour;
     }
+    // updates the player's health
+    updateHealth(amount) {
+        this.health += amount;
+    }
+    // checks if the player is dead
+    isDead() {
+        return this.health <= 0;
+    }
     // reset the player to the initial state
     reset() {
         this.x = PLAYER_INITS.x;
@@ -120,6 +129,7 @@ export class Player {
         this.h = PLAYER_INITS.h;
         this.xspeed = PLAYER_INITS.xspeed;
         this.yspeed = PLAYER_INITS.yspeed;
+        this.health = 3;
         this.effects = [];
         this.updateEffectsAbilities();
     }

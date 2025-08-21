@@ -8,15 +8,39 @@ import { handleModifierCollisions } from './modifierEffect.js';
 import { HazardManager } from './hazardManager.js';
 
 // represents an individual modifier circle in the game
-class Modifier {
+export class Modifier {
+    modifierType: MODIFIER_TYPE;
     x: number;
     y: number;
     r: number;
+    fillColour: string;
+    borderColour: string;
 
-    constructor(x: number, y: number, r: number, speed: number) {
+    constructor(modifierType: MODIFIER_TYPE, 
+        x: number, 
+        y: number, 
+        r: number, 
+        fillColour: string, 
+        borderColour: string) {
+        this.modifierType = modifierType;
         this.x = x;
         this.y = y;
         this.r = r;
+        this.fillColour = fillColour;
+        this.borderColour = borderColour;
+    }
+
+    // draws the modifier on the canvas
+    draw(ctx: CanvasRenderingContext2D, fillColour: string): void {
+        // Draw fill
+        ctx.fillStyle = fillColour;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+        // Draw outline
+        ctx.strokeStyle = this.borderColour;
+        ctx.lineWidth = 1;
+        ctx.stroke();
     }
 }
 
@@ -96,10 +120,13 @@ export class ModifierManager {
                 // map the new modifier location to the canvas dimensions in pixels
                 const newModifierY = ((GAME_CONFIG.VIRTUAL_HEIGHT + modg.radius) * rand) / modg.density;
                 // create a new modifier just to the right of the canvas boundry
-                modg.modifiers.push(new Modifier(GAME_CONFIG.VIRTUAL_WIDTH + modg.radius, 
+                modg.modifiers.push(new Modifier(modg.modifierType,
+                    GAME_CONFIG.VIRTUAL_WIDTH + modg.radius, 
                     newModifierY - modg.radius, 
                     modg.radius, 
-                    modg.speed));
+                    modg.fillColour,
+                    modg.outlineColour
+                ));
             }   
         }
     }
@@ -124,12 +151,13 @@ export class ModifierManager {
     }
 
     // detects collisions between the player and modifier circles
-    detectModifierCollisions(player: Player, hazardManager: HazardManager): void {
+    detectCollisions(player: Player, hazardManager: HazardManager): Modifier[] {
         let closestX: number = 0;
         let closestY: number = 0;
         let dx: number = 0;
         let dy: number = 0;
         let mod: Modifier;
+        let collisions: Modifier[] = [];
 
         for (let modg of this.modifierGroups) {
             for (let i = modg.modifiers.length - 1; i >= 0; i--) {
@@ -142,28 +170,34 @@ export class ModifierManager {
                 dx = mod.x - closestX;
                 dy = mod.y - closestY;
 
-                // If distance < radius, collision!
-                if ((dx * dx + dy * dy) <= (mod.r * mod.r)) {
-                    handleModifierCollisions(modg.modifierType, player, hazardManager); 
-                    modg.modifiers.splice(i, 1); // destroy the modifier after collision
+                // If distance < radius there is a collision
+                if ((dx * dx + dy * dy) <= (mod.r * mod.r)) { 
+                    //modg.modifiers.splice(i, 1); // destroy the modifier after collision
+                    collisions.push(mod);
                 }
             }
         }
+        return collisions;
     }
 
     // draws all modifiers on the canvas
     drawModifiers(ctx: CanvasRenderingContext2D): void {
         for (let modg of this.modifierGroups) {
             for (let mod of modg.modifiers) {
-                // Draw fill
-                ctx.fillStyle = modg.fillColour;
-                ctx.beginPath();
-                ctx.arc(mod.x, mod.y, mod.r, 0, Math.PI * 2);
-                ctx.fill();
-                // Draw outline
-                ctx.strokeStyle = modg.outlineColour;
-                ctx.lineWidth = 2; // You can adjust the thickness
-                ctx.stroke();
+                mod.draw(ctx, mod.fillColour);
+            }
+        }
+    }
+
+    // destroys modifiers that are currently active
+    destroyModifiers(modifiers: Modifier[]): void {
+        for (let modg of this.modifierGroups) {
+            for (let mod of modifiers) {
+                const index = modg.modifiers.indexOf(mod);
+                if (index !== -1) {
+                    modg.modifiers.splice(index, 1);
+                    break;
+                }
             }
         }
     }

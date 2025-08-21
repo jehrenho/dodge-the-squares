@@ -5,21 +5,34 @@ import { canvas } from './game.js';
 import { Player } from './player.js';
 
 // represents a single hazard rectangle in the game
-class HazardRectangle {
+export class Hazard {
     x: number;
     y: number;
     w: number;
     h: number;
     initw: number;
     inith: number;
+    colour: string;
 
-    constructor(x:number, y:number, w:number, h:number){
+    constructor(x:number, y:number, w:number, h:number, colour: string){
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.initw = HAZ_GEN_INITS.w;
         this.inith = HAZ_GEN_INITS.h;
+        this.colour = colour;
+    }
+
+    draw(ctx: CanvasRenderingContext2D, colour: string) {
+        // Draw the hazard rectangle's fill colour
+        ctx.fillStyle = colour;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+
+        // Draw border
+        ctx.strokeStyle = HAZ_GEN_INITS.borderColour;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
     }
 }
 
@@ -38,7 +51,7 @@ export class HazardManager {
     rateOfSizeFactorChange: number;
     minShrinkFactor: number;
     maxEnlargeFactor: number;
-    hazards: HazardRectangle[];
+    hazards: Hazard[];
 
     constructor () {
         this.hazardSpeed = HAZ_GEN_INITS.speed;
@@ -58,11 +71,12 @@ export class HazardManager {
         if (rand < this.hazardDensity) {
             // map the new rectangle location to the canvas dimensions in pixels
             const newHazardy = ((GAME_CONFIG.VIRTUAL_HEIGHT + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
-            // create a new rectangle
-            this.hazards.push(new HazardRectangle(GAME_CONFIG.VIRTUAL_WIDTH, 
+            // create a new hazard
+            this.hazards.push(new Hazard(GAME_CONFIG.VIRTUAL_WIDTH, 
                 newHazardy - HAZ_GEN_INITS.h, 
                 HAZ_GEN_INITS.w * this.currentSizeFactor, 
-                HAZ_GEN_INITS.h * this.currentSizeFactor));
+                HAZ_GEN_INITS.h * this.currentSizeFactor, 
+                this.colour));
         }
     }
 
@@ -122,30 +136,25 @@ export class HazardManager {
         this.rateOfSizeFactorChange = (this.targetSizeFactor - this.currentSizeFactor) / HAZ_GEN_INITS.sizeModInitTransFrames;
     }
 
-    // detects collisions between the player and hazard rectangles
-    detectCollisions(player: Player): boolean {
-        if (player.isInvincible) return false;
+    // detects collisions between the player and hazards
+    detectCollisions(player: Player): Hazard[] {
+        if (player.isInvincible) return [];
+        let collisions: Hazard[] = [];
         for (let hazard of this.hazards) {
             if (hazard.x < player.x + player.w &&
             hazard.x + hazard.w > player.x &&
             hazard.y < player.y + player.h &&
             hazard.y + hazard.h > player.y
-            ) return true;
+            ) collisions.push(hazard);
         }
-        return false;
+        return collisions;
     }
 
     // draws all hazards on the canvas
     draw(ctx:CanvasRenderingContext2D): void {
         ctx.fillStyle = this.colour;
         for (let hazard of this.hazards){
-            // Draw the hazard rectangle's fill colour
-            ctx.fillRect(hazard.x, hazard.y, hazard.w, hazard.h);
-
-            // Draw border
-            ctx.strokeStyle = HAZ_GEN_INITS.borderColour;
-            ctx.lineWidth = 1;
-            ctx.strokeRect(hazard.x, hazard.y, hazard.w, hazard.h);
+            hazard.draw(ctx, this.colour);
         }
     }
 

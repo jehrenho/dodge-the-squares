@@ -7,7 +7,10 @@ export const GAME_CONFIG = {
     menuFont: "25px Arial",
     statusBarFont: "25px Arial",
     VIRTUAL_WIDTH: 1912,
-    VIRTUAL_HEIGHT: 954
+    VIRTUAL_HEIGHT: 954,
+    collisionFlashColour: "white",
+    flashingFramesDuration: 30,
+    framesPerFlash: 4
 };
 // input event types
 export var InputEventType;

@@ -31,7 +31,6 @@ export class IceRinkEffect extends ModifierEffect {
     }
 }
 // handles logic for applying and resolving modifier effect collisions
-// IN DEV.
 export function handleModifierCollisions(contactedModifierType, player, hazardManager) {
     // see if the new effect is already active
     for (let effect of player.effects) {
