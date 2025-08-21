@@ -38,9 +38,12 @@ export const PLAYER_INITS = {
     xspeed: 0,
     yspeed: 0,
     maxSpeed: 7.0,
-    Accel: 0.25,
-    fillColour: "green",
-    borderColour: "black"
+    accel: 0.25,
+    health3Colour: "green",
+    health2Colour: "olive",
+    health1Colour: "saddlebrown",
+    borderColour: "black",
+    num_lives: 3
 };
 // hazard generation constants
 export const HAZ_GEN_INITS = {

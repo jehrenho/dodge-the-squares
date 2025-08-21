@@ -1,10 +1,11 @@
 import { GAME_CONFIG } from './config.js';
 import { drawGameElements } from './game.js';
 // handles the flashing of game objects upon collisions
-export class Flasher {
-    constructor(player, gameState, modifierManager) {
+export class CollisionFlasher {
+    constructor(player, gameState, hazardManager, modifierManager) {
         this.player = player;
         this.gameState = gameState;
+        this.hazardManager = hazardManager;
         this.modifierManager = modifierManager;
         this.hazards = [];
         this.modifiers = [];
@@ -72,10 +73,11 @@ export class Flasher {
         else {
             // exit the COLLISION_FLASH state and continue with the game
             if (this.player.isDead())
-                this.gameState.setStatus(3 /* GameStatus.GAMEOVER */);
+                this.gameState.setPhase(3 /* GamePhase.GAMEOVER */);
             else {
-                this.gameState.setStatus(1 /* GameStatus.INGAME */);
+                this.gameState.setPhase(1 /* GamePhase.INGAME */);
                 this.modifierManager.destroyModifiers(this.modifiers);
+                this.hazardManager.destroyHazards(this.hazards);
             }
             this.reset();
         }

@@ -165,6 +165,19 @@ export class HazardManager {
         this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
     }
 
+    // destroys active hazards
+    destroyHazards(inputHazards: Hazard[]) {
+        for (let haz of this.hazards) {
+            for (let inputHaz of inputHazards) {
+                if (haz === inputHaz) {
+                    // remove the hazard from the hazards array
+                    this.hazards.splice(this.hazards.indexOf(haz), 1);
+                    break;
+                }
+            }
+        }
+    }
+
     // resets all hazards (clears them)
     reset(): void {
         this.hazardSpeed = HAZ_GEN_INITS.speed;

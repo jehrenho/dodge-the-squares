@@ -30,10 +30,10 @@ export class Player {
         this.xspeed = PLAYER_INITS.xspeed;
         this.yspeed = PLAYER_INITS.yspeed;
         this.maxSpeed = PLAYER_INITS.maxSpeed;
-        this.accel = PLAYER_INITS.Accel;
-        this.colour = PLAYER_INITS.fillColour;
+        this.accel = PLAYER_INITS.accel;
+        this.colour = PLAYER_INITS.health3Colour;
         this.isInvincible = false;
-        this.health = 3;
+        this.health = PLAYER_INITS.num_lives;
         this.effects = [];
     }
 
@@ -90,8 +90,8 @@ export class Player {
     // updated the player's abilities based on the currently active effects
     updateEffectsAbilities(): void {
         this.isInvincible = false;
-        this.colour = PLAYER_INITS.fillColour;
-        this.accel = PLAYER_INITS.Accel;
+        this.updateColour();
+        this.accel = PLAYER_INITS.accel;
 
         for (let effect of this.effects) {
             if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
@@ -117,6 +117,28 @@ export class Player {
         this.updateEffectsAbilities();
     }
 
+    // set the player colour
+    updateColour() {
+        if (this.health >= 3) {
+            this.colour = PLAYER_INITS.health3Colour;
+        } else if (this.health === 2) {
+            this.colour = PLAYER_INITS.health2Colour;
+        } else {
+            this.colour = PLAYER_INITS.health1Colour;
+        }
+    }
+
+    // updates the player's health
+    modifyHealth(amount: number): void {
+        this.health += amount;
+        this.updateColour();
+    }
+
+    // checks if the player is dead
+    isDead(): boolean {
+        return this.health <= 0;
+    }
+
     // draw the player rectangle on the canvas
     draw(ctx: CanvasRenderingContext2D, colour: string): void {
         // Draw the player rectangle's fill colour
@@ -124,24 +146,9 @@ export class Player {
         ctx.fillRect(this.x, this.y, this.w, this.h);
 
         // Draw border
-        ctx.strokeStyle = PLAYER_INITS.borderColour;        // Border color
-        ctx.lineWidth = 1;                // Border thickness
+        ctx.strokeStyle = PLAYER_INITS.borderColour;
+        ctx.lineWidth = 1;
         ctx.strokeRect(this.x, this.y, this.w, this.h);
-    }
-
-    // set the player colour
-    setColour(colour: string): void {
-        this.colour = colour;
-    }
-
-    // updates the player's health
-    updateHealth(amount: number): void {
-        this.health += amount;
-    }
-
-    // checks if the player is dead
-    isDead(): boolean {
-        return this.health <= 0;
     }
 
     // reset the player to the initial state

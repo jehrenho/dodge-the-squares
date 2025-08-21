@@ -1,13 +1,14 @@
-import { GameStatus, GAME_CONFIG } from './config.js';
+import { GamePhase  , GAME_CONFIG } from './config.js';
 import { Player } from './player.js';
-import { Hazard } from './hazardManager.js';
+import { Hazard, HazardManager } from './hazardManager.js';
 import { Modifier, ModifierManager } from './modifierManager.js';
 import { GameState, drawGameElements } from './game.js';
 
 // handles the flashing of game objects upon collisions
-export class Flasher {
+export class CollisionFlasher {
   player: Player;
   gameState: GameState;
+  hazardManager: HazardManager;
   modifierManager: ModifierManager;
   hazards: Hazard[];
   modifiers: Modifier[];
@@ -16,9 +17,13 @@ export class Flasher {
   flashColour: string;
   isFlashOnNow: boolean;
 
-  constructor(player: Player, gameState: GameState, modifierManager: ModifierManager) {
+  constructor(player: Player, 
+    gameState: GameState, 
+    hazardManager: HazardManager, 
+    modifierManager: ModifierManager) {
     this.player = player;
     this.gameState = gameState;
+    this.hazardManager = hazardManager;
     this.modifierManager = modifierManager;
     this.hazards = [];
     this.modifiers = [];
@@ -86,10 +91,11 @@ export class Flasher {
       this.framesRemainingThisFlash--;
     } else {
       // exit the COLLISION_FLASH state and continue with the game
-      if (this.player.isDead()) this.gameState.setStatus(GameStatus.GAMEOVER);
+      if (this.player.isDead()) this.gameState.setPhase(GamePhase.GAMEOVER);
       else {
-        this.gameState.setStatus(GameStatus.INGAME);
+        this.gameState.setPhase(GamePhase.INGAME);
         this.modifierManager.destroyModifiers(this.modifiers);
+        this.hazardManager.destroyHazards(this.hazards);
       }
       this.reset();
     }

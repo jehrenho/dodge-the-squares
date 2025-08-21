@@ -1,10 +1,10 @@
-import { GameStatus, GAME_CONFIG } from './config.js';
+import { GamePhase, GAME_CONFIG } from './config.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { HazardManager, Hazard } from './hazardManager.js';
 import { ModifierManager, Modifier } from './modifierManager.js';
 import { handleModifierCollisions } from './modifierEffect.js';
-import { Flasher } from './flasher.js';
+import { CollisionFlasher } from './collisionFlasher.js';
 
 export const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
 if (!canvas) throw new Error("Canvas element with id 'gameCanvas' not found.");
@@ -17,13 +17,13 @@ export class GameState {
   numFramesThisGame: number;
   numSecondsSurvived: number;
   numMinutesSurvived: number;
-  status: GameStatus;
+  phase: GamePhase;
 
   constructor () {
     this.numFramesThisGame = 0;
     this.numSecondsSurvived = 0;
     this.numMinutesSurvived = 0;
-    this.status = GameStatus.MENU;
+    this.phase = GamePhase.MENU;
   }
 
   // increments the frame count and updates the time survived
@@ -51,14 +51,14 @@ export class GameState {
     }
   }
 
-  // returns the current game status
-  getStatus(): GameStatus {
-    return this.status;
+  // returns the current game phase
+  getPhase(): GamePhase {
+    return this.phase;
   }
 
-  // sets the current game status
-  setStatus(status: GameStatus): void {
-    this.status = status;
+  // sets the current game phase
+  setPhase(phase: GamePhase): void {
+    this.phase = phase;
   }
 
   // resets the game timer
@@ -98,7 +98,7 @@ function drawMenu(): void {
   ctx.font = GAME_CONFIG.menuFont;
   ctx.fillText("Press Enter to Start", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 100, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
 
-  if (inputManager.isEnterPressedAndReleased()) gameState.setStatus(GameStatus.INGAME);
+  if (inputManager.isEnterPressedAndReleased()) gameState.setPhase(GamePhase.INGAME);
 }
 
 // draws the game
@@ -112,8 +112,8 @@ function drawGame(): void {
   let modifierCollisions: Modifier[] = modifierManager.detectCollisions(player, hazardManager);
   if (modifierCollisions.length > 0) {
     // player touched a modifier
-    gameState.setStatus(GameStatus.COLLISION_FLASH);
-    flasher.setModifiers(modifierCollisions);
+    gameState.setPhase(GamePhase.COLLISION_FLASH);
+    collisionFlasher.setModifiers(modifierCollisions);
     for (const mod of modifierCollisions) {
       handleModifierCollisions(mod.modifierType, player, hazardManager);
     }
@@ -124,9 +124,9 @@ function drawGame(): void {
   let hazardCollisions: Hazard[] = hazardManager.detectCollisions(player);
   if(hazardCollisions.length > 0) {
     // player touched a hazard
-    gameState.setStatus(GameStatus.COLLISION_FLASH);
-    flasher.setHazards(hazardCollisions);
-    player.updateHealth(-1);
+    gameState.setPhase(GamePhase.COLLISION_FLASH);
+    collisionFlasher.setHazards(hazardCollisions);
+    player.modifyHealth(-1);
   }
 
   drawGameElements();
@@ -148,7 +148,7 @@ function drawGameOver(): void {
 
   // listen for Enter key to continue to menu
   if (inputManager.isEnterPressedAndReleased()) {
-    gameState.setStatus(GameStatus.MENU);
+    gameState.setPhase(GamePhase.MENU);
     gameState.reset();
     player.reset();
     hazardManager.reset();
@@ -165,13 +165,13 @@ function gameLoop(): void {
   ctx.save();
   ctx.scale(windowScaleX, windowScaleY);
   // draw the game
-  if (gameState.getStatus() === GameStatus.MENU) {
+  if (gameState.getPhase() === GamePhase.MENU) {
       drawMenu();
-  } else if (gameState.getStatus() === GameStatus.INGAME) {
+  } else if (gameState.getPhase() === GamePhase.INGAME) {
       drawGame();
-  } else if (gameState.getStatus() === GameStatus.COLLISION_FLASH) {
-      flasher.draw(ctx);
-  } else if (gameState.getStatus() === GameStatus.GAMEOVER) {
+  } else if (gameState.getPhase() === GamePhase.COLLISION_FLASH) {
+      collisionFlasher.draw(ctx);
+  } else if (gameState.getPhase() === GamePhase.GAMEOVER) {
       drawGameOver();
   }
   ctx.restore();
@@ -189,7 +189,7 @@ const hazardManager = new HazardManager();
 const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
 const gameState = new GameState();
-const flasher = new Flasher(player, gameState, modifierManager);
+const collisionFlasher = new CollisionFlasher(player, gameState, hazardManager, modifierManager);
 
 // start tracking keyboard input
 inputManager.startListening();
