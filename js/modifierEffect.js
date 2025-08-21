@@ -31,7 +31,6 @@ export class IceRinkEffect extends ModifierEffect {
     }
 }
 // handles logic for applying and resolving modifier effect collisions
-// IN DEV.
 export function handleModifierCollisions(contactedModifierType, player, hazardManager) {
     // see if the new effect is already active
     for (let effect of player.effects) {
@@ -68,6 +67,9 @@ export function handleModifierCollisions(contactedModifierType, player, hazardMa
             break;
         case 3 /* MODIFIER_TYPE.ENLARGE_HAZ */:
             hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
+            break;
+        case 4 /* MODIFIER_TYPE.EXTRA_LIFE */:
+            player.modifyHealth(1);
             break;
     }
     // update the player's abilities based on the new effects

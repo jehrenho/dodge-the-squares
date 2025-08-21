@@ -7,7 +7,10 @@ export const GAME_CONFIG = {
     menuFont: "25px Arial",
     statusBarFont: "25px Arial",
     VIRTUAL_WIDTH: 1912,
-    VIRTUAL_HEIGHT: 954
+    VIRTUAL_HEIGHT: 954,
+    collisionFlashColour: "white",
+    flashingFramesDuration: 30,
+    framesPerFlash: 4
 };
 // input event types
 export var InputEventType;
@@ -35,9 +38,12 @@ export const PLAYER_INITS = {
     xspeed: 0,
     yspeed: 0,
     maxSpeed: 7.0,
-    Accel: 0.25,
-    fillColour: "green",
-    borderColour: "black"
+    accel: 0.25,
+    health3Colour: "green",
+    health2Colour: "olive",
+    health1Colour: "saddlebrown",
+    borderColour: "black",
+    num_lives: 3
 };
 // hazard generation constants
 export const HAZ_GEN_INITS = {
@@ -55,7 +61,7 @@ export const HAZ_GEN_INITS = {
 // modifier generation constants
 export const MOD_GEN_INITS = {
     INVINCIBILITY: {
-        density: 0.00028, // 0.0008 is a good start
+        density: 0.00037, // 0.0008 is a good start
         speed: 9,
         radius: 25,
         fillColour: "gold",
@@ -81,6 +87,13 @@ export const MOD_GEN_INITS = {
         radius: 100,
         fillColour: "darkred",
         outlineColour: "maroon"
+    },
+    EXTRA_LIFE: {
+        density: 0.00037,
+        speed: 10,
+        radius: 20,
+        fillColour: "lawngreen",
+        outlineColour: "darkgreen"
     }
 };
 // modifier effect constants

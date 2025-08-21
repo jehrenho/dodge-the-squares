@@ -40,9 +40,7 @@ export class IceRinkEffect extends ModifierEffect {
 }
 
 // handles logic for applying and resolving modifier effect collisions
-// IN DEV.
 export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, player: Player, hazardManager: HazardManager): void {
-    
     // see if the new effect is already active
     for (let effect of player.effects) {
         if (effect.type === contactedModifierType) {
@@ -52,12 +50,10 @@ export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, p
             return;
         }
     }
-
     // return if there are any active effects that are incompatible with the new effect
     if (player.isInvincible) return;
-
     // destroy any existing effects that are incompatible with the new effect
-   if (contactedModifierType === MODIFIER_TYPE.INVINCIBILITY) {
+    if (contactedModifierType === MODIFIER_TYPE.INVINCIBILITY) {
         // invincibility deactivates ice rink
         for (let i = player.effects.length - 1; i >= 0; i--) {
             if (player.effects[i].type != MODIFIER_TYPE.INVINCIBILITY) {
@@ -66,7 +62,6 @@ export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, p
             }
         }
     }
-
     // add the new effect to the player's effects
     switch (contactedModifierType) {
         case MODIFIER_TYPE.INVINCIBILITY:
@@ -81,8 +76,10 @@ export function handleModifierCollisions(contactedModifierType: MODIFIER_TYPE, p
         case MODIFIER_TYPE.ENLARGE_HAZ:
             hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
             break;
+        case MODIFIER_TYPE.EXTRA_LIFE:
+            player.modifyHealth(1);
+            break;
     }
-
     // update the player's abilities based on the new effects
     player.updateEffectsAbilities();
 }

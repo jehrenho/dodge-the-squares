@@ -20,6 +20,7 @@ export class Player {
     colour: string;
     effects: ModifierEffect[]; // array of active modifier effects
     isInvincible: boolean;
+    health: number;
 
     constructor() {
         this.x = PLAYER_INITS.x;
@@ -29,10 +30,11 @@ export class Player {
         this.xspeed = PLAYER_INITS.xspeed;
         this.yspeed = PLAYER_INITS.yspeed;
         this.maxSpeed = PLAYER_INITS.maxSpeed;
-        this.accel = PLAYER_INITS.Accel;
-        this.colour = PLAYER_INITS.fillColour;
-        this.effects = [];
+        this.accel = PLAYER_INITS.accel;
+        this.colour = PLAYER_INITS.health3Colour;
         this.isInvincible = false;
+        this.health = PLAYER_INITS.num_lives;
+        this.effects = [];
     }
 
     // handles player input and updates it's speed accordingly
@@ -88,8 +90,8 @@ export class Player {
     // updated the player's abilities based on the currently active effects
     updateEffectsAbilities(): void {
         this.isInvincible = false;
-        this.colour = PLAYER_INITS.fillColour;
-        this.accel = PLAYER_INITS.Accel;
+        this.updateColour();
+        this.accel = PLAYER_INITS.accel;
 
         for (let effect of this.effects) {
             if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
@@ -115,21 +117,40 @@ export class Player {
         this.updateEffectsAbilities();
     }
 
+    // set the player colour
+    updateColour() {
+        if (this.health >= 3) {
+            this.colour = PLAYER_INITS.health3Colour;
+        } else if (this.health === 2) {
+            this.colour = PLAYER_INITS.health2Colour;
+        } else {
+            this.colour = PLAYER_INITS.health1Colour;
+        }
+    }
+
+    // updates the player's health
+    modifyHealth(amount: number): void {
+        this.health += amount;
+        // cap health at a maximum
+        if (this.health > PLAYER_INITS.num_lives) this.health = PLAYER_INITS.num_lives;
+        this.updateColour();
+    }
+
+    // checks if the player is dead
+    isDead(): boolean {
+        return this.health <= 0;
+    }
+
     // draw the player rectangle on the canvas
-    draw(ctx: CanvasRenderingContext2D): void {
+    draw(ctx: CanvasRenderingContext2D, colour: string): void {
         // Draw the player rectangle's fill colour
-        ctx.fillStyle = this.colour;
+        ctx.fillStyle = colour;
         ctx.fillRect(this.x, this.y, this.w, this.h);
 
         // Draw border
-        ctx.strokeStyle = PLAYER_INITS.borderColour;        // Border color
-        ctx.lineWidth = 1;                // Border thickness
+        ctx.strokeStyle = PLAYER_INITS.borderColour;
+        ctx.lineWidth = 1;
         ctx.strokeRect(this.x, this.y, this.w, this.h);
-    }
-
-    // set the player colour
-    setColour(colour: string): void {
-        this.colour = colour;
     }
 
     // reset the player to the initial state
@@ -140,6 +161,7 @@ export class Player {
         this.h = PLAYER_INITS.h;
         this.xspeed = PLAYER_INITS.xspeed;
         this.yspeed = PLAYER_INITS.yspeed;
+        this.health = 3;
         this.effects = [];
         this.updateEffectsAbilities();
     }
