@@ -10,6 +10,12 @@ export class Hazard {
         this.inith = HAZ_GEN_INITS.h;
         this.colour = colour;
     }
+    // sets the hazards position
+    setPositionByCentre(x, y) {
+        this.x = x - this.w / 2;
+        this.y = y - this.h / 2;
+    }
+    // draws the hazard on the canvas
     draw(ctx, colour) {
         // Draw the hazard rectangle's fill colour
         ctx.fillStyle = colour;
@@ -37,6 +43,12 @@ export class HazardManager {
         this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
         this.hazards = [];
     }
+    // creates a new hazard given it's center position
+    createHazard(x, y, w, h, colour) {
+        const hazard = new Hazard(x, y, w, h, colour);
+        this.hazards.push(hazard);
+        return hazard;
+    }
     // generates new hazards based on the hazard density
     generateNewHazards() {
         const rand = Math.random();
@@ -44,7 +56,7 @@ export class HazardManager {
             // map the new rectangle location to the canvas dimensions in pixels
             const newHazardy = ((GAME_CONFIG.VIRTUAL_HEIGHT + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
             // create a new hazard
-            this.hazards.push(new Hazard(GAME_CONFIG.VIRTUAL_WIDTH, newHazardy - HAZ_GEN_INITS.h, HAZ_GEN_INITS.w * this.currentSizeFactor, HAZ_GEN_INITS.h * this.currentSizeFactor, this.colour));
+            this.createHazard(GAME_CONFIG.VIRTUAL_WIDTH, newHazardy - HAZ_GEN_INITS.h, HAZ_GEN_INITS.w * this.currentSizeFactor, HAZ_GEN_INITS.h * this.currentSizeFactor, this.colour);
         }
     }
     // moves all hazards to the left, destroys hazards that have moved off screen, and sets their size

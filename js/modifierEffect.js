@@ -13,7 +13,7 @@ export class ModifierEffect {
 // Invincibility effect class
 export class InvincibilityEffect extends ModifierEffect {
     constructor(player) {
-        super(player, 0 /* MODIFIER_TYPE.INVINCIBILITY */);
+        super(player, "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */);
         this.resetEffectTimer();
     }
     resetEffectTimer() {
@@ -23,7 +23,7 @@ export class InvincibilityEffect extends ModifierEffect {
 // Ice Rink effect class
 export class IceRinkEffect extends ModifierEffect {
     constructor(player) {
-        super(player, 1 /* MODIFIER_TYPE.ICE_RINK */);
+        super(player, "ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */);
         this.resetEffectTimer();
     }
     resetEffectTimer() {
@@ -45,10 +45,10 @@ export function handleModifierCollisions(contactedModifierType, player, hazardMa
     if (player.isInvincible)
         return;
     // destroy any existing effects that are incompatible with the new effect
-    if (contactedModifierType === 0 /* MODIFIER_TYPE.INVINCIBILITY */) {
+    if (contactedModifierType === "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */) {
         // invincibility deactivates ice rink
         for (let i = player.effects.length - 1; i >= 0; i--) {
-            if (player.effects[i].type != 0 /* MODIFIER_TYPE.INVINCIBILITY */) {
+            if (player.effects[i].type != "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */) {
                 player.effects.splice(i, 1);
                 break;
             }
@@ -56,19 +56,19 @@ export function handleModifierCollisions(contactedModifierType, player, hazardMa
     }
     // add the new effect to the player's effects
     switch (contactedModifierType) {
-        case 0 /* MODIFIER_TYPE.INVINCIBILITY */:
+        case "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */:
             player.effects.push(new InvincibilityEffect(player));
             break;
-        case 1 /* MODIFIER_TYPE.ICE_RINK */:
+        case "ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */:
             player.effects.push(new IceRinkEffect(player));
             break;
-        case 2 /* MODIFIER_TYPE.SHRINK_HAZ */:
+        case "SHRINK_HAZ" /* MODIFIER_TYPE.SHRINK_HAZ */:
             hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor);
             break;
-        case 3 /* MODIFIER_TYPE.ENLARGE_HAZ */:
+        case "ENLARGE_HAZ" /* MODIFIER_TYPE.ENLARGE_HAZ */:
             hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
             break;
-        case 4 /* MODIFIER_TYPE.EXTRA_LIFE */:
+        case "EXTRA_LIFE" /* MODIFIER_TYPE.EXTRA_LIFE */:
             player.modifyHealth(1);
             break;
     }

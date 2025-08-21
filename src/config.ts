@@ -68,16 +68,16 @@ export const HAZ_GEN_INITS = {
 
 // modifier type constants
 export const enum MODIFIER_TYPE {
-    INVINCIBILITY,
-    ICE_RINK,
-    SHRINK_HAZ,
-    ENLARGE_HAZ,
-    EXTRA_LIFE
+    INVINCIBILITY = "INVINCIBILITY",
+    ICE_RINK = "ICE_RINK",
+    SHRINK_HAZ = "SHRINK_HAZ",
+    ENLARGE_HAZ = "ENLARGE_HAZ",
+    EXTRA_LIFE = "EXTRA_LIFE"
 };
 
 // modifier generation constants
 export const MOD_GEN_INITS = {
-    INVINCIBILITY: {
+    [MODIFIER_TYPE.INVINCIBILITY]: {
         density: 0.00037, // 0.0008 is a good start
         speed: 9,
         radius: 25,
@@ -85,7 +85,7 @@ export const MOD_GEN_INITS = {
         outlineColour: "yellow",
         description: "Grants temporary invincibility"
     },
-    ICE_RINK: {
+    [MODIFIER_TYPE.ICE_RINK]: {
         density: 0.0065,
         speed: 5,
         radius: 80,
@@ -93,7 +93,7 @@ export const MOD_GEN_INITS = {
         outlineColour: "skyblue",
         description: "Creates a slippery ice rink"
     },
-    SHRINK_HAZ: {
+    [MODIFIER_TYPE.SHRINK_HAZ]: {
         density: 0.002,
         speed: 6.0,
         radius: 30,
@@ -101,7 +101,7 @@ export const MOD_GEN_INITS = {
         outlineColour: "indianred",
         description: "Shrinks hazards"
     },
-    ENLARGE_HAZ: {
+    [MODIFIER_TYPE.ENLARGE_HAZ]: {
         density: 0.006,
         speed: 4,
         radius: 100,
@@ -109,7 +109,7 @@ export const MOD_GEN_INITS = {
         outlineColour: "maroon",
         description: "Enlarges hazards"
     },
-    EXTRA_LIFE: {
+    [MODIFIER_TYPE.EXTRA_LIFE]: {
         density: 0.00037,
         speed: 10,
         radius: 20,

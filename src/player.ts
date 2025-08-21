@@ -23,8 +23,8 @@ export class Player {
     health: number;
 
     constructor() {
-        this.x = PLAYER_INITS.x;
-        this.y = PLAYER_INITS.y;
+        this.x = 0;
+        this.y = 0;
         this.w = PLAYER_INITS.w;
         this.h = PLAYER_INITS.h;
         this.xspeed = PLAYER_INITS.xspeed;
@@ -139,6 +139,12 @@ export class Player {
     // checks if the player is dead
     isDead(): boolean {
         return this.health <= 0;
+    }
+
+    // sets the player position
+    setPositionByCentre(x: number, y: number): void {
+        this.x = x - this.w / 2;
+        this.y = y - this.h / 2;
     }
 
     // draw the player rectangle on the canvas

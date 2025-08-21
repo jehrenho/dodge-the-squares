@@ -57,7 +57,7 @@ export class GameState {
     }
 }
 // draws the game background
-function drawBackground() {
+export function drawBackground() {
     ctx.fillStyle = GAME_CONFIG.backgroundColour;
     ctx.fillRect(0, 0, GAME_CONFIG.VIRTUAL_WIDTH, GAME_CONFIG.VIRTUAL_HEIGHT);
 }
@@ -108,7 +108,7 @@ function drawGame() {
 }
 // draws the game over screen
 function drawGameOver() {
-    // print the game over screen
+    drawBackground();
     ctx.fillStyle = GAME_CONFIG.gameOverFontColour;
     ctx.font = GAME_CONFIG.menuFont;
     ctx.fillText("Game Over", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
@@ -121,6 +121,7 @@ function drawGameOver() {
         player.reset();
         hazardManager.reset();
         modifierManager.reset();
+        Menu.reset();
     }
     ;
 }
@@ -134,8 +135,10 @@ function gameLoop() {
     ctx.scale(windowScaleX, windowScaleY);
     // draw the game
     if (gameState.getPhase() === 0 /* GamePhase.MENU */) {
-        drawBackground();
-        Menu.draw(ctx, player, inputManager, gameState);
+        Menu.draw(ctx);
+        // start the game when Enter is pressed
+        if (inputManager.isEnterPressedAndReleased())
+            gameState.setPhase(1 /* GamePhase.INGAME */);
     }
     else if (gameState.getPhase() === 1 /* GamePhase.INGAME */) {
         drawGame();
@@ -160,7 +163,7 @@ const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
 const gameState = new GameState();
 const collisionFlasher = new CollisionFlasher(player, gameState, hazardManager, modifierManager);
-Menu.init(player, hazardManager);
+Menu.init(player, hazardManager, modifierManager);
 // start tracking keyboard input
 inputManager.startListening();
 // start the game loop

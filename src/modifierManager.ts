@@ -119,6 +119,15 @@ export class ModifierManager {
         ));
     }
 
+    // creates modifiers and add's them to the correct modifier group
+    createModifier(type: MODIFIER_TYPE, x: number, y: number): void {
+        const modGroup = this.modifierGroups.find(group => group.modifierType === type);
+        if (modGroup) {
+            const newModifier = new Modifier(type, x, y, modGroup.radius, modGroup.fillColour, modGroup.outlineColour);
+            modGroup.modifiers.push(newModifier);
+        }
+    }
+   
     // generates new modifiers based on modifier group densities
     generateNewModifiers(): void {
         let rand: number = 0;
