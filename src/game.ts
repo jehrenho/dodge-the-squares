@@ -1,4 +1,4 @@
-import { GamePhase, GAME_CONFIG, MODIFIER_TYPE, MOD_GEN_INITS } from './config.js';
+import { GamePhase, GAME_CONFIG } from './config.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { HazardManager, Hazard } from './hazardManager.js';
