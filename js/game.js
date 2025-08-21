@@ -5,6 +5,7 @@ import { HazardManager } from './hazardManager.js';
 import { ModifierManager } from './modifierManager.js';
 import { handleModifierCollisions } from './modifierEffect.js';
 import { CollisionFlasher } from './collisionFlasher.js';
+import { Menu } from './menu.js';
 export const canvas = document.getElementById("gameCanvas");
 if (!canvas)
     throw new Error("Canvas element with id 'gameCanvas' not found.");
@@ -56,7 +57,7 @@ export class GameState {
     }
 }
 // draws the game background
-function drawBackground() {
+export function drawBackground() {
     ctx.fillStyle = GAME_CONFIG.backgroundColour;
     ctx.fillRect(0, 0, GAME_CONFIG.VIRTUAL_WIDTH, GAME_CONFIG.VIRTUAL_HEIGHT);
 }
@@ -74,14 +75,6 @@ export function drawGameElements() {
     hazardManager.draw(ctx);
     player.draw(ctx, player.colour);
     drawInGameText();
-}
-// draws the menu
-function drawMenu() {
-    ctx.fillStyle = GAME_CONFIG.fontColour;
-    ctx.font = GAME_CONFIG.menuFont;
-    ctx.fillText("Press Enter to Start", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 100, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
-    if (inputManager.isEnterPressedAndReleased())
-        gameState.setPhase(1 /* GamePhase.INGAME */);
 }
 // draws the game
 function drawGame() {
@@ -115,7 +108,7 @@ function drawGame() {
 }
 // draws the game over screen
 function drawGameOver() {
-    // print the game over screen
+    drawBackground();
     ctx.fillStyle = GAME_CONFIG.gameOverFontColour;
     ctx.font = GAME_CONFIG.menuFont;
     ctx.fillText("Game Over", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
@@ -128,6 +121,7 @@ function drawGameOver() {
         player.reset();
         hazardManager.reset();
         modifierManager.reset();
+        Menu.reset();
     }
     ;
 }
@@ -141,7 +135,10 @@ function gameLoop() {
     ctx.scale(windowScaleX, windowScaleY);
     // draw the game
     if (gameState.getPhase() === 0 /* GamePhase.MENU */) {
-        drawMenu();
+        Menu.draw(ctx);
+        // start the game when Enter is pressed
+        if (inputManager.isEnterPressedAndReleased())
+            gameState.setPhase(1 /* GamePhase.INGAME */);
     }
     else if (gameState.getPhase() === 1 /* GamePhase.INGAME */) {
         drawGame();
@@ -159,13 +156,14 @@ function gameLoop() {
 // initialize canvas size
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-// create instances of the game objects
+// create and initialize all game objects
 const player = new Player();
 const hazardManager = new HazardManager();
 const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
 const gameState = new GameState();
 const collisionFlasher = new CollisionFlasher(player, gameState, hazardManager, modifierManager);
+Menu.init(player, hazardManager, modifierManager);
 // start tracking keyboard input
 inputManager.startListening();
 // start the game loop

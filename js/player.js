@@ -2,8 +2,8 @@ import { GAME_CONFIG, Keys, PLAYER_INITS, MOD_EFFECT_CONFIG } from './config.js'
 // represents the player square and it's state
 export class Player {
     constructor() {
-        this.x = PLAYER_INITS.x;
-        this.y = PLAYER_INITS.y;
+        this.x = 0;
+        this.y = 0;
         this.w = PLAYER_INITS.w;
         this.h = PLAYER_INITS.h;
         this.xspeed = PLAYER_INITS.xspeed;
@@ -77,11 +77,11 @@ export class Player {
         this.updateColour();
         this.accel = PLAYER_INITS.accel;
         for (let effect of this.effects) {
-            if (effect.type === 0 /* MODIFIER_TYPE.INVINCIBILITY */) {
+            if (effect.type === "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */) {
                 this.isInvincible = true;
                 this.colour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
             }
-            else if (effect.type === 1 /* MODIFIER_TYPE.ICE_RINK */) {
+            else if (effect.type === "ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */) {
                 this.colour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
                 this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
             }
@@ -122,6 +122,11 @@ export class Player {
     // checks if the player is dead
     isDead() {
         return this.health <= 0;
+    }
+    // sets the player position
+    setPositionByCentre(x, y) {
+        this.x = x - this.w / 2;
+        this.y = y - this.h / 2;
     }
     // draw the player rectangle on the canvas
     draw(ctx, colour) {

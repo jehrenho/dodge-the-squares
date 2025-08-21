@@ -39,11 +39,19 @@ export class ModifierManager {
     // initializes all modifier groups
     constructor() {
         this.modifierGroups = [];
-        this.modifierGroups.push(new ModifierGroup(0 /* MODIFIER_TYPE.INVINCIBILITY */, MOD_GEN_INITS.INVINCIBILITY.speed, MOD_GEN_INITS.INVINCIBILITY.density, MOD_GEN_INITS.INVINCIBILITY.radius, MOD_GEN_INITS.INVINCIBILITY.fillColour, MOD_GEN_INITS.INVINCIBILITY.outlineColour));
-        this.modifierGroups.push(new ModifierGroup(1 /* MODIFIER_TYPE.ICE_RINK */, MOD_GEN_INITS.ICE_RINK.speed, MOD_GEN_INITS.ICE_RINK.density, MOD_GEN_INITS.ICE_RINK.radius, MOD_GEN_INITS.ICE_RINK.fillColour, MOD_GEN_INITS.ICE_RINK.outlineColour));
-        this.modifierGroups.push(new ModifierGroup(2 /* MODIFIER_TYPE.SHRINK_HAZ */, MOD_GEN_INITS.SHRINK_HAZ.speed, MOD_GEN_INITS.SHRINK_HAZ.density, MOD_GEN_INITS.SHRINK_HAZ.radius, MOD_GEN_INITS.SHRINK_HAZ.fillColour, MOD_GEN_INITS.SHRINK_HAZ.outlineColour));
-        this.modifierGroups.push(new ModifierGroup(3 /* MODIFIER_TYPE.ENLARGE_HAZ */, MOD_GEN_INITS.ENLARGE_HAZ.speed, MOD_GEN_INITS.ENLARGE_HAZ.density, MOD_GEN_INITS.ENLARGE_HAZ.radius, MOD_GEN_INITS.ENLARGE_HAZ.fillColour, MOD_GEN_INITS.ENLARGE_HAZ.outlineColour));
-        this.modifierGroups.push(new ModifierGroup(4 /* MODIFIER_TYPE.EXTRA_LIFE */, MOD_GEN_INITS.EXTRA_LIFE.speed, MOD_GEN_INITS.EXTRA_LIFE.density, MOD_GEN_INITS.EXTRA_LIFE.radius, MOD_GEN_INITS.EXTRA_LIFE.fillColour, MOD_GEN_INITS.EXTRA_LIFE.outlineColour));
+        this.modifierGroups.push(new ModifierGroup("INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */, MOD_GEN_INITS.INVINCIBILITY.speed, MOD_GEN_INITS.INVINCIBILITY.density, MOD_GEN_INITS.INVINCIBILITY.radius, MOD_GEN_INITS.INVINCIBILITY.fillColour, MOD_GEN_INITS.INVINCIBILITY.outlineColour));
+        this.modifierGroups.push(new ModifierGroup("ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */, MOD_GEN_INITS.ICE_RINK.speed, MOD_GEN_INITS.ICE_RINK.density, MOD_GEN_INITS.ICE_RINK.radius, MOD_GEN_INITS.ICE_RINK.fillColour, MOD_GEN_INITS.ICE_RINK.outlineColour));
+        this.modifierGroups.push(new ModifierGroup("SHRINK_HAZ" /* MODIFIER_TYPE.SHRINK_HAZ */, MOD_GEN_INITS.SHRINK_HAZ.speed, MOD_GEN_INITS.SHRINK_HAZ.density, MOD_GEN_INITS.SHRINK_HAZ.radius, MOD_GEN_INITS.SHRINK_HAZ.fillColour, MOD_GEN_INITS.SHRINK_HAZ.outlineColour));
+        this.modifierGroups.push(new ModifierGroup("ENLARGE_HAZ" /* MODIFIER_TYPE.ENLARGE_HAZ */, MOD_GEN_INITS.ENLARGE_HAZ.speed, MOD_GEN_INITS.ENLARGE_HAZ.density, MOD_GEN_INITS.ENLARGE_HAZ.radius, MOD_GEN_INITS.ENLARGE_HAZ.fillColour, MOD_GEN_INITS.ENLARGE_HAZ.outlineColour));
+        this.modifierGroups.push(new ModifierGroup("EXTRA_LIFE" /* MODIFIER_TYPE.EXTRA_LIFE */, MOD_GEN_INITS.EXTRA_LIFE.speed, MOD_GEN_INITS.EXTRA_LIFE.density, MOD_GEN_INITS.EXTRA_LIFE.radius, MOD_GEN_INITS.EXTRA_LIFE.fillColour, MOD_GEN_INITS.EXTRA_LIFE.outlineColour));
+    }
+    // creates modifiers and add's them to the correct modifier group
+    createModifier(type, x, y) {
+        const modGroup = this.modifierGroups.find(group => group.modifierType === type);
+        if (modGroup) {
+            const newModifier = new Modifier(type, x, y, modGroup.radius, modGroup.fillColour, modGroup.outlineColour);
+            modGroup.modifiers.push(newModifier);
+        }
     }
     // generates new modifiers based on modifier group densities
     generateNewModifiers() {
