@@ -38,8 +38,8 @@ export enum Keys {
 
 // player configuration constants
 export const PLAYER_INITS = {
-    x: 50,
-    y: 50,
+    x: 200,
+    y: 160,
     w: 30,
     h: 30,
     xspeed: 0,
@@ -50,7 +50,7 @@ export const PLAYER_INITS = {
     health2Colour: "olive",
     health1Colour: "saddlebrown",
     borderColour: "black",
-    num_lives: 3
+    num_lives: 3,
 };
 
 // hazard generation constants
@@ -82,35 +82,40 @@ export const MOD_GEN_INITS = {
         speed: 9,
         radius: 25,
         fillColour: "gold",
-        outlineColour: "yellow"
+        outlineColour: "yellow",
+        description: "Grants temporary invincibility"
     },
     ICE_RINK: {
         density: 0.0065,
         speed: 5,
         radius: 80,
         fillColour: "lightskyblue",
-        outlineColour: "skyblue"
+        outlineColour: "skyblue",
+        description: "Creates a slippery ice rink"
     },
     SHRINK_HAZ: {
         density: 0.002,
         speed: 6.0,
         radius: 30,
         fillColour: "coral",
-        outlineColour: "indianred"
+        outlineColour: "indianred",
+        description: "Shrinks hazards"
     },
     ENLARGE_HAZ: {
         density: 0.006,
         speed: 4,
         radius: 100,
         fillColour: "darkred",
-        outlineColour: "maroon"
+        outlineColour: "maroon",
+        description: "Enlarges hazards"
     },
     EXTRA_LIFE: {
         density: 0.00037,
         speed: 10,
         radius: 20,
         fillColour: "lawngreen",
-        outlineColour: "darkgreen"
+        outlineColour: "darkgreen",
+        description: "Grants an extra life"
     }
 };
 

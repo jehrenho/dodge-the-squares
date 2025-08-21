@@ -5,6 +5,7 @@ import { HazardManager } from './hazardManager.js';
 import { ModifierManager } from './modifierManager.js';
 import { handleModifierCollisions } from './modifierEffect.js';
 import { CollisionFlasher } from './collisionFlasher.js';
+import { Menu } from './menu.js';
 export const canvas = document.getElementById("gameCanvas");
 if (!canvas)
     throw new Error("Canvas element with id 'gameCanvas' not found.");
@@ -75,14 +76,6 @@ export function drawGameElements() {
     player.draw(ctx, player.colour);
     drawInGameText();
 }
-// draws the menu
-function drawMenu() {
-    ctx.fillStyle = GAME_CONFIG.fontColour;
-    ctx.font = GAME_CONFIG.menuFont;
-    ctx.fillText("Press Enter to Start", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 100, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
-    if (inputManager.isEnterPressedAndReleased())
-        gameState.setPhase(1 /* GamePhase.INGAME */);
-}
 // draws the game
 function drawGame() {
     // update game objects
@@ -141,7 +134,8 @@ function gameLoop() {
     ctx.scale(windowScaleX, windowScaleY);
     // draw the game
     if (gameState.getPhase() === 0 /* GamePhase.MENU */) {
-        drawMenu();
+        drawBackground();
+        Menu.draw(ctx, player, inputManager, gameState);
     }
     else if (gameState.getPhase() === 1 /* GamePhase.INGAME */) {
         drawGame();
@@ -159,13 +153,14 @@ function gameLoop() {
 // initialize canvas size
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-// create instances of the game objects
+// create and initialize all game objects
 const player = new Player();
 const hazardManager = new HazardManager();
 const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
 const gameState = new GameState();
 const collisionFlasher = new CollisionFlasher(player, gameState, hazardManager, modifierManager);
+Menu.init(player, hazardManager);
 // start tracking keyboard input
 inputManager.startListening();
 // start the game loop

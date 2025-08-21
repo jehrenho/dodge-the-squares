@@ -1,10 +1,11 @@
-import { GamePhase, GAME_CONFIG } from './config.js';
+import { GamePhase, GAME_CONFIG, MODIFIER_TYPE, MOD_GEN_INITS } from './config.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { HazardManager, Hazard } from './hazardManager.js';
 import { ModifierManager, Modifier } from './modifierManager.js';
 import { handleModifierCollisions } from './modifierEffect.js';
 import { CollisionFlasher } from './collisionFlasher.js';
+import { Menu } from './menu.js';
 
 export const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
 if (!canvas) throw new Error("Canvas element with id 'gameCanvas' not found.");
@@ -92,15 +93,6 @@ export function drawGameElements(): void {
   drawInGameText();
 }
 
-// draws the menu
-function drawMenu(): void {
-  ctx.fillStyle = GAME_CONFIG.fontColour;
-  ctx.font = GAME_CONFIG.menuFont;
-  ctx.fillText("Press Enter to Start", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 100, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
-
-  if (inputManager.isEnterPressedAndReleased()) gameState.setPhase(GamePhase.INGAME);
-}
-
 // draws the game
 function drawGame(): void {
   // update game objects
@@ -166,7 +158,8 @@ function gameLoop(): void {
   ctx.scale(windowScaleX, windowScaleY);
   // draw the game
   if (gameState.getPhase() === GamePhase.MENU) {
-      drawMenu();
+      drawBackground();
+      Menu.draw(ctx, player, inputManager, gameState);
   } else if (gameState.getPhase() === GamePhase.INGAME) {
       drawGame();
   } else if (gameState.getPhase() === GamePhase.COLLISION_FLASH) {
@@ -183,13 +176,14 @@ function gameLoop(): void {
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// create instances of the game objects
+// create and initialize all game objects
 const player = new Player();
 const hazardManager = new HazardManager();
 const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
 const gameState = new GameState();
 const collisionFlasher = new CollisionFlasher(player, gameState, hazardManager, modifierManager);
+Menu.init(player, hazardManager);
 
 // start tracking keyboard input
 inputManager.startListening();
