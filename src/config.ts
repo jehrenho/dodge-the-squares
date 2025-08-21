@@ -78,7 +78,7 @@ export const enum MODIFIER_TYPE {
 // modifier generation constants
 export const MOD_GEN_INITS = {
     INVINCIBILITY: {
-        density: 0.0003, // 0.0008 is a good start
+        density: 0.00037, // 0.0008 is a good start
         speed: 9,
         radius: 25,
         fillColour: "gold",
@@ -106,8 +106,8 @@ export const MOD_GEN_INITS = {
         outlineColour: "maroon"
     },
     EXTRA_LIFE: {
-        density: 0.0003,
-        speed: 9,
+        density: 0.00037,
+        speed: 10,
         radius: 20,
         fillColour: "lawngreen",
         outlineColour: "darkgreen"
