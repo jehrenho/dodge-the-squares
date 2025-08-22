@@ -1,4 +1,4 @@
-import { GamePhase, GAME_CONFIG } from './config.js';
+import { GamePhase, GAME_CONFIG, Keys } from './config.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { HazardManager, Hazard } from './hazardManager.js';
@@ -99,7 +99,7 @@ function drawGame(): void {
   modifierManager.updateModifiers();
   hazardManager.updateHazards();
   player.updatePosition(inputManager);
-  
+
   // handle player-modifier collisions
   let modifierCollisions: Modifier[] = modifierManager.detectCollisions(player, hazardManager);
   if (modifierCollisions.length > 0) {
@@ -139,7 +139,7 @@ function drawGameOver(): void {
   ctx.fillText("Press Enter to continue", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 80);
 
   // listen for Enter key to continue to menu
-  if (inputManager.isEnterPressedAndReleased()) {
+  if (inputManager.isKeyJustReleased(Keys.ENTER)) {
     gameState.setPhase(GamePhase.MENU);
     gameState.reset();
     player.reset();
@@ -161,7 +161,7 @@ function gameLoop(): void {
   if (gameState.getPhase() === GamePhase.MENU) {
       Menu.draw(ctx);
       // start the game when Enter is pressed
-      if (inputManager.isEnterPressedAndReleased()) gameState.setPhase(GamePhase.INGAME);
+      if (inputManager.isKeyJustReleased(Keys.ENTER)) gameState.setPhase(GamePhase.INGAME);
   } else if (gameState.getPhase() === GamePhase.INGAME) {
       drawGame();
   } else if (gameState.getPhase() === GamePhase.COLLISION_FLASH) {
@@ -170,6 +170,7 @@ function gameLoop(): void {
       drawGameOver();
   }
   ctx.restore();
+  inputManager.update();
   // schedule next frame
   requestAnimationFrame(gameLoop);
 }

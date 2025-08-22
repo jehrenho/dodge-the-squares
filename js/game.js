@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js';
+import { GAME_CONFIG, Keys } from './config.js';
 import { InputManager } from './input.js';
 import { Player } from './player.js';
 import { HazardManager } from './hazardManager.js';
@@ -115,7 +115,7 @@ function drawGameOver() {
     ctx.fillText(`You Survived for: ${gameState.getSecondsSurvived().toFixed(2)}s`, GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 40);
     ctx.fillText("Press Enter to continue", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 80);
     // listen for Enter key to continue to menu
-    if (inputManager.isEnterPressedAndReleased()) {
+    if (inputManager.isKeyJustReleased(Keys.ENTER)) {
         gameState.setPhase(0 /* GamePhase.MENU */);
         gameState.reset();
         player.reset();
@@ -137,7 +137,7 @@ function gameLoop() {
     if (gameState.getPhase() === 0 /* GamePhase.MENU */) {
         Menu.draw(ctx);
         // start the game when Enter is pressed
-        if (inputManager.isEnterPressedAndReleased())
+        if (inputManager.isKeyJustReleased(Keys.ENTER))
             gameState.setPhase(1 /* GamePhase.INGAME */);
     }
     else if (gameState.getPhase() === 1 /* GamePhase.INGAME */) {
@@ -150,6 +150,7 @@ function gameLoop() {
         drawGameOver();
     }
     ctx.restore();
+    inputManager.update();
     // schedule next frame
     requestAnimationFrame(gameLoop);
 }

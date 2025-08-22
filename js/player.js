@@ -18,16 +18,16 @@ export class Player {
     // handles player input and updates it's speed accordingly
     handleInput(input) {
         // increase speed if the arrow keys are pressed
-        if (input.keys[Keys.UP] && this.yspeed > -this.maxSpeed)
+        if (input.isKeyPressed(Keys.UP) && this.yspeed > -this.maxSpeed)
             this.yspeed -= this.accel;
-        if (input.keys[Keys.DOWN] && this.yspeed < this.maxSpeed)
+        if (input.isKeyPressed(Keys.DOWN) && this.yspeed < this.maxSpeed)
             this.yspeed += this.accel;
-        if (input.keys[Keys.LEFT] && this.xspeed > -this.maxSpeed)
+        if (input.isKeyPressed(Keys.LEFT) && this.xspeed > -this.maxSpeed)
             this.xspeed -= this.accel;
-        if (input.keys[Keys.RIGHT] && this.xspeed < this.maxSpeed)
+        if (input.isKeyPressed(Keys.RIGHT) && this.xspeed < this.maxSpeed)
             this.xspeed += this.accel;
         // decrease speed when the arrow keys are released
-        if (!input.keys[Keys.UP] && !input.keys[Keys.DOWN] && this.yspeed != 0) {
+        if (!input.isKeyPressed(Keys.UP) && !input.isKeyPressed(Keys.DOWN) && this.yspeed != 0) {
             if (this.yspeed > this.accel)
                 this.yspeed -= this.accel;
             else if (this.yspeed < -this.accel)
@@ -35,7 +35,7 @@ export class Player {
             else
                 this.yspeed = 0;
         }
-        if (!input.keys[Keys.LEFT] && !input.keys[Keys.RIGHT] && this.xspeed != 0) {
+        if (!input.isKeyPressed(Keys.LEFT) && !input.isKeyPressed(Keys.RIGHT) && this.xspeed != 0) {
             if (this.xspeed > this.accel)
                 this.xspeed -= this.accel;
             else if (this.xspeed < -this.accel)
