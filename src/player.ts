@@ -4,34 +4,30 @@ import { GAME_CONFIG,
     MODIFIER_TYPE,
     MOD_EFFECT_CONFIG
  } from './config.js';
-import { InputManager } from './input.js';
+import { InputManager } from './inputManager.js';
 import { ModifierEffect } from './modifierEffect.js';
+import { VisibleShape } from './visibleShape.js';
 
 // represents the player square and it's state
-export class Player {
-    x: number;
-    y: number;
+export class Player extends VisibleShape {
     h: number;
     w: number;
     xspeed: number;
     yspeed: number;
     maxSpeed: number;
     accel: number;
-    colour: string;
     effects: ModifierEffect[]; // array of active modifier effects
     isInvincible: boolean;
     health: number;
 
     constructor() {
-        this.x = 0;
-        this.y = 0;
+        super(0, 0, PLAYER_INITS.health3Colour, PLAYER_INITS.borderColour);
         this.w = PLAYER_INITS.w;
         this.h = PLAYER_INITS.h;
         this.xspeed = PLAYER_INITS.xspeed;
         this.yspeed = PLAYER_INITS.yspeed;
         this.maxSpeed = PLAYER_INITS.maxSpeed;
         this.accel = PLAYER_INITS.accel;
-        this.colour = PLAYER_INITS.health3Colour;
         this.isInvincible = false;
         this.health = PLAYER_INITS.num_lives;
         this.effects = [];
@@ -90,15 +86,15 @@ export class Player {
     // updated the player's abilities based on the currently active effects
     updateEffectsAbilities(): void {
         this.isInvincible = false;
-        this.updateColour();
+        this.updateFillColour();
         this.accel = PLAYER_INITS.accel;
 
         for (let effect of this.effects) {
             if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
                 this.isInvincible = true;
-                this.colour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
+                this.fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
             } else if (effect.type === MODIFIER_TYPE.ICE_RINK) {
-                this.colour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
+                this.fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
                 this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
             }
         }
@@ -118,13 +114,13 @@ export class Player {
     }
 
     // set the player colour
-    updateColour() {
+    updateFillColour() {
         if (this.health >= 3) {
-            this.colour = PLAYER_INITS.health3Colour;
+            this.fillColour = PLAYER_INITS.health3Colour;
         } else if (this.health === 2) {
-            this.colour = PLAYER_INITS.health2Colour;
+            this.fillColour = PLAYER_INITS.health2Colour;
         } else {
-            this.colour = PLAYER_INITS.health1Colour;
+            this.fillColour = PLAYER_INITS.health1Colour;
         }
     }
 
@@ -133,7 +129,7 @@ export class Player {
         this.health += amount;
         // cap health at a maximum
         if (this.health > PLAYER_INITS.num_lives) this.health = PLAYER_INITS.num_lives;
-        this.updateColour();
+        this.updateFillColour();
     }
 
     // checks if the player is dead
@@ -148,13 +144,13 @@ export class Player {
     }
 
     // draw the player rectangle on the canvas
-    draw(ctx: CanvasRenderingContext2D, colour: string): void {
+    draw(ctx: CanvasRenderingContext2D): void {
         // Draw the player rectangle's fill colour
-        ctx.fillStyle = colour;
+        ctx.fillStyle = this.fillColour;
         ctx.fillRect(this.x, this.y, this.w, this.h);
 
         // Draw border
-        ctx.strokeStyle = PLAYER_INITS.borderColour;
+        ctx.strokeStyle = this.borderColour;
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x, this.y, this.w, this.h);
     }

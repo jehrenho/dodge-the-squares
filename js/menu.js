@@ -1,9 +1,11 @@
 import { GAME_CONFIG, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
-import { drawBackground } from './game.js';
+import { Artist } from './artist.js';
+// menu class for managing the game menu
 export class Menu {
-    // initializes the menu class
-    static init(player, hazardManager, modifierManager) {
+    // initializes the menu based on the size of the window
+    static init(ctx, player, hazardManager, modifierManager) {
         // save references to the main game objects for encapsulation
+        Menu.ctx = ctx;
         Menu.player = player;
         Menu.hazardManager = hazardManager;
         Menu.modifierManager = modifierManager;
@@ -30,7 +32,7 @@ export class Menu {
         if (!Menu.hazardManager)
             throw new Error("Menu.hazardManager has not been initialized!");
         else
-            Menu.menuHazard = Menu.hazardManager.createHazard(0, 0, HAZ_GEN_INITS.w, HAZ_GEN_INITS.h, HAZ_GEN_INITS.colour);
+            Menu.menuHazard = Menu.hazardManager.createHazard(0, 0, HAZ_GEN_INITS.w, HAZ_GEN_INITS.h, HAZ_GEN_INITS.fillColour, HAZ_GEN_INITS.borderColour);
         // create the menu modifiers
         if (!Menu.modifierManager)
             throw new Error("Menu.modifierManager has not been initialized!");
@@ -43,81 +45,81 @@ export class Menu {
         }
     }
     // draws the how to play instructions
-    static drawHowToPlay(ctx) {
+    static drawHowToPlay() {
         // draw the title
-        ctx.font = MENU_CONFIG.HTPTitleFont;
-        ctx.fillStyle = MENU_CONFIG.HTPTextColour;
-        ctx.textAlign = "center";
-        ctx.fillText(MENU_CONFIG.HTPTitle, Menu.HTPx, Menu.HTPy);
+        Menu.ctx.font = MENU_CONFIG.HTPTitleFont;
+        Menu.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
+        Menu.ctx.textAlign = "center";
+        Menu.ctx.fillText(MENU_CONFIG.HTPTitle, Menu.HTPx, Menu.HTPy);
         Menu.HTPy += Menu.HTPGapY;
         // draw the player square
         if (!Menu.player)
             throw new Error("Menu.player has not been initialized!");
         else {
             Menu.player.setPositionByCentre(Menu.HTPx, Menu.HTPy - MENU_CONFIG.HTPPlayerDiscYOffset);
-            Menu.player.draw(ctx, Menu.player.colour);
+            Menu.player.draw(Menu.ctx);
         }
         // draw the player controls description
-        ctx.fillStyle = MENU_CONFIG.HTPTextColour;
-        ctx.font = MENU_CONFIG.HTPTextFont;
-        ctx.fillText(MENU_CONFIG.HTPPlayerText, Menu.HTPx, Menu.HTPy + MENU_CONFIG.HTPPlayerDiscYOffset);
+        Menu.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
+        Menu.ctx.font = MENU_CONFIG.HTPTextFont;
+        Menu.ctx.fillText(MENU_CONFIG.HTPPlayerText, Menu.HTPx, Menu.HTPy + MENU_CONFIG.HTPPlayerDiscYOffset);
         Menu.HTPy += Menu.HTPGapY;
         // draw a hazard square and description
         if (!Menu.menuHazard)
             throw new Error("Menu.menuHazard has not been initialized!");
         else {
             Menu.menuHazard.setPositionByCentre(Menu.HTPx, Menu.HTPy - MENU_CONFIG.HTPHazardDiscYOffset);
-            Menu.menuHazard.draw(ctx, Menu.menuHazard.colour);
+            Menu.menuHazard.draw(Menu.ctx);
         }
-        ctx.fillStyle = MENU_CONFIG.HTPTextColour;
-        ctx.font = MENU_CONFIG.HTPTextFont;
-        ctx.fillText(MENU_CONFIG.HTPHazardText, Menu.HTPx, Menu.HTPy + MENU_CONFIG.HTPHazardDiscYOffset);
+        Menu.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
+        Menu.ctx.font = MENU_CONFIG.HTPTextFont;
+        Menu.ctx.fillText(MENU_CONFIG.HTPHazardText, Menu.HTPx, Menu.HTPy + MENU_CONFIG.HTPHazardDiscYOffset);
         Menu.HTPy += Menu.HTPGapY;
         // draw the 3 lives explenation
-        ctx.fillText(MENU_CONFIG.HTP3LivesText, Menu.HTPx, Menu.HTPy);
+        Menu.ctx.fillText(MENU_CONFIG.HTP3LivesText, Menu.HTPx, Menu.HTPy);
         Menu.HTPy += Menu.HTPGapY;
         // draw the pause instruction
-        ctx.fillText(MENU_CONFIG.HTPPauseText, Menu.HTPx, Menu.HTPy);
+        Menu.ctx.fillText(MENU_CONFIG.HTPPauseText, Menu.HTPx, Menu.HTPy);
         Menu.HTPy += Menu.HTPGapY;
         // draw the game objective description
-        ctx.font = MENU_CONFIG.HTPObjectiveFont;
-        ctx.fillText(MENU_CONFIG.HTPObjectiveText, Menu.HTPx, Menu.HTPy);
+        Menu.ctx.font = MENU_CONFIG.HTPObjectiveFont;
+        Menu.ctx.fillText(MENU_CONFIG.HTPObjectiveText, Menu.HTPx, Menu.HTPy);
         Menu.HTPy += Menu.HTPGapY;
         // reset the Y position for the next frame
         Menu.HTPy = Menu.HTPStarty;
     }
     // draws the start game prompt
-    static drawStartPrompt(ctx) {
-        ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
-        ctx.font = MENU_CONFIG.startPromptFont;
-        ctx.textAlign = "center";
-        ctx.fillText(MENU_CONFIG.startPrompt, Menu.centreX, Menu.centreY);
+    static drawStartPrompt() {
+        Menu.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
+        Menu.ctx.font = MENU_CONFIG.startPromptFont;
+        Menu.ctx.textAlign = "center";
+        Menu.ctx.fillText(MENU_CONFIG.startPrompt, Menu.centreX, Menu.centreY);
     }
     // draws the menu modifiers and their descriptions
-    static drawModifierExplanations(ctx) {
+    static drawModifierExplanations() {
         // draw the menu modifiers
         if (!Menu.modifierManager)
             throw new Error("Menu.modifierManager has not been initialized!");
         else
-            Menu.modifierManager.drawModifiers(ctx);
+            Menu.modifierManager.drawModifiers(Menu.ctx);
         // draw the descriptions
-        ctx.font = MENU_CONFIG.modExFont;
-        ctx.fillStyle = MENU_CONFIG.modExTextColour;
-        ctx.textAlign = "left";
+        Menu.ctx.font = MENU_CONFIG.modExFont;
+        Menu.ctx.fillStyle = MENU_CONFIG.modExTextColour;
+        Menu.ctx.textAlign = "left";
         let i = 0;
         for (const [modifierType, config] of Object.entries(MOD_GEN_INITS)) {
-            ctx.fillText(config.description, Menu.modExStartX + MENU_CONFIG.modExDescriptionXOffset, Menu.modExStartY + i * Menu.modExGapY + 7);
+            Menu.ctx.fillText(config.description, Menu.modExStartX + MENU_CONFIG.modExDescriptionXOffset, Menu.modExStartY + i * Menu.modExGapY + 7);
             i++;
         }
     }
     // draws the menu
-    static draw(ctx) {
-        drawBackground();
-        Menu.drawStartPrompt(ctx);
-        Menu.drawHowToPlay(ctx);
-        Menu.drawModifierExplanations(ctx);
+    static draw() {
+        Artist.drawBackground();
+        Menu.drawStartPrompt();
+        Menu.drawHowToPlay();
+        Menu.drawModifierExplanations();
     }
-    // reset's the menu
+    // resets the menu
     static reset() {
         Menu.createMenuObjects();
     }

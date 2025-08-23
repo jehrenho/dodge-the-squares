@@ -1,4 +1,4 @@
-import { canvas } from "./game.js";
+import { Artist } from "./artist.js";
 import { InputEventType } from "./config.js";
 // manages keyboard input for the game
 export class InputManager {
@@ -16,8 +16,8 @@ export class InputManager {
     }
     // handle window resize events
     onResize(event) {
-        canvas.width = window.innerWidth - 1;
-        canvas.height = window.innerHeight - 1;
+        Artist.ctx.canvas.width = window.innerWidth - 1;
+        Artist.ctx.canvas.height = window.innerHeight - 1;
     }
     // checks if a key is currently pressed
     isKeyPressed(key) {
@@ -29,6 +29,10 @@ export class InputManager {
             return true;
         else
             return false;
+    }
+    // clears the key state for a specific key
+    clearKeyState(key) {
+        this.keyStates[key] = false;
     }
     // updates the state of the input manager
     update() {
