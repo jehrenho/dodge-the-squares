@@ -9,7 +9,6 @@ export const enum GamePhase {
 export const GAME_CONFIG = {
     backgroundColour: "lightgreen",
     fontColour: "black",
-    gameOverFontColour: "darkred",
     menuFont: "25px Arial",
     statusBarFont: "25px Arial",
     pausedFontColour: "black",
@@ -173,4 +172,14 @@ export const MENU_CONFIG = {
     startPrompt: "Press Enter to Start Game",
     startPromptFont: "bold 20px Arial",
     startPromptTextColour: "black"
+};
+
+export const GAME_OVER_CONFIG = {
+    fontColour: "black",
+    titleFont: "32px Arial",
+    gameOverTitle: "Game Over",
+    messagingFont: "26px Arial",
+    gameOverMessage: "You Survived for: {time}s",
+    promptFont: "20px Arial",
+    gameOverPrompt: "Press Enter to continue"
 };

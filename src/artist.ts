@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js';
+import { GAME_CONFIG, GAME_OVER_CONFIG } from './config.js';
 import { Player } from './player.js';
 import { HazardManager } from './hazardManager.js';
 import { ModifierManager } from './modifierManager.js';
@@ -84,12 +84,15 @@ export class Artist {
   // draws the game over screen
   static drawGameOver(): void {
     Artist.drawBackground();
-    Artist.ctx.fillStyle = GAME_CONFIG.gameOverFontColour;
-    Artist.ctx.font = GAME_CONFIG.menuFont;
-    Artist.ctx.fillText("Game Over", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
-    Artist.ctx.fillText(`You Survived for: ${Artist.gameState.getSecondsSurvived().toFixed(2)}s`, 
-      GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 40);
-    Artist.ctx.fillText("Press Enter to continue", GAME_CONFIG.VIRTUAL_WIDTH / 2 - 70, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 80);
+    Artist.ctx.fillStyle = GAME_OVER_CONFIG.fontColour;
+    Artist.ctx.font = GAME_OVER_CONFIG.titleFont;
+    Artist.ctx.textAlign = "center";
+    Artist.ctx.fillText(GAME_OVER_CONFIG.gameOverTitle, GAME_CONFIG.VIRTUAL_WIDTH / 2, GAME_CONFIG.VIRTUAL_HEIGHT / 2);
+    Artist.ctx.font = GAME_OVER_CONFIG.messagingFont;
+    Artist.ctx.fillText(GAME_OVER_CONFIG.gameOverMessage.replace("{time}", Artist.gameState.getSecondsSurvived().toFixed(2)), 
+      GAME_CONFIG.VIRTUAL_WIDTH / 2, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 40);
+      Artist.ctx.font = GAME_OVER_CONFIG.promptFont;
+    Artist.ctx.fillText(GAME_OVER_CONFIG.gameOverPrompt, GAME_CONFIG.VIRTUAL_WIDTH / 2, GAME_CONFIG.VIRTUAL_HEIGHT / 2 + 80);
   }
 
   // draws the menu
