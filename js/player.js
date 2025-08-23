@@ -1,16 +1,15 @@
 import { GAME_CONFIG, Keys, PLAYER_INITS, MOD_EFFECT_CONFIG } from './config.js';
+import { VisibleShape } from './visibleShape.js';
 // represents the player square and it's state
-export class Player {
+export class Player extends VisibleShape {
     constructor() {
-        this.x = 0;
-        this.y = 0;
+        super(0, 0, PLAYER_INITS.health3Colour, PLAYER_INITS.borderColour);
         this.w = PLAYER_INITS.w;
         this.h = PLAYER_INITS.h;
         this.xspeed = PLAYER_INITS.xspeed;
         this.yspeed = PLAYER_INITS.yspeed;
         this.maxSpeed = PLAYER_INITS.maxSpeed;
         this.accel = PLAYER_INITS.accel;
-        this.colour = PLAYER_INITS.health3Colour;
         this.isInvincible = false;
         this.health = PLAYER_INITS.num_lives;
         this.effects = [];
@@ -18,16 +17,16 @@ export class Player {
     // handles player input and updates it's speed accordingly
     handleInput(input) {
         // increase speed if the arrow keys are pressed
-        if (input.keys[Keys.UP] && this.yspeed > -this.maxSpeed)
+        if (input.isKeyPressed(Keys.UP) && this.yspeed > -this.maxSpeed)
             this.yspeed -= this.accel;
-        if (input.keys[Keys.DOWN] && this.yspeed < this.maxSpeed)
+        if (input.isKeyPressed(Keys.DOWN) && this.yspeed < this.maxSpeed)
             this.yspeed += this.accel;
-        if (input.keys[Keys.LEFT] && this.xspeed > -this.maxSpeed)
+        if (input.isKeyPressed(Keys.LEFT) && this.xspeed > -this.maxSpeed)
             this.xspeed -= this.accel;
-        if (input.keys[Keys.RIGHT] && this.xspeed < this.maxSpeed)
+        if (input.isKeyPressed(Keys.RIGHT) && this.xspeed < this.maxSpeed)
             this.xspeed += this.accel;
         // decrease speed when the arrow keys are released
-        if (!input.keys[Keys.UP] && !input.keys[Keys.DOWN] && this.yspeed != 0) {
+        if (!input.isKeyPressed(Keys.UP) && !input.isKeyPressed(Keys.DOWN) && this.yspeed != 0) {
             if (this.yspeed > this.accel)
                 this.yspeed -= this.accel;
             else if (this.yspeed < -this.accel)
@@ -35,7 +34,7 @@ export class Player {
             else
                 this.yspeed = 0;
         }
-        if (!input.keys[Keys.LEFT] && !input.keys[Keys.RIGHT] && this.xspeed != 0) {
+        if (!input.isKeyPressed(Keys.LEFT) && !input.isKeyPressed(Keys.RIGHT) && this.xspeed != 0) {
             if (this.xspeed > this.accel)
                 this.xspeed -= this.accel;
             else if (this.xspeed < -this.accel)
@@ -74,15 +73,15 @@ export class Player {
     // updated the player's abilities based on the currently active effects
     updateEffectsAbilities() {
         this.isInvincible = false;
-        this.updateColour();
+        this.updateFillColour();
         this.accel = PLAYER_INITS.accel;
         for (let effect of this.effects) {
             if (effect.type === "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */) {
                 this.isInvincible = true;
-                this.colour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
+                this.fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
             }
             else if (effect.type === "ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */) {
-                this.colour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
+                this.fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
                 this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
             }
         }
@@ -100,15 +99,15 @@ export class Player {
         this.updateEffectsAbilities();
     }
     // set the player colour
-    updateColour() {
+    updateFillColour() {
         if (this.health >= 3) {
-            this.colour = PLAYER_INITS.health3Colour;
+            this.fillColour = PLAYER_INITS.health3Colour;
         }
         else if (this.health === 2) {
-            this.colour = PLAYER_INITS.health2Colour;
+            this.fillColour = PLAYER_INITS.health2Colour;
         }
         else {
-            this.colour = PLAYER_INITS.health1Colour;
+            this.fillColour = PLAYER_INITS.health1Colour;
         }
     }
     // updates the player's health
@@ -117,7 +116,7 @@ export class Player {
         // cap health at a maximum
         if (this.health > PLAYER_INITS.num_lives)
             this.health = PLAYER_INITS.num_lives;
-        this.updateColour();
+        this.updateFillColour();
     }
     // checks if the player is dead
     isDead() {
@@ -129,12 +128,12 @@ export class Player {
         this.y = y - this.h / 2;
     }
     // draw the player rectangle on the canvas
-    draw(ctx, colour) {
+    draw(ctx) {
         // Draw the player rectangle's fill colour
-        ctx.fillStyle = colour;
+        ctx.fillStyle = this.fillColour;
         ctx.fillRect(this.x, this.y, this.w, this.h);
         // Draw border
-        ctx.strokeStyle = PLAYER_INITS.borderColour;
+        ctx.strokeStyle = this.borderColour;
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x, this.y, this.w, this.h);
     }

@@ -6,11 +6,16 @@ export const GAME_CONFIG = {
     gameOverFontColour: "darkred",
     menuFont: "25px Arial",
     statusBarFont: "25px Arial",
+    pausedFontColour: "black",
+    pausedFont: "25px Arial",
     VIRTUAL_WIDTH: 1912,
     VIRTUAL_HEIGHT: 954,
-    collisionFlashColour: "white",
+    collisionFlashFillColour: "white",
+    collisionFlashBorderColour: "black",
     flashingFramesDuration: 30,
-    framesPerFlash: 4
+    framesPerFlash: 4,
+    pauseTitle: "Game Paused",
+    pauseMessage: "Press Space to Continue"
 };
 // input event types
 export var InputEventType;
@@ -27,6 +32,7 @@ export var Keys;
     Keys["LEFT"] = "ArrowLeft";
     Keys["RIGHT"] = "ArrowRight";
     Keys["ENTER"] = "Enter";
+    Keys["SPACE"] = " ";
 })(Keys || (Keys = {}));
 ;
 // player configuration constants
@@ -51,7 +57,7 @@ export const HAZ_GEN_INITS = {
     h: 50,
     speed: 4,
     density: 0.02,
-    colour: "red",
+    fillColour: "red",
     borderColour: "darkred",
     difficultyLogBase: 3,
     sizeModInitTransFrames: 60,

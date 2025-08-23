@@ -2,19 +2,14 @@ import { GAME_CONFIG,
     MODIFIER_TYPE,
     MOD_GEN_INITS
 } from './config.js';
-import { canvas } from './game.js';
 import { Player } from './player.js';
-import { handleModifierCollisions } from './modifierEffect.js';
 import { HazardManager } from './hazardManager.js';
+import { VisibleShape } from './visibleShape.js';
 
 // represents an individual modifier circle in the game
-export class Modifier {
+export class Modifier extends VisibleShape {
     modifierType: MODIFIER_TYPE;
-    x: number;
-    y: number;
     r: number;
-    fillColour: string;
-    borderColour: string;
 
     constructor(modifierType: MODIFIER_TYPE, 
         x: number, 
@@ -22,12 +17,9 @@ export class Modifier {
         r: number, 
         fillColour: string, 
         borderColour: string) {
+        super(x, y, fillColour, borderColour);
         this.modifierType = modifierType;
-        this.x = x;
-        this.y = y;
         this.r = r;
-        this.fillColour = fillColour;
-        this.borderColour = borderColour;
     }
 
     // draws the modifier on the canvas
@@ -153,8 +145,8 @@ export class ModifierManager {
         for (let modg of this.modifierGroups) {
             for (let i = modg.modifiers.length - 1; i >= 0; i--) {
                 modg.modifiers[i].x -= modg.speed;
-                // remove modifiers that have moved off the left side of the canvas
-                if (modg.modifiers[i].x < -modg.modifiers[i].r) {
+                // remove old modifiers
+                if (modg.modifiers[i].x < -modg.modifiers[i].r || modg.modifiers[i].isTimeToKill()) {
                     modg.modifiers.splice(i, 1);
                 }
             }

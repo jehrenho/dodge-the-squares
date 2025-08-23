@@ -1,14 +1,13 @@
 import { GAME_CONFIG, HAZ_GEN_INITS, MOD_EFFECT_CONFIG } from './config.js';
+import { VisibleShape } from './visibleShape.js';
 // represents a single hazard rectangle in the game
-export class Hazard {
-    constructor(x, y, w, h, colour) {
-        this.x = x;
-        this.y = y;
+export class Hazard extends VisibleShape {
+    constructor(x, y, w, h, colour, borderColour) {
+        super(x, y, colour, borderColour);
         this.w = w;
         this.h = h;
-        this.initw = HAZ_GEN_INITS.w;
-        this.inith = HAZ_GEN_INITS.h;
-        this.colour = colour;
+        this.nominalw = HAZ_GEN_INITS.w;
+        this.nominalh = HAZ_GEN_INITS.h;
     }
     // sets the hazards position
     setPositionByCentre(x, y) {
@@ -16,12 +15,12 @@ export class Hazard {
         this.y = y - this.h / 2;
     }
     // draws the hazard on the canvas
-    draw(ctx, colour) {
+    draw(ctx) {
         // Draw the hazard rectangle's fill colour
-        ctx.fillStyle = colour;
+        ctx.fillStyle = this.fillColour;
         ctx.fillRect(this.x, this.y, this.w, this.h);
         // Draw border
-        ctx.strokeStyle = HAZ_GEN_INITS.borderColour;
+        ctx.strokeStyle = this.borderColour;
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x, this.y, this.w, this.h);
     }
@@ -35,7 +34,8 @@ export class HazardManager {
     constructor() {
         this.hazardSpeed = HAZ_GEN_INITS.speed;
         this.hazardDensity = HAZ_GEN_INITS.density;
-        this.colour = HAZ_GEN_INITS.colour;
+        this.fillColour = HAZ_GEN_INITS.fillColour;
+        this.borderColour = HAZ_GEN_INITS.borderColour;
         this.currentSizeFactor = 1.0;
         this.targetSizeFactor = 1.0;
         this.rateOfSizeFactorChange = 0;
@@ -44,8 +44,8 @@ export class HazardManager {
         this.hazards = [];
     }
     // creates a new hazard given it's center position
-    createHazard(x, y, w, h, colour) {
-        const hazard = new Hazard(x, y, w, h, colour);
+    createHazard(x, y, w, h, colour, borderColour) {
+        const hazard = new Hazard(x, y, w, h, colour, borderColour);
         this.hazards.push(hazard);
         return hazard;
     }
@@ -56,7 +56,7 @@ export class HazardManager {
             // map the new rectangle location to the canvas dimensions in pixels
             const newHazardy = ((GAME_CONFIG.VIRTUAL_HEIGHT + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
             // create a new hazard
-            this.createHazard(GAME_CONFIG.VIRTUAL_WIDTH, newHazardy - HAZ_GEN_INITS.h, HAZ_GEN_INITS.w * this.currentSizeFactor, HAZ_GEN_INITS.h * this.currentSizeFactor, this.colour);
+            this.createHazard(GAME_CONFIG.VIRTUAL_WIDTH, newHazardy - HAZ_GEN_INITS.h, HAZ_GEN_INITS.w * this.currentSizeFactor, HAZ_GEN_INITS.h * this.currentSizeFactor, this.fillColour, this.borderColour);
         }
     }
     // moves all hazards to the left, destroys hazards that have moved off screen, and sets their size
@@ -64,15 +64,15 @@ export class HazardManager {
         for (let i = this.hazards.length - 1; i >= 0; i--) {
             this.hazards[i].x -= this.hazardSpeed;
             // remove rectangles that have moved off the left side of the canvas
-            if (this.hazards[i].x < -this.hazards[i].w) {
+            if (this.hazards[i].x < -this.hazards[i].w || this.hazards[i].isTimeToKill()) {
                 this.hazards.splice(i, 1);
                 continue;
             }
             // update the size of the hazards if we need to
             if (this.rateOfSizeFactorChange === 0)
                 continue;
-            this.hazards[i].w = this.hazards[i].initw * this.currentSizeFactor;
-            this.hazards[i].h = this.hazards[i].inith * this.currentSizeFactor;
+            this.hazards[i].w = this.hazards[i].nominalw * this.currentSizeFactor;
+            this.hazards[i].h = this.hazards[i].nominalh * this.currentSizeFactor;
         }
     }
     // updates the size of the hazards
@@ -128,9 +128,9 @@ export class HazardManager {
     }
     // draws all hazards on the canvas
     draw(ctx) {
-        ctx.fillStyle = this.colour;
+        ctx.fillStyle = this.fillColour;
         for (let hazard of this.hazards) {
-            hazard.draw(ctx, this.colour);
+            hazard.draw(ctx);
         }
     }
     // updates the difficulty of hazards logarithmically based on the time survived
@@ -155,12 +155,11 @@ export class HazardManager {
     reset() {
         this.hazardSpeed = HAZ_GEN_INITS.speed;
         this.hazardDensity = HAZ_GEN_INITS.density;
-        this.colour = HAZ_GEN_INITS.colour;
+        this.minShrinkFactor = MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor;
+        this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
         this.currentSizeFactor = 1.0;
         this.targetSizeFactor = 1.0;
         this.rateOfSizeFactorChange = 0;
-        this.minShrinkFactor = MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor;
-        this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
         this.hazards = [];
     }
 }
