@@ -2,10 +2,11 @@ import { GAME_CONFIG,
     Keys,
     PLAYER_INITS,
     MODIFIER_TYPE,
+    ModifierType,
     MOD_EFFECT_CONFIG
  } from './config.js';
 import { InputManager } from './inputManager.js';
-import { ModifierEffect } from './modifierEffect.js';
+import { ModifierEffect, InvincibilityEffect, IceRinkEffect } from './modifierEffect.js';
 import { VisibleShape } from './visibleShape.js';
 
 // represents the player square and it's state
@@ -83,12 +84,29 @@ export class Player extends VisibleShape {
         this.enforceBoundaries();
     }
 
-    // updated the player's abilities based on the currently active effects
-    updateEffectsAbilities(): void {
-        this.isInvincible = false;
-        this.updateFillColour();
-        this.accel = PLAYER_INITS.accel;
+    // adds a new modifier effect to the player
+    addEffect(effectType: ModifierType): void {
+        switch(effectType) {
+            case MODIFIER_TYPE.INVINCIBILITY:
+                this.effects.push(new InvincibilityEffect(this));
+                break;
+            case MODIFIER_TYPE.ICE_RINK:
+                this.effects.push(new IceRinkEffect(this));
+                break;
+            default:
+                console.error(`Unknown modifier type: ${effectType}`);
+        }
+    }
 
+    // updated the player's abilities based on the currently active effects
+    // TODO: implement this function based on the effects in effect[]
+    // TODO: make the player flash when effects are wearing off
+    updateEffectsAbilities(): void {
+        // sets abilities to defaults
+        this.isInvincible = false;
+        this.setColourByHealth();
+        this.accel = PLAYER_INITS.accel;
+        // add effects abilities
         for (let effect of this.effects) {
             if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
                 this.isInvincible = true;
@@ -104,7 +122,8 @@ export class Player extends VisibleShape {
     updateEffects(): void {
         for (let i = this.effects.length - 1; i >= 0; i--) {
             const effect = this.effects[i];
-            if (effect.update(this) <= 0) {
+            effect.update(this);
+            if (effect.isExpired()) {
                 // remove the ModifierEffect from the player's effects array
                 this.effects.splice(i, 1);
             }
@@ -114,7 +133,7 @@ export class Player extends VisibleShape {
     }
 
     // set the player colour
-    updateFillColour() {
+    setColourByHealth() {
         if (this.health >= 3) {
             this.fillColour = PLAYER_INITS.health3Colour;
         } else if (this.health === 2) {
@@ -129,7 +148,7 @@ export class Player extends VisibleShape {
         this.health += amount;
         // cap health at a maximum
         if (this.health > PLAYER_INITS.num_lives) this.health = PLAYER_INITS.num_lives;
-        this.updateFillColour();
+        this.setColourByHealth();
     }
 
     // checks if the player is dead

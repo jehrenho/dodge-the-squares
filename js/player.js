@@ -1,4 +1,5 @@
-import { GAME_CONFIG, Keys, PLAYER_INITS, MOD_EFFECT_CONFIG } from './config.js';
+import { GAME_CONFIG, Keys, PLAYER_INITS, MODIFIER_TYPE, MOD_EFFECT_CONFIG } from './config.js';
+import { InvincibilityEffect, IceRinkEffect } from './modifierEffect.js';
 import { VisibleShape } from './visibleShape.js';
 // represents the player square and it's state
 export class Player extends VisibleShape {
@@ -70,17 +71,34 @@ export class Player extends VisibleShape {
         this.x += this.xspeed;
         this.enforceBoundaries();
     }
+    // adds a new modifier effect to the player
+    addEffect(effectType) {
+        switch (effectType) {
+            case MODIFIER_TYPE.INVINCIBILITY:
+                this.effects.push(new InvincibilityEffect(this));
+                break;
+            case MODIFIER_TYPE.ICE_RINK:
+                this.effects.push(new IceRinkEffect(this));
+                break;
+            default:
+                console.error(`Unknown modifier type: ${effectType}`);
+        }
+    }
     // updated the player's abilities based on the currently active effects
+    // TODO: implement this function based on the effects in effect[]
+    // TODO: make the player flash when effects are wearing off
     updateEffectsAbilities() {
+        // sets abilities to defaults
         this.isInvincible = false;
-        this.updateFillColour();
+        this.setColourByHealth();
         this.accel = PLAYER_INITS.accel;
+        // add effects abilities
         for (let effect of this.effects) {
-            if (effect.type === "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */) {
+            if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
                 this.isInvincible = true;
                 this.fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
             }
-            else if (effect.type === "ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */) {
+            else if (effect.type === MODIFIER_TYPE.ICE_RINK) {
                 this.fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
                 this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
             }
@@ -90,7 +108,8 @@ export class Player extends VisibleShape {
     updateEffects() {
         for (let i = this.effects.length - 1; i >= 0; i--) {
             const effect = this.effects[i];
-            if (effect.update(this) <= 0) {
+            effect.update(this);
+            if (effect.isExpired()) {
                 // remove the ModifierEffect from the player's effects array
                 this.effects.splice(i, 1);
             }
@@ -99,7 +118,7 @@ export class Player extends VisibleShape {
         this.updateEffectsAbilities();
     }
     // set the player colour
-    updateFillColour() {
+    setColourByHealth() {
         if (this.health >= 3) {
             this.fillColour = PLAYER_INITS.health3Colour;
         }
@@ -116,7 +135,7 @@ export class Player extends VisibleShape {
         // cap health at a maximum
         if (this.health > PLAYER_INITS.num_lives)
             this.health = PLAYER_INITS.num_lives;
-        this.updateFillColour();
+        this.setColourByHealth();
     }
     // checks if the player is dead
     isDead() {

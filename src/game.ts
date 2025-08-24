@@ -1,11 +1,11 @@
-import { GamePhase, GAME_CONFIG, Keys } from './config.js';
+import { GamePhase, Keys } from './config.js';
 import { InputManager } from './inputManager.js';
 import { Player } from './player.js';
-import { HazardManager, Hazard } from './hazardManager.js';
-import { ModifierManager, Modifier } from './modifierManager.js';
-import { handleModifierCollisions } from './modifierEffect.js';
+import { HazardManager } from './hazardManager.js';
+import { ModifierManager } from './modifierManager.js';
 import { Flasher } from './flasher.js';
 import { Artist } from './artist.js';
+import { CollisionUtil } from './collisionUtil.js';
 
 // stores and manages the game phase and game timer
 export class GameState {
@@ -96,7 +96,6 @@ function gameLoop(): void {
 
 // generates an in-game frame
 function generateInGameFrame(): void {
-  console.log("Generating in-game frame");
   // pause the game if space is pressed
   if (!gameState.isPaused && inputManager.isKeyPressed(Keys.SPACE)) {
     gameState.isPaused = true;
@@ -119,29 +118,8 @@ function generateInGameFrame(): void {
     modifierManager.updateModifiers();
     hazardManager.updateHazards();
     player.updatePosition(inputManager);
-
-    // handle player-modifier collisions
-    let modifierCollisions: Modifier[] = modifierManager.detectCollisions(player, hazardManager);
-    if (modifierCollisions.length > 0) {
-      // player touched a modifier
-      Flasher.startFlashingCollision(player, modifierCollisions);
-      for (const mod of modifierCollisions) {
-        mod.setToKill();
-        handleModifierCollisions(mod.modifierType, player, hazardManager);
-      }
-    }
-    player.updateEffects();
-
-    // handle player-hazard collisions
-    let hazardCollisions: Hazard[] = hazardManager.detectCollisions(player);
-    if(hazardCollisions.length > 0) {
-      // player touched a hazard
-      Flasher.startFlashingCollision(player, hazardCollisions);
-      for (const haz of hazardCollisions) {
-        haz.setToKill();
-        player.modifyHealth(-1);
-      }
-    }
+    CollisionUtil.resolveModifierCollisions();
+    CollisionUtil.resolveHazardCollisions();
     // draw the frame
     Artist.drawInGameElements();
     // update the time survived this game and increase difficulty
@@ -165,6 +143,7 @@ const hazardManager = new HazardManager();
 const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
 Artist.init(gameState, player, hazardManager, modifierManager);
+CollisionUtil.init(player, hazardManager, modifierManager);
 
 // start tracking keyboard input
 inputManager.startListening();

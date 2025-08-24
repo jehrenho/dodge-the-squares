@@ -1,4 +1,4 @@
-import { GAME_CONFIG, MODIFIER_TYPE, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
+import { GAME_CONFIG, ModifierType, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
 import { Player } from './player.js';
 import { HazardManager, Hazard } from './hazardManager.js';
 import { Artist } from './artist.js';
@@ -63,7 +63,7 @@ export class Menu {
         else {
             let i = 0;
             for (const [modifierType, config] of Object.entries(MOD_GEN_INITS)) {
-                Menu.modifierManager.createModifier(modifierType as MODIFIER_TYPE, 
+                Menu.modifierManager.createModifier(modifierType as ModifierType, 
                     Menu.modExStartX, Menu.modExStartY + i * Menu.modExGapY);
                 i++
             }
