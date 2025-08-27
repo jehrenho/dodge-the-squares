@@ -1,17 +1,15 @@
 import { MODIFIER_TYPE, ModifierType, MOD_EFFECT_CONFIG } from "./config.js";
-import { Player } from "./player.js";
-import { HazardManager } from "./hazardManager.js";
 
 // defines the base class for all modifier effects
 export abstract class ModifierEffect {
     type: ModifierType;
     framesRemaining: number;
-    constructor(player: Player, modifierType: ModifierType) {
+    constructor(modifierType: ModifierType) {
         this.type = modifierType;
         this.framesRemaining = 0;
     }
     abstract resetEffectTimer(): void;
-    update(player: Player): void {
+    update(): void {
         this.framesRemaining--;
     }
     deactivate(): void {
@@ -24,8 +22,8 @@ export abstract class ModifierEffect {
 
 // Invincibility effect class
 export class InvincibilityEffect extends ModifierEffect {
-    constructor(player: Player) {
-        super(player, MODIFIER_TYPE.INVINCIBILITY)
+    constructor() {
+        super(MODIFIER_TYPE.INVINCIBILITY);
         this.resetEffectTimer();
     }
     resetEffectTimer(): void {
@@ -35,8 +33,8 @@ export class InvincibilityEffect extends ModifierEffect {
 
 // Ice Rink effect class
 export class IceRinkEffect extends ModifierEffect {
-    constructor(player: Player) {
-        super(player, MODIFIER_TYPE.ICE_RINK);
+    constructor() {
+        super(MODIFIER_TYPE.ICE_RINK);
         this.resetEffectTimer();
     }
     resetEffectTimer(): void {

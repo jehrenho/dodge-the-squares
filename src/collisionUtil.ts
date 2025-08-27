@@ -20,11 +20,12 @@ export class CollisionUtil {
     // detect new collisions
     let modifierCollisions: Modifier[] = CollisionUtil.modifierManager.detectCollisions(CollisionUtil.player);
     if (modifierCollisions.length > 0) {
-      // take the necessary actions to resolve the collisions
+      // start flashing the player and collided modifiers
       Flasher.startFlashingCollision(CollisionUtil.player, modifierCollisions);
       for (const mod of modifierCollisions) {
-          mod.setToKill();
-          CollisionUtil.actOnModifierCollision(mod.getType(), CollisionUtil.player, CollisionUtil.hazardManager);
+        // destroy the modifier and apply the modifiers effect(s)
+        mod.setToKill();
+        CollisionUtil.actOnModifierCollision(mod.getType(), CollisionUtil.player, CollisionUtil.hazardManager);
       }
     }
     CollisionUtil.player.updateEffects();
@@ -35,9 +36,9 @@ export class CollisionUtil {
     // detect new collisions
     let hazardCollisions: Hazard[] = CollisionUtil.hazardManager.detectCollisions(CollisionUtil.player);
     if (hazardCollisions.length > 0) {
-      // decrease player health
       Flasher.startFlashingCollision(CollisionUtil.player, hazardCollisions);
       for (const haz of hazardCollisions) {
+        // destroy the hazard and decrease player health
         haz.setToKill();
         CollisionUtil.player.modifyHealth(-1);
       }
@@ -46,6 +47,7 @@ export class CollisionUtil {
 
   // handles logic for applying and resolving modifier effect collisions
   static actOnModifierCollision(newModifierType: ModifierType, player: Player, hazardManager: HazardManager): void {
+    // handle the trivial modifiers effects that don't interact with other effects
     if (newModifierType == MODIFIER_TYPE.SHRINK_HAZ) {
       hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor);
       return;
@@ -56,8 +58,14 @@ export class CollisionUtil {
       player.modifyHealth(1);
       return;
     }
+    // activate the effect if there are no other active effects
+    if (player.isNoEffects()) {
+      player.addEffect(newModifierType);
+      return;
+    }
+    // determine what to do, given there is a new complex modifier collision, when there are active effects
     for (let activeEffect of player.effects) {
-      // determine what to do with the new effect
+      // determine what to do with the new modifier effect
       switch (collisionMatrix[COLLISION_ROLE.NEW][activeEffect.type][newModifierType]) {
         case COLLISION_ACTION.ACTIVATE:
           player.addEffect(newModifierType);
@@ -69,7 +77,7 @@ export class CollisionUtil {
           console.error(`Unexpected collision action for ${newModifierType} and ${activeEffect.type}`);
           break;
       }
-      // determine what to do with the active effects
+      // determine what to do with the already active effects
       switch (collisionMatrix[COLLISION_ROLE.OLD][activeEffect.type][newModifierType]) {
         case COLLISION_ACTION.REACTIVATE:
           activeEffect.resetEffectTimer();
@@ -78,13 +86,12 @@ export class CollisionUtil {
           activeEffect.deactivate();
           break;
         case COLLISION_ACTION.IGNORE:
+          // do nothing
           break;
         default:
           console.error(`Unexpected collision action for ${newModifierType} and ${activeEffect.type}`);
           break;
       }
     }
-    // update the player's abilities based on the new effects
-    player.updateEffectsAbilities();
   }
 }

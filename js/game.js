@@ -107,6 +107,7 @@ function generateInGameFrame() {
         hazardManager.updateHazards();
         player.updatePosition(inputManager);
         CollisionUtil.resolveModifierCollisions();
+        player.updateEffects();
         CollisionUtil.resolveHazardCollisions();
         // draw the frame
         Artist.drawInGameElements();
