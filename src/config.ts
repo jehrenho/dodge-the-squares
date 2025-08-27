@@ -222,6 +222,13 @@ export const MOD_EFFECT_CONFIG = {
     }
 };
 
+// effect wear off flash constants
+export const EWOF_CONFIG = {
+    numFramesPerFlash: 4,
+    starts: [240, 180, 120, 60],
+    frequencies: [60, 30, 15, 8]
+};
+
 // menu constants
 export const MENU_CONFIG = {
     // How to Play constants

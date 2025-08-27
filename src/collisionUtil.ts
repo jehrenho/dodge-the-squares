@@ -28,7 +28,6 @@ export class CollisionUtil {
         CollisionUtil.actOnModifierCollision(mod.getType(), CollisionUtil.player, CollisionUtil.hazardManager);
       }
     }
-    CollisionUtil.player.updateEffects();
   }
 
   // detects new player-hazard collisions and decreases player health when a hazard is touched
@@ -80,7 +79,7 @@ export class CollisionUtil {
       // determine what to do with the already active effects
       switch (collisionMatrix[COLLISION_ROLE.OLD][activeEffect.type][newModifierType]) {
         case COLLISION_ACTION.REACTIVATE:
-          activeEffect.resetEffectTimer();
+          activeEffect.reset();
           break;
         case COLLISION_ACTION.DESTROY:
           activeEffect.deactivate();
