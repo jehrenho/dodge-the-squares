@@ -2,10 +2,11 @@ import { GAME_CONFIG,
     Keys,
     PLAYER_INITS,
     MODIFIER_TYPE,
+    ModifierType,
     MOD_EFFECT_CONFIG
  } from './config.js';
 import { InputManager } from './inputManager.js';
-import { ModifierEffect } from './modifierEffect.js';
+import { ModifierEffect, InvincibilityEffect, IceRinkEffect } from './modifierEffect.js';
 import { VisibleShape } from './visibleShape.js';
 
 // represents the player square and it's state
@@ -17,7 +18,7 @@ export class Player extends VisibleShape {
     maxSpeed: number;
     accel: number;
     effects: ModifierEffect[]; // array of active modifier effects
-    isInvincible: boolean;
+    invincibility: boolean;
     health: number;
 
     constructor() {
@@ -28,7 +29,7 @@ export class Player extends VisibleShape {
         this.yspeed = PLAYER_INITS.yspeed;
         this.maxSpeed = PLAYER_INITS.maxSpeed;
         this.accel = PLAYER_INITS.accel;
-        this.isInvincible = false;
+        this.invincibility = false;
         this.health = PLAYER_INITS.num_lives;
         this.effects = [];
     }
@@ -83,44 +84,72 @@ export class Player extends VisibleShape {
         this.enforceBoundaries();
     }
 
-    // updated the player's abilities based on the currently active effects
-    updateEffectsAbilities(): void {
-        this.isInvincible = false;
-        this.updateFillColour();
-        this.accel = PLAYER_INITS.accel;
-
-        for (let effect of this.effects) {
-            if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
-                this.isInvincible = true;
-                this.fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
-            } else if (effect.type === MODIFIER_TYPE.ICE_RINK) {
-                this.fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
-                this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
-            }
+    // adds a new modifier effect to the player
+    addEffect(effectType: ModifierType): void {
+        switch(effectType) {
+            case MODIFIER_TYPE.INVINCIBILITY:
+                this.effects.push(new InvincibilityEffect());
+                break;
+            case MODIFIER_TYPE.ICE_RINK:
+                this.effects.push(new IceRinkEffect());
+                break;
+            default:
+                console.error(`Unknown modifier type: ${effectType}`);
         }
+    }
+
+    // return true if there are no active effects
+    isNoEffects(): boolean {
+        return this.effects.length === 0;
     }
 
     // update the player's effects and remove any that have expired
     updateEffects(): void {
         for (let i = this.effects.length - 1; i >= 0; i--) {
             const effect = this.effects[i];
-            if (effect.update(this) <= 0) {
-                // remove the ModifierEffect from the player's effects array
+            // update the effect
+            effect.update();
+            if (effect.isExpired()) {
+                // remove any expired effects
                 this.effects.splice(i, 1);
             }
         }
         // update the player's abilities based on the remaining effects
-        this.updateEffectsAbilities();
+        this.resolveActiveEffects();
     }
 
-    // set the player colour
-    updateFillColour() {
+    // sets the player properties based on the currently active effects
+    resolveActiveEffects(): void {
+        // sets abilities to defaults
+        this.invincibility = false;
+        this.accel = PLAYER_INITS.accel;
+        // set player colour to health colour defaults
+        this.setDefaultColourByHealth();
+        this.fillColour = this.defaultFillColour;
+        // set the player's abilities and colour based on it's active effects
+        for (let effect of this.effects) {
+            if (effect.type === MODIFIER_TYPE.INVINCIBILITY) {
+                this.invincibility = true;
+                this.fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
+            } else if (effect.type === MODIFIER_TYPE.ICE_RINK) {
+                this.fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
+                this.accel = MOD_EFFECT_CONFIG.ICE_RINK.accel;
+            }
+            // set the player's colour to default if the effect is currently flashing because it is wearing off
+            if (effect.isWearOffFlashing()) {
+                this.fillColour = this.defaultFillColour;
+            }
+        }
+    }
+
+    // set the player's default colour based on it's health
+    setDefaultColourByHealth() {
         if (this.health >= 3) {
-            this.fillColour = PLAYER_INITS.health3Colour;
+            this.defaultFillColour = PLAYER_INITS.health3Colour;
         } else if (this.health === 2) {
-            this.fillColour = PLAYER_INITS.health2Colour;
+            this.defaultFillColour = PLAYER_INITS.health2Colour;
         } else {
-            this.fillColour = PLAYER_INITS.health1Colour;
+            this.defaultFillColour = PLAYER_INITS.health1Colour;
         }
     }
 
@@ -129,7 +158,11 @@ export class Player extends VisibleShape {
         this.health += amount;
         // cap health at a maximum
         if (this.health > PLAYER_INITS.num_lives) this.health = PLAYER_INITS.num_lives;
-        this.updateFillColour();
+    }
+
+    // checks if the player is invincible
+    isInvincible(): boolean {
+        return this.invincibility;
     }
 
     // checks if the player is dead
@@ -165,6 +198,6 @@ export class Player extends VisibleShape {
         this.yspeed = PLAYER_INITS.yspeed;
         this.health = 3;
         this.effects = [];
-        this.updateEffectsAbilities();
+        this.resolveActiveEffects();
     }
 }

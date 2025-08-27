@@ -70,14 +70,31 @@ export const HAZ_GEN_INITS = {
     sizeModDecayFrames: 900,
 };
 
-// modifier type constants
-export const enum MODIFIER_TYPE {
-    INVINCIBILITY = "INVINCIBILITY",
-    ICE_RINK = "ICE_RINK",
-    SHRINK_HAZ = "SHRINK_HAZ",
-    ENLARGE_HAZ = "ENLARGE_HAZ",
-    EXTRA_LIFE = "EXTRA_LIFE"
-};
+export const MODIFIER_TYPE = {
+  INVINCIBILITY: "INVINCIBILITY",
+  ICE_RINK: "ICE_RINK",
+  SHRINK_HAZ: "SHRINK_HAZ",
+  ENLARGE_HAZ: "ENLARGE_HAZ",
+  EXTRA_LIFE: "EXTRA_LIFE"
+} as const;
+
+export const COLLISION_ACTION = {
+  ACTIVATE: "ACTIVATE",
+  DESTROY: "DESTROY",
+  IGNORE: "IGNORE",
+  REACTIVATE: "REACTIVATE",
+  ERROR: "ERROR"
+} as const;
+
+export const COLLISION_ROLE = {
+  NEW: "NEW",
+  OLD: "OLD"
+} as const;
+
+// create Typescript union types of the properties in the above objects
+export type ModifierType = typeof MODIFIER_TYPE[keyof typeof MODIFIER_TYPE];
+export type CollisionAction = typeof COLLISION_ACTION[keyof typeof COLLISION_ACTION];
+export type CollisionRole = typeof COLLISION_ROLE[keyof typeof COLLISION_ROLE];
 
 // modifier generation constants
 export const MOD_GEN_INITS = {
@@ -123,6 +140,69 @@ export const MOD_GEN_INITS = {
     }
 };
 
+// create the CollisionMatrix type with strongly typed keys
+type CollisionMatrix = {
+  [role in CollisionRole]: {
+    [oldType in ModifierType]: {
+      [newType in ModifierType]: CollisionAction
+    }
+  }
+};
+
+// declare the collision matrix object used to store action values
+export const collisionMatrix: CollisionMatrix = {} as CollisionMatrix;
+
+// initialize the collision matrix with default values
+for (const role of Object.values(COLLISION_ROLE)) {
+  collisionMatrix[role] = {} as any;
+
+  for (const oldType of Object.values(MODIFIER_TYPE)) {
+    collisionMatrix[role][oldType] = {} as any;
+
+    for (const newType of Object.values(MODIFIER_TYPE)) {
+      // Default rule = IGNORE
+      collisionMatrix[role][oldType][newType] = COLLISION_ACTION.ERROR;
+    }
+  }
+}
+
+// --- Collision-Action Matrix Values ---
+
+// What happens to new effects when invincibility is active
+collisionMatrix[COLLISION_ROLE.NEW][MODIFIER_TYPE.INVINCIBILITY] = {
+    [MODIFIER_TYPE.INVINCIBILITY]: COLLISION_ACTION.DESTROY, // reactivate the old invincibility
+    [MODIFIER_TYPE.ICE_RINK]: COLLISION_ACTION.DESTROY,
+    [MODIFIER_TYPE.SHRINK_HAZ]: COLLISION_ACTION.ACTIVATE,
+    [MODIFIER_TYPE.ENLARGE_HAZ]: COLLISION_ACTION.DESTROY,
+    [MODIFIER_TYPE.EXTRA_LIFE]: COLLISION_ACTION.ACTIVATE
+};
+// What happens to an active invincibility effect when new effects are applied
+collisionMatrix[COLLISION_ROLE.OLD][MODIFIER_TYPE.INVINCIBILITY] = {
+    [MODIFIER_TYPE.INVINCIBILITY]: COLLISION_ACTION.REACTIVATE, // destroy the new invincibility
+    [MODIFIER_TYPE.ICE_RINK]: COLLISION_ACTION.IGNORE,
+    [MODIFIER_TYPE.SHRINK_HAZ]: COLLISION_ACTION.IGNORE,
+    [MODIFIER_TYPE.ENLARGE_HAZ]: COLLISION_ACTION.IGNORE,
+    [MODIFIER_TYPE.EXTRA_LIFE]: COLLISION_ACTION.IGNORE
+};
+// What happens to new effects when ice rink is active
+collisionMatrix[COLLISION_ROLE.NEW][MODIFIER_TYPE.ICE_RINK] = {
+    [MODIFIER_TYPE.INVINCIBILITY]: COLLISION_ACTION.ACTIVATE,
+    [MODIFIER_TYPE.ICE_RINK]: COLLISION_ACTION.DESTROY, // reactivate the old ice rink
+    [MODIFIER_TYPE.SHRINK_HAZ]: COLLISION_ACTION.ACTIVATE,
+    [MODIFIER_TYPE.ENLARGE_HAZ]: COLLISION_ACTION.ACTIVATE,
+    [MODIFIER_TYPE.EXTRA_LIFE]: COLLISION_ACTION.ACTIVATE
+};
+// What happens to an active ice rink effect when new effects are applied
+collisionMatrix[COLLISION_ROLE.OLD][MODIFIER_TYPE.ICE_RINK] = {
+    [MODIFIER_TYPE.INVINCIBILITY]: COLLISION_ACTION.DESTROY,
+    [MODIFIER_TYPE.ICE_RINK]: COLLISION_ACTION.REACTIVATE, // destroy the new ice rink
+    [MODIFIER_TYPE.SHRINK_HAZ]: COLLISION_ACTION.IGNORE,
+    [MODIFIER_TYPE.ENLARGE_HAZ]: COLLISION_ACTION.IGNORE,
+    [MODIFIER_TYPE.EXTRA_LIFE]: COLLISION_ACTION.IGNORE
+};
+
+
+
 // modifier effect constants
 export const MOD_EFFECT_CONFIG = {
     INVINCIBILITY: {
@@ -140,6 +220,13 @@ export const MOD_EFFECT_CONFIG = {
     ENLARGE_HAZ: {
         scaleFactor: 2
     }
+};
+
+// effect wear off flash constants
+export const EWOF_CONFIG = {
+    numFramesPerFlash: 4,
+    starts: [240, 180, 120, 60], // frame counts for when to start flashing
+    frequencies: [60, 30, 15, 8] 
 };
 
 // menu constants

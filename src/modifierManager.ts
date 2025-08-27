@@ -1,5 +1,5 @@
 import { GAME_CONFIG,
-    MODIFIER_TYPE,
+    ModifierType, MODIFIER_TYPE,
     MOD_GEN_INITS
 } from './config.js';
 import { Player } from './player.js';
@@ -8,10 +8,10 @@ import { VisibleShape } from './visibleShape.js';
 
 // represents an individual modifier circle in the game
 export class Modifier extends VisibleShape {
-    modifierType: MODIFIER_TYPE;
-    r: number;
+    private readonly modifierType: ModifierType;
+    private readonly r: number;
 
-    constructor(modifierType: MODIFIER_TYPE, 
+    constructor(modifierType: ModifierType, 
         x: number, 
         y: number, 
         r: number, 
@@ -20,6 +20,16 @@ export class Modifier extends VisibleShape {
         super(x, y, fillColour, borderColour);
         this.modifierType = modifierType;
         this.r = r;
+    }
+
+    // returns the radius of the modifier
+    getRadius(): number {
+        return this.r;
+    }
+
+    // returns the type of the modifier
+    getType(): ModifierType {
+        return this.modifierType;
     }
 
     // draws the modifier on the canvas
@@ -38,15 +48,14 @@ export class Modifier extends VisibleShape {
 
 // manages a group of modifier circles of the same type (e.g., all invincibility modifiers)
 class ModifierGroup {
-    modifierType: MODIFIER_TYPE;
+    modifierType: ModifierType;
     speed: number;
     density: number;
     radius: number;
     fillColour: string;
     outlineColour: string;
     modifiers: Modifier[];
-    
-    constructor(modifierType: MODIFIER_TYPE, 
+    constructor(modifierType: ModifierType, 
         speed: number,  
         density: number,
         radius: number, 
@@ -112,7 +121,7 @@ export class ModifierManager {
     }
 
     // creates modifiers and add's them to the correct modifier group
-    createModifier(type: MODIFIER_TYPE, x: number, y: number): void {
+    createModifier(type: ModifierType, x: number, y: number): void {
         const modGroup = this.modifierGroups.find(group => group.modifierType === type);
         if (modGroup) {
             const newModifier = new Modifier(type, x, y, modGroup.radius, modGroup.fillColour, modGroup.outlineColour);
@@ -146,7 +155,7 @@ export class ModifierManager {
             for (let i = modg.modifiers.length - 1; i >= 0; i--) {
                 modg.modifiers[i].x -= modg.speed;
                 // remove old modifiers
-                if (modg.modifiers[i].x < -modg.modifiers[i].r || modg.modifiers[i].isTimeToKill()) {
+                if (modg.modifiers[i].x < -modg.modifiers[i].getRadius() || modg.modifiers[i].isTimeToKill()) {
                     modg.modifiers.splice(i, 1);
                 }
             }
@@ -160,7 +169,7 @@ export class ModifierManager {
     }
 
     // detects collisions between the player and modifier circles
-    detectCollisions(player: Player, hazardManager: HazardManager): Modifier[] {
+    detectCollisions(player: Player): Modifier[] {
         let closestX: number = 0;
         let closestY: number = 0;
         let dx: number = 0;
@@ -180,7 +189,7 @@ export class ModifierManager {
                 dy = mod.y - closestY;
 
                 // If distance < radius there is a collision
-                if ((dx * dx + dy * dy) <= (mod.r * mod.r)) { 
+                if ((dx * dx + dy * dy) <= (mod.getRadius() * mod.getRadius())) {
                     //modg.modifiers.splice(i, 1); // destroy the modifier after collision
                     collisions.push(mod);
                 }

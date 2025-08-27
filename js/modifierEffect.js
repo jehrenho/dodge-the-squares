@@ -1,77 +1,82 @@
-import { MOD_EFFECT_CONFIG } from "./config.js";
+import { MODIFIER_TYPE, MOD_EFFECT_CONFIG, EWOF_CONFIG } from "./config.js";
 // defines the base class for all modifier effects
 export class ModifierEffect {
-    constructor(player, modifierType) {
+    constructor(modifierType) {
         this.type = modifierType;
         this.framesRemaining = 0;
+        this.resetWearOffFlash();
     }
-    update(player) {
+    // decrements the frames remaining for the effect
+    update() {
         this.framesRemaining--;
+    }
+    // returns the number of frames remaining for the effect
+    getFramesRemaining() {
         return this.framesRemaining;
+    }
+    // returns true is the player colour should be flashing (because it is wearing off) given the frames remaining
+    isWearOffFlashing() {
+        if (this.framesRemaining >= this.WOflashMaxFrames) {
+            // the effect is not flashing yet
+            return false;
+        }
+        else if (this.framesRemaining < this.WOflashMinFrames) {
+            // a single flash just ended, update the flash max/min window for the next flash
+            this.WOindex2++;
+            this.updateWearOffFlash();
+            return false;
+        }
+        else {
+            // the effect is currently flashing
+            return true;
+        }
+    }
+    // updates the frame window max/min for the wear off flash effect based on the frames remaining on the effect
+    updateWearOffFlash() {
+        // sets the flash window max/min
+        this.WOflashMaxFrames = EWOF_CONFIG.starts[this.WOindex1] - this.WOindex2 * EWOF_CONFIG.frequencies[this.WOindex1];
+        this.WOflashMinFrames = this.WOflashMaxFrames - EWOF_CONFIG.numFramesPerFlash;
+        if (this.WOflashMinFrames <= EWOF_CONFIG.starts[this.WOindex1 + 1]) {
+            // increases the flashing frequency
+            this.WOindex1++;
+            this.WOindex2 = 0;
+            this.updateWearOffFlash();
+        }
+    }
+    // deactivates the effect immediately
+    deactivate() {
+        this.framesRemaining = 0;
+    }
+    // checks if the effect is expired
+    isExpired() {
+        return this.framesRemaining <= 0;
+    }
+    // resets the wear off flashing state
+    resetWearOffFlash() {
+        this.WOindex1 = 0;
+        this.WOindex2 = 0;
+        this.updateWearOffFlash();
     }
 }
 // Invincibility effect class
 export class InvincibilityEffect extends ModifierEffect {
-    constructor(player) {
-        super(player, "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */);
-        this.resetEffectTimer();
+    constructor() {
+        super(MODIFIER_TYPE.INVINCIBILITY);
+        this.reset();
     }
-    resetEffectTimer() {
+    reset() {
         this.framesRemaining = MOD_EFFECT_CONFIG.INVINCIBILITY.frames;
+        this.resetWearOffFlash();
     }
 }
 // Ice Rink effect class
 export class IceRinkEffect extends ModifierEffect {
-    constructor(player) {
-        super(player, "ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */);
-        this.resetEffectTimer();
+    constructor() {
+        super(MODIFIER_TYPE.ICE_RINK);
+        this.reset();
     }
-    resetEffectTimer() {
+    reset() {
         this.framesRemaining = MOD_EFFECT_CONFIG.ICE_RINK.frames;
+        this.resetWearOffFlash();
     }
-}
-// handles logic for applying and resolving modifier effect collisions
-export function handleModifierCollisions(contactedModifierType, player, hazardManager) {
-    // see if the new effect is already active
-    for (let effect of player.effects) {
-        if (effect.type === contactedModifierType) {
-            // if it is, just reset the timer on the existing effect
-            // no further action required
-            effect.resetEffectTimer();
-            return;
-        }
-    }
-    // return if there are any active effects that are incompatible with the new effect
-    if (player.isInvincible)
-        return;
-    // destroy any existing effects that are incompatible with the new effect
-    if (contactedModifierType === "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */) {
-        // invincibility deactivates ice rink
-        for (let i = player.effects.length - 1; i >= 0; i--) {
-            if (player.effects[i].type != "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */) {
-                player.effects.splice(i, 1);
-                break;
-            }
-        }
-    }
-    // add the new effect to the player's effects
-    switch (contactedModifierType) {
-        case "INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */:
-            player.effects.push(new InvincibilityEffect(player));
-            break;
-        case "ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */:
-            player.effects.push(new IceRinkEffect(player));
-            break;
-        case "SHRINK_HAZ" /* MODIFIER_TYPE.SHRINK_HAZ */:
-            hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor);
-            break;
-        case "ENLARGE_HAZ" /* MODIFIER_TYPE.ENLARGE_HAZ */:
-            hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
-            break;
-        case "EXTRA_LIFE" /* MODIFIER_TYPE.EXTRA_LIFE */:
-            player.modifyHealth(1);
-            break;
-    }
-    // update the player's abilities based on the new effects
-    player.updateEffectsAbilities();
 }

@@ -1,4 +1,4 @@
-import { GAME_CONFIG, MOD_GEN_INITS } from './config.js';
+import { GAME_CONFIG, MODIFIER_TYPE, MOD_GEN_INITS } from './config.js';
 import { VisibleShape } from './visibleShape.js';
 // represents an individual modifier circle in the game
 export class Modifier extends VisibleShape {
@@ -6,6 +6,14 @@ export class Modifier extends VisibleShape {
         super(x, y, fillColour, borderColour);
         this.modifierType = modifierType;
         this.r = r;
+    }
+    // returns the radius of the modifier
+    getRadius() {
+        return this.r;
+    }
+    // returns the type of the modifier
+    getType() {
+        return this.modifierType;
     }
     // draws the modifier on the canvas
     draw(ctx, fillColour) {
@@ -37,11 +45,11 @@ export class ModifierManager {
     // initializes all modifier groups
     constructor() {
         this.modifierGroups = [];
-        this.modifierGroups.push(new ModifierGroup("INVINCIBILITY" /* MODIFIER_TYPE.INVINCIBILITY */, MOD_GEN_INITS.INVINCIBILITY.speed, MOD_GEN_INITS.INVINCIBILITY.density, MOD_GEN_INITS.INVINCIBILITY.radius, MOD_GEN_INITS.INVINCIBILITY.fillColour, MOD_GEN_INITS.INVINCIBILITY.outlineColour));
-        this.modifierGroups.push(new ModifierGroup("ICE_RINK" /* MODIFIER_TYPE.ICE_RINK */, MOD_GEN_INITS.ICE_RINK.speed, MOD_GEN_INITS.ICE_RINK.density, MOD_GEN_INITS.ICE_RINK.radius, MOD_GEN_INITS.ICE_RINK.fillColour, MOD_GEN_INITS.ICE_RINK.outlineColour));
-        this.modifierGroups.push(new ModifierGroup("SHRINK_HAZ" /* MODIFIER_TYPE.SHRINK_HAZ */, MOD_GEN_INITS.SHRINK_HAZ.speed, MOD_GEN_INITS.SHRINK_HAZ.density, MOD_GEN_INITS.SHRINK_HAZ.radius, MOD_GEN_INITS.SHRINK_HAZ.fillColour, MOD_GEN_INITS.SHRINK_HAZ.outlineColour));
-        this.modifierGroups.push(new ModifierGroup("ENLARGE_HAZ" /* MODIFIER_TYPE.ENLARGE_HAZ */, MOD_GEN_INITS.ENLARGE_HAZ.speed, MOD_GEN_INITS.ENLARGE_HAZ.density, MOD_GEN_INITS.ENLARGE_HAZ.radius, MOD_GEN_INITS.ENLARGE_HAZ.fillColour, MOD_GEN_INITS.ENLARGE_HAZ.outlineColour));
-        this.modifierGroups.push(new ModifierGroup("EXTRA_LIFE" /* MODIFIER_TYPE.EXTRA_LIFE */, MOD_GEN_INITS.EXTRA_LIFE.speed, MOD_GEN_INITS.EXTRA_LIFE.density, MOD_GEN_INITS.EXTRA_LIFE.radius, MOD_GEN_INITS.EXTRA_LIFE.fillColour, MOD_GEN_INITS.EXTRA_LIFE.outlineColour));
+        this.modifierGroups.push(new ModifierGroup(MODIFIER_TYPE.INVINCIBILITY, MOD_GEN_INITS.INVINCIBILITY.speed, MOD_GEN_INITS.INVINCIBILITY.density, MOD_GEN_INITS.INVINCIBILITY.radius, MOD_GEN_INITS.INVINCIBILITY.fillColour, MOD_GEN_INITS.INVINCIBILITY.outlineColour));
+        this.modifierGroups.push(new ModifierGroup(MODIFIER_TYPE.ICE_RINK, MOD_GEN_INITS.ICE_RINK.speed, MOD_GEN_INITS.ICE_RINK.density, MOD_GEN_INITS.ICE_RINK.radius, MOD_GEN_INITS.ICE_RINK.fillColour, MOD_GEN_INITS.ICE_RINK.outlineColour));
+        this.modifierGroups.push(new ModifierGroup(MODIFIER_TYPE.SHRINK_HAZ, MOD_GEN_INITS.SHRINK_HAZ.speed, MOD_GEN_INITS.SHRINK_HAZ.density, MOD_GEN_INITS.SHRINK_HAZ.radius, MOD_GEN_INITS.SHRINK_HAZ.fillColour, MOD_GEN_INITS.SHRINK_HAZ.outlineColour));
+        this.modifierGroups.push(new ModifierGroup(MODIFIER_TYPE.ENLARGE_HAZ, MOD_GEN_INITS.ENLARGE_HAZ.speed, MOD_GEN_INITS.ENLARGE_HAZ.density, MOD_GEN_INITS.ENLARGE_HAZ.radius, MOD_GEN_INITS.ENLARGE_HAZ.fillColour, MOD_GEN_INITS.ENLARGE_HAZ.outlineColour));
+        this.modifierGroups.push(new ModifierGroup(MODIFIER_TYPE.EXTRA_LIFE, MOD_GEN_INITS.EXTRA_LIFE.speed, MOD_GEN_INITS.EXTRA_LIFE.density, MOD_GEN_INITS.EXTRA_LIFE.radius, MOD_GEN_INITS.EXTRA_LIFE.fillColour, MOD_GEN_INITS.EXTRA_LIFE.outlineColour));
     }
     // creates modifiers and add's them to the correct modifier group
     createModifier(type, x, y) {
@@ -70,7 +78,7 @@ export class ModifierManager {
             for (let i = modg.modifiers.length - 1; i >= 0; i--) {
                 modg.modifiers[i].x -= modg.speed;
                 // remove old modifiers
-                if (modg.modifiers[i].x < -modg.modifiers[i].r || modg.modifiers[i].isTimeToKill()) {
+                if (modg.modifiers[i].x < -modg.modifiers[i].getRadius() || modg.modifiers[i].isTimeToKill()) {
                     modg.modifiers.splice(i, 1);
                 }
             }
@@ -82,7 +90,7 @@ export class ModifierManager {
         this.moveModifiers();
     }
     // detects collisions between the player and modifier circles
-    detectCollisions(player, hazardManager) {
+    detectCollisions(player) {
         let closestX = 0;
         let closestY = 0;
         let dx = 0;
@@ -99,7 +107,7 @@ export class ModifierManager {
                 dx = mod.x - closestX;
                 dy = mod.y - closestY;
                 // If distance < radius there is a collision
-                if ((dx * dx + dy * dy) <= (mod.r * mod.r)) {
+                if ((dx * dx + dy * dy) <= (mod.getRadius() * mod.getRadius())) {
                     //modg.modifiers.splice(i, 1); // destroy the modifier after collision
                     collisions.push(mod);
                 }

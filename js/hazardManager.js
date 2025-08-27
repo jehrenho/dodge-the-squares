@@ -114,7 +114,7 @@ export class HazardManager {
     }
     // detects collisions between the player and hazards
     detectCollisions(player) {
-        if (player.isInvincible)
+        if (player.isInvincible())
             return [];
         let collisions = [];
         for (let hazard of this.hazards) {
