@@ -2,39 +2,41 @@ Dodge the Squares Game
 
 
 ## Description
-Dodge the Squares is a browser-based Javascript/Typescript game where players avoid moving obstacles as long as they can. 
+Dodge the Squares is a browser-based Javascript/Typescript game where players avoid moving obstacles as long as 
+they can. 
 The progressively increasing difficulty and variety of modifiers make dodge a fun challenge!
+
+
+## Play the Game!
+Visit https://jehrenho.github.io/dodge/ to play the game in your browser
 
 
 ## Features
 - a How to Play screen helps new players learn the controls and game objective
-- Player can move left and right using arrow keys
+    - The How to Play screen "comes to life" when the game starts
+- Player can move up, down, left, and right within the game boundaries using the arrow keys
 - Hazards are randomly generated and decrease the player's health when touched
-- Modifiers change certain elements of the game to make the game interesting and aesthetic 
+- Modifiers change certain elements of the game to make the game fun and aesthetic 
     - The Enlarge Hazard modifier makes the hazards larger for a short period of time
     - The Shrink Hazard modifier makes the hazards smaller for a short period of time
     - The Ice Rink modifier significantly decreases the player's acceleration
     - The Invincibility modifier makes the player invincible for a short period of time
     - The Extra Life modifier gives the player an extra life
-- Difficulty increases over time
+- The player's colour flashes when an effect is wearing off
+- When the player collides with an object, the player and the object flash momentarily
+- The game's difficulty logarithmically increases over time
+- The game can be paused at any time by pressing the space key
 - The time spent in game is recorded and reported to the player when the game is over
 - The game automatically adjusts it's dimensions depending on the size of the window it is in
 
 
 ## Technologies
-- Javascript
-- Typecript
+- Typecript/JavaScript
 - HTML5 Canvas
 - CSS
 
 
-## Controls
-- Arrow Left / Right / Up / Down: Move player
-- Enter: Start game and return to menu
-- Space: Pause and resume the game
-
-
-## Organization
+## File Structure
 
 game.ts
 Contains the main game loop that generates a single frame of the game.
@@ -50,7 +52,8 @@ collisionFlasher.ts
 Contains the CollisionFlasher class which flashes game elements.
 
 visibleShape.ts
-Contains the abstract VisibleGameShape class that holds properties that all hazards, modifiers, and the player have in common
+Contains the abstract VisibleGameShape class that holds properties that all hazards, modifiers, and the player 
+have in common
 
 player.ts
 Conatins the player class which represents the player square nad it's state.
@@ -74,10 +77,40 @@ config.ts
 Contains all the configuration constants the game needs to function.
 
 
+## Challenges
+
+--- The Collision-Action Matrix --
+
+PROBLEM: Every effect interacts with all the other effects in unique ways. For example, when the player 
+collides with an Ice Rink effect:
+    - the Ice Rink effect is activated if the player has no active effects
+    - the Ice Rink effect does nothing if the player already has the invincibility effect
+    - the Ice Rink effect resets the player's Ice Rink effect if the player already has the Ice Rink effect
+    - the Ice Rink effect might stack with an effect that is implemented in future development
+Effect interactions are complex and it would be difficult to hard code this logic.
+
+SOLUTION: Create a strongly typed collision matrix that verbosely describes how to handle every effect interaction.
+The collision matrix is implemented in the config.ts file. The matrix is declared and initialized such that:
+
+collisionMatrix[role: CollisionRole][oldType: ModifierType][newType: ModifierType] 
+
+is the action that must be taken for either an already active effect or a new effect upon the player colliding with
+a new modifier where:
+    -"role" specifies weather the action is for the new effect or the old effect
+    -"oldType" is the type of an effect that is already active 
+    -"newType" is the type of the new effect of a modifier the player just collided with
+
+Implementing matrices like the collisionMatrix in Dodge The Squares requires a robust understanding of TypeScript
+to create strongly typed iterable structures that scale easily.
+
+
 ## Future improvements
+- Prevent the game from stretching when the window size is adjusted
 - MODIFIER - blind (Black) - put up a blinder of some kind
 - MODIFIER - RAIN (darker blue) - randomize the speed of the incoming hazards, dampens down to nothing
 - MODIFIER - WAVE (very dark blue) - makes the hazards wave in the y dimension sinusodally, dampens down to nothing
 - MODIFIER - SHIELD (silver) - gives the player a shield that pops some hazards
-- Make the player colour flash before modifier effects ware off completely
-- Add a backend and make a leaderboard
+- Adjust modifier generation frequencies as a function of time survived
+- Build a backend that allows players to submit their name and score to leaderboard
+    - Add a submission field to the game over screen
+    - Add the leaderboard to the Menu
