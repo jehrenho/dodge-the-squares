@@ -75,7 +75,7 @@ function gameLoop() {
             }
     }
     inputManager.update();
-    Artist.prepToDrawNextFrame();
+    Artist.finishDrawingFrame();
     // schedule the generation of the next frame
     requestAnimationFrame(gameLoop);
 }

@@ -24,14 +24,44 @@ export class Artist {
     }
     // clears the canvas and sets up window scaling to the current window size
     static prepToDrawFrame() {
+        // clear the game area
         Artist.ctx.clearRect(0, 0, GAME_CONFIG.VIRTUAL_WIDTH, GAME_CONFIG.VIRTUAL_HEIGHT);
-        const windowScaleX = Artist.ctx.canvas.width / GAME_CONFIG.VIRTUAL_WIDTH;
-        const windowScaleY = Artist.ctx.canvas.height / GAME_CONFIG.VIRTUAL_HEIGHT;
         Artist.ctx.save();
-        Artist.ctx.scale(windowScaleX, windowScaleY);
+        // set up translation and scaling for the game area
+        Artist.ctx.setTransform(1, 0, 0, 1, 0, 0); // reset any transforms
+        Artist.windowScaleX = Artist.ctx.canvas.width / GAME_CONFIG.VIRTUAL_WIDTH;
+        Artist.windowScaleY = Artist.ctx.canvas.height / GAME_CONFIG.VIRTUAL_HEIGHT;
+        Artist.scale = Math.min(Artist.windowScaleX, Artist.windowScaleY);
+        // calculate translation to center the game area
+        const offsetX = (Artist.ctx.canvas.width - GAME_CONFIG.VIRTUAL_WIDTH * Artist.scale) / 2;
+        const offsetY = (Artist.ctx.canvas.height - GAME_CONFIG.VIRTUAL_HEIGHT * Artist.scale) / 2;
+        // apply the translation and scaling
+        Artist.ctx.translate(offsetX, offsetY);
+        Artist.ctx.scale(Artist.scale, Artist.scale);
     }
-    // restores the canvas context to its previous state so scaling can be reapplied
-    static prepToDrawNextFrame() {
+    // finishes drawing the current frame and restores the context
+    static finishDrawingFrame() {
+        Artist.ctx.restore();
+        // draw the black letterbox bars
+        const gameWidth = GAME_CONFIG.VIRTUAL_WIDTH * Artist.scale;
+        const gameHeight = GAME_CONFIG.VIRTUAL_HEIGHT * Artist.scale;
+        const offsetX = (Artist.ctx.canvas.width - gameWidth) / 2;
+        const offsetY = (Artist.ctx.canvas.height - gameHeight) / 2;
+        Artist.ctx.save();
+        Artist.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transforms
+        Artist.ctx.fillStyle = GAME_CONFIG.letterboxColour;
+        // left bar
+        if (offsetX > 0) {
+            Artist.ctx.fillRect(0, 0, offsetX, Artist.ctx.canvas.height);
+            // right bar
+            Artist.ctx.fillRect(offsetX + gameWidth, 0, offsetX, Artist.ctx.canvas.height);
+        }
+        // top bar
+        if (offsetY > 0) {
+            Artist.ctx.fillRect(0, 0, Artist.ctx.canvas.width, offsetY);
+            // bottom bar
+            Artist.ctx.fillRect(0, offsetY + gameHeight, Artist.ctx.canvas.width, offsetY);
+        }
         Artist.ctx.restore();
     }
     // draws the game background
@@ -83,3 +113,6 @@ export class Artist {
         Menu.reset();
     }
 }
+Artist.windowScaleX = 0;
+Artist.windowScaleY = 0;
+Artist.scale = 0;
