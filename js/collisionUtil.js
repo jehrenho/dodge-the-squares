@@ -35,30 +35,17 @@ export class CollisionUtil {
     }
     // handles logic for applying and resolving modifier effect collisions
     static actOnModifierCollision(newModifierType, player, hazardManager) {
-        // handle the trivial modifiers effects that don't interact with other effects
-        if (newModifierType == MODIFIER_TYPE.SHRINK_HAZ) {
-            hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor);
-            return;
-        }
-        else if (newModifierType == MODIFIER_TYPE.ENLARGE_HAZ) {
-            hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
-            return;
-        }
-        else if (newModifierType == MODIFIER_TYPE.EXTRA_LIFE) {
-            player.modifyHealth(1);
-            return;
-        }
         // activate the effect if there are no other active effects
         if (player.isNoEffects()) {
-            player.addEffect(newModifierType);
+            CollisionUtil.activateEffect(newModifierType, player, hazardManager);
             return;
         }
-        // determine what to do, given there is a new complex modifier collision, when there are active effects
+        // determine what to do, given a new modifier collision, when there are active effects
         for (let activeEffect of player.effects) {
             // determine what to do with the new modifier effect
             switch (collisionMatrix[COLLISION_ROLE.NEW][activeEffect.type][newModifierType]) {
                 case COLLISION_ACTION.ACTIVATE:
-                    player.addEffect(newModifierType);
+                    CollisionUtil.activateEffect(newModifierType, player, hazardManager);
                     break;
                 case COLLISION_ACTION.DESTROY:
                     // do nothing
@@ -82,6 +69,29 @@ export class CollisionUtil {
                     console.error(`Unexpected collision action for ${newModifierType} and ${activeEffect.type}`);
                     break;
             }
+        }
+    }
+    // activates new effects
+    static activateEffect(type, player, hazardManager) {
+        switch (type) {
+            case MODIFIER_TYPE.SHRINK_HAZ:
+                hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor);
+                break;
+            case MODIFIER_TYPE.ENLARGE_HAZ:
+                hazardManager.applySizeScaleFactor(MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor);
+                break;
+            case MODIFIER_TYPE.EXTRA_LIFE:
+                player.modifyHealth(1);
+                break;
+            case MODIFIER_TYPE.INVINCIBILITY:
+                player.addEffect(type);
+                break;
+            case MODIFIER_TYPE.ICE_RINK:
+                player.addEffect(type);
+                break;
+            default:
+                console.error(`Unexpected modifier type: ${type}`);
+                break;
         }
     }
 }
