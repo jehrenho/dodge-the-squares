@@ -1,4 +1,4 @@
-import { Artist } from "./artist.js";
+import { Artist } from "./graphicsUtil.js";
 import { InputEventType } from "./config.js";
 // manages keyboard input for the game
 export class InputManager {

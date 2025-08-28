@@ -13,11 +13,11 @@ This project demonstrates:
 
 ## 🎮 Play the Game!
 
-[Play Dodge the Squares in your browser](https://jehrenho.github.io/dodge/)
+[Play Dodge the Squares in your browser](https://jehrenho.github.io/dodge-game/)
 
 ---
 
-## ⚡ Features
+## Features
 
 - **Interactive tutorial:** “How to Play” screen introduces controls and objectives  
 - **Responsive controls:** Move with arrow keys within game boundaries  
@@ -35,7 +35,7 @@ This project demonstrates:
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 - TypeScript / JavaScript  
 - HTML5 Canvas  
@@ -44,7 +44,7 @@ This project demonstrates:
 
 ---
 
-## 📁 File Structure
+## File Structure
 
 - `game.ts` — main game loop & game state  
 - `artist.ts` — rendering logic  
@@ -61,7 +61,7 @@ This project demonstrates:
 
 ---
 
-## 🧩 Challenges
+## Challenges
 
 ### Collision-Action Matrix
 Managing interactions between multiple simultaneous modifiers was a major design challenge.  
@@ -81,9 +81,7 @@ collisionMatrix[role: CollisionRole][oldType: ModifierType][newType: ModifierTyp
 This approach ensures clarity, scalability, and type safety when adding new effects
 
 ### Collision Detection
-Every frame, the game checks whether the **player square** collides with either: 
-- 🟥 **Hazards (squares)** 
-- 🟢 **Modifiers (circles)** 
+Every frame, the game checks whether the **player square** collides with any of the **Hazard squares** or **Modifiers circles**
 
 **Solution:** To handle this efficiently, two classic algorithms are used: 
 
@@ -94,9 +92,8 @@ This ensures fast, reliable collision checks even as the number of hazards and m
 
 ---
 
-## 🔮 Future Improvements
+## Future Improvements
 
-- Improve window resizing (prevent stretching). 
 - New modifiers: 
   - Blind — temporary screen obstruction 
   - Rain — randomize hazard speed with gradual damping 

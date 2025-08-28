@@ -4,7 +4,7 @@ import { Player } from './player.js';
 import { HazardManager } from './hazardManager.js';
 import { ModifierManager } from './modifierManager.js';
 import { Flasher } from './flasher.js';
-import { Artist } from './artist.js';
+import { GraphicsUtil } from './graphicsUtil.js';
 import { CollisionUtil } from './collisionUtil.js';
 // stores and manages the game phase and game timer
 export class GameState {
@@ -55,10 +55,10 @@ export class GameState {
 }
 // main game loop: generates a single frame in the game
 function gameLoop() {
-    Artist.prepToDrawFrame();
+    GraphicsUtil.prepToDrawFrame();
     switch (gameState.getPhase()) {
         case 0 /* GamePhase.MENU */:
-            Artist.drawMenu();
+            GraphicsUtil.drawMenu();
             // start the game when Enter is pressed
             if (inputManager.isKeyJustReleased(Keys.ENTER))
                 gameState.setPhase(1 /* GamePhase.INGAME */);
@@ -67,7 +67,7 @@ function gameLoop() {
             generateInGameFrame();
             break;
         case 2 /* GamePhase.GAMEOVER */:
-            Artist.drawGameOver();
+            GraphicsUtil.drawGameOver();
             // return to the menu when Enter is pressed
             if (inputManager.isKeyJustReleased(Keys.ENTER)) {
                 resetGame();
@@ -75,7 +75,7 @@ function gameLoop() {
             }
     }
     inputManager.update();
-    Artist.finishDrawingFrame();
+    GraphicsUtil.finishDrawingFrame();
     // schedule the generation of the next frame
     requestAnimationFrame(gameLoop);
 }
@@ -88,14 +88,14 @@ function generateInGameFrame() {
     }
     // draw the pause menu if the game is paused
     if (gameState.isPaused) {
-        Artist.drawGamePaused();
+        GraphicsUtil.drawGamePaused();
         if (inputManager.isKeyJustReleased(Keys.SPACE))
             gameState.isPaused = false;
     }
     else if (Flasher.isFlashingCollision()) {
         // don't update the game objects if a collision is flashing, just draw the in-game elements
         Flasher.update();
-        Artist.drawInGameElements();
+        GraphicsUtil.drawInGameElements();
     }
     else {
         // end the game if the player is dead
@@ -110,7 +110,7 @@ function generateInGameFrame() {
         player.updateEffects();
         CollisionUtil.resolveHazardCollisions();
         // draw the frame
-        Artist.drawInGameElements();
+        GraphicsUtil.drawInGameElements();
         // update the time survived this game and increase difficulty
         gameState.incrementFrameCount();
     }
@@ -121,7 +121,7 @@ function resetGame() {
     player.reset();
     hazardManager.reset();
     modifierManager.reset();
-    Artist.reset();
+    GraphicsUtil.reset();
 }
 // create and initialize all game objects
 const gameState = new GameState();
@@ -129,7 +129,7 @@ const player = new Player();
 const hazardManager = new HazardManager();
 const modifierManager = new ModifierManager();
 const inputManager = new InputManager();
-Artist.init(gameState, player, hazardManager, modifierManager);
+GraphicsUtil.init(gameState, player, hazardManager, modifierManager);
 CollisionUtil.init(player, hazardManager, modifierManager);
 // start tracking keyboard input
 inputManager.startListening();

@@ -1,7 +1,7 @@
 import { GAME_CONFIG, ModifierType, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
 import { Player } from './player.js';
 import { HazardManager, Hazard } from './hazardManager.js';
-import { Artist } from './artist.js';
+import { Artist } from './graphicsUtil.js';
 import { ModifierManager } from './modifierManager.js';
 
 // menu class for managing the game menu
