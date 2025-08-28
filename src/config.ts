@@ -8,6 +8,7 @@ export const enum GamePhase {
 // game configuration constants
 export const GAME_CONFIG = {
     backgroundColour: "lightgreen",
+    letterboxColour: "black",
     fontColour: "black",
     menuFont: "25px Arial",
     statusBarFont: "25px Arial",
