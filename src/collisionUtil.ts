@@ -1,7 +1,9 @@
 import { ModifierType, MODIFIER_TYPE, COLLISION_ROLE, COLLISION_ACTION, collisionMatrix, MOD_EFFECT_CONFIG } from './config.js';
 import { Player } from './player.js';
-import { HazardManager, Hazard } from './hazardManager.js';
-import { ModifierManager, Modifier } from './modifierManager.js';
+import { Hazard } from './hazard.js';
+import { Modifier } from './modifier.js';
+import { HazardManager } from './hazardManager.js';
+import { ModifierManager } from './modifierManager.js';
 import { Flasher } from './flasher.js';
 
 export class CollisionUtil {

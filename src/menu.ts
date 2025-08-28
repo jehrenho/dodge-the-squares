@@ -1,7 +1,7 @@
 import { GAME_CONFIG, ModifierType, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
 import { Player } from './player.js';
-import { HazardManager, Hazard } from './hazardManager.js';
-import { Artist } from './graphicsUtil.js';
+import { Hazard } from './hazard.js'
+import { HazardManager } from './hazardManager.js';
 import { ModifierManager } from './modifierManager.js';
 
 // menu class for managing the game menu
@@ -148,7 +148,6 @@ export class Menu {
 
     // draws the menu
     static draw(): void {
-        Artist.drawBackground();
         Menu.drawStartPrompt();
         Menu.drawHowToPlay();
         Menu.drawModifierExplanations();

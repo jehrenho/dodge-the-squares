@@ -1,7 +1,7 @@
-import { GamePhase  , GAME_CONFIG } from './config.js';
+import { GAME_CONFIG } from './config.js';
 import { Player } from './player.js';
-import { Hazard, HazardManager } from './hazardManager.js';
-import { Modifier, ModifierManager } from './modifierManager.js';
+import { Hazard } from './hazard.js';
+import { Modifier } from './modifier.js';
 
 // handles the flashing of game objects upon collisions
 export class Flasher {

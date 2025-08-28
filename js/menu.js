@@ -1,5 +1,4 @@
 import { GAME_CONFIG, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
-import { Artist } from './graphicsUtil.js';
 // menu class for managing the game menu
 export class Menu {
     // initializes the menu based on the size of the window
@@ -114,7 +113,6 @@ export class Menu {
     }
     // draws the menu
     static draw() {
-        Artist.drawBackground();
         Menu.drawStartPrompt();
         Menu.drawHowToPlay();
         Menu.drawModifierExplanations();

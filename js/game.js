@@ -55,7 +55,9 @@ export class GameState {
 }
 // main game loop: generates a single frame in the game
 function gameLoop() {
+    // prepare the graphics utility to draw the frame
     GraphicsUtil.prepToDrawFrame();
+    // draw the frame depending on the game phase
     switch (gameState.getPhase()) {
         case 0 /* GamePhase.MENU */:
             GraphicsUtil.drawMenu();
@@ -74,8 +76,10 @@ function gameLoop() {
                 gameState.setPhase(0 /* GamePhase.MENU */);
             }
     }
-    inputManager.update();
+    // finish drawing the frame and prepare the graphics utility for the next frame
     GraphicsUtil.finishDrawingFrame();
+    // update the input manager for key rising/falling detection
+    inputManager.update();
     // schedule the generation of the next frame
     requestAnimationFrame(gameLoop);
 }

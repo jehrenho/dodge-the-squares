@@ -137,6 +137,7 @@ export class GraphicsUtil {
 
   // draws the menu
   static drawMenu(): void {
+    GraphicsUtil.drawBackground();
     Menu.draw();
   }
 

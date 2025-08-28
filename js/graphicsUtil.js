@@ -106,6 +106,7 @@ export class GraphicsUtil {
     }
     // draws the menu
     static drawMenu() {
+        GraphicsUtil.drawBackground();
         Menu.draw();
     }
     // resets the artist's state

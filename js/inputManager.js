@@ -1,4 +1,4 @@
-import { Artist } from "./graphicsUtil.js";
+import { GraphicsUtil } from "./graphicsUtil.js";
 import { InputEventType } from "./config.js";
 // manages keyboard input for the game
 export class InputManager {
@@ -16,8 +16,8 @@ export class InputManager {
     }
     // handle window resize events
     onResize(event) {
-        Artist.ctx.canvas.width = window.innerWidth - 1;
-        Artist.ctx.canvas.height = window.innerHeight - 1;
+        GraphicsUtil.ctx.canvas.width = window.innerWidth - 1;
+        GraphicsUtil.ctx.canvas.height = window.innerHeight - 1;
     }
     // checks if a key is currently pressed
     isKeyPressed(key) {
@@ -34,7 +34,7 @@ export class InputManager {
     clearKeyState(key) {
         this.keyStates[key] = false;
     }
-    // updates the state of the input manager
+    // updates the last frame key states for key rising/falling detection
     update() {
         for (const key in this.keyStates) {
             this.keyStatesLastFrame[key] = this.keyStates[key];
