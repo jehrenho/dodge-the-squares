@@ -1,5 +1,5 @@
 import { GraphicsUtil } from "./graphicsUtil.js";
-import { InputEventType, Keys } from "./config.js";
+import { InputEventType, KEYS, Keys } from "./config.js";
 
 // manages keyboard input for the game
 export class InputManager {
@@ -27,6 +27,16 @@ export class InputManager {
         return this.keyStates[key] === true;
     }
 
+    // checks if the Enter key is currently pressed
+    isEnterPressed(): boolean {
+        return this.keyStates[KEYS.ENTER] === true;
+    }
+
+    // checks if the Space key is currently pressed
+    isSpaceJustPressed(): boolean {
+        return this.keyStates[KEYS.SPACE] === true && this.keyStatesLastFrame[KEYS.SPACE] === false;
+    }
+
     // checks if a key was just released this frame
     isKeyJustReleased(key: Keys): boolean {
         if (!this.keyStates[key] && this.keyStatesLastFrame[key]) return true;
@@ -38,6 +48,11 @@ export class InputManager {
         this.keyStates[key] = false;
     }
 
+    // sets the space key state to false to wait for the key to be released
+    waitForSpaceToRelease(): void {
+        this.keyStates[KEYS.SPACE] = false;
+    }
+
     // updates the last frame key states for key rising/falling detection
     update(): void {
         for (const key in this.keyStates) {
@@ -45,8 +60,14 @@ export class InputManager {
         }
     }
 
-    // starts listening for events
-    startListening(): void {
+    // initializes state and starts listening for events
+    init(): void {
+        // initialize key states
+        for (const keyName of Object.values(KEYS)) {
+            this.keyStates[keyName] = false;
+            this.keyStatesLastFrame[keyName] = false;
+        }
+
         // start keyboard listening
         window.addEventListener(InputEventType.KEYDOWN, this.onKeyDown.bind(this));
         window.addEventListener(InputEventType.KEYUP, this.onKeyUp.bind(this));

@@ -34,14 +34,16 @@ export enum InputEventType {
 }
 
 // keyboard keys
-export enum Keys {
-    UP = "ArrowUp",
-    DOWN = "ArrowDown",
-    LEFT = "ArrowLeft",
-    RIGHT = "ArrowRight",
-    ENTER = "Enter",
-    SPACE = " "
-};
+export const KEYS = {
+    UP: "ArrowUp",
+    DOWN: "ArrowDown",
+    LEFT: "ArrowLeft",
+    RIGHT: "ArrowRight",
+    ENTER: "Enter",
+    SPACE: " "
+} as const;
+
+export type Keys = typeof KEYS[keyof typeof KEYS];
 
 // player configuration constants
 export const PLAYER_INITS = {

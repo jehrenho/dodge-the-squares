@@ -27,16 +27,14 @@ export var InputEventType;
     InputEventType["RESIZE"] = "resize";
 })(InputEventType || (InputEventType = {}));
 // keyboard keys
-export var Keys;
-(function (Keys) {
-    Keys["UP"] = "ArrowUp";
-    Keys["DOWN"] = "ArrowDown";
-    Keys["LEFT"] = "ArrowLeft";
-    Keys["RIGHT"] = "ArrowRight";
-    Keys["ENTER"] = "Enter";
-    Keys["SPACE"] = " ";
-})(Keys || (Keys = {}));
-;
+export const KEYS = {
+    UP: "ArrowUp",
+    DOWN: "ArrowDown",
+    LEFT: "ArrowLeft",
+    RIGHT: "ArrowRight",
+    ENTER: "Enter",
+    SPACE: " "
+};
 // player configuration constants
 export const PLAYER_INITS = {
     x: 200,

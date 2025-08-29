@@ -1,4 +1,4 @@
-import { Keys, GAME_CONFIG } from './config.js';
+import { GAME_CONFIG } from './config.js';
 import { InputManager } from './inputManager.js';
 import { Player } from './player.js';
 import { HazardManager } from './hazardManager.js';
@@ -11,10 +11,9 @@ export class GameState {
     constructor() {
         this.numFramesThisGame = 0;
         this.phase = 0 /* GamePhase.MENU */;
-        this.isPaused = false;
     }
     // increments the frame count and updates the time survived
-    incrementFrameCount(hazardManager) {
+    incrementFrameCount() {
         this.numFramesThisGame++;
     }
     // returns the number of frames survived
@@ -41,7 +40,6 @@ export class GameState {
     reset() {
         this.numFramesThisGame = 0;
         this.phase = 0 /* GamePhase.MENU */;
-        this.isPaused = false;
     }
 }
 // represents a single game instance
@@ -54,8 +52,8 @@ export class Game {
         this.inputManager = new InputManager();
         GraphicsUtil.init(this.gameState, this.player, this.hazardManager, this.modifierManager);
         CollisionUtil.init(this.player, this.hazardManager, this.modifierManager);
-        // start tracking keyboard input
-        this.inputManager.startListening();
+        this.inputManager.init();
+        this.isGamePaused = false;
     }
     // the main game loop: generates a single frame in the game
     gameLoop() {
@@ -66,7 +64,7 @@ export class Game {
             case 0 /* GamePhase.MENU */:
                 GraphicsUtil.drawMenu();
                 // start the game when Enter is pressed
-                if (this.inputManager.isKeyJustReleased(Keys.ENTER))
+                if (this.inputManager.isEnterPressed())
                     this.gameState.setPhase(1 /* GamePhase.INGAME */);
                 break;
             case 1 /* GamePhase.INGAME */:
@@ -75,10 +73,11 @@ export class Game {
             case 2 /* GamePhase.GAMEOVER */:
                 GraphicsUtil.drawGameOver();
                 // return to the menu when Enter is pressed
-                if (this.inputManager.isKeyJustReleased(Keys.ENTER)) {
+                if (this.inputManager.isEnterPressed()) {
                     this.resetGame();
                     this.gameState.setPhase(0 /* GamePhase.MENU */);
                 }
+                break;
         }
         // finish drawing the frame and prepare the graphics utility for the next frame
         GraphicsUtil.finishDrawingFrame();
@@ -90,15 +89,16 @@ export class Game {
     // generates an in-game frame
     generateInGameFrame() {
         // pause the game if space is pressed
-        if (!this.gameState.isPaused && this.inputManager.isKeyPressed(Keys.SPACE)) {
-            this.gameState.isPaused = true;
-            this.inputManager.clearKeyState(Keys.SPACE);
+        if (!this.isGamePaused && this.inputManager.isSpaceJustPressed()) {
+            this.isGamePaused = true;
+            this.inputManager.waitForSpaceToRelease();
         }
         // draw the pause menu if the game is paused
-        if (this.gameState.isPaused) {
+        if (this.isGamePaused) {
             GraphicsUtil.drawGamePaused();
-            if (this.inputManager.isKeyJustReleased(Keys.SPACE))
-                this.gameState.isPaused = false;
+            if (this.inputManager.isSpaceJustPressed()) {
+                this.isGamePaused = false;
+            }
         }
         else if (Flasher.isFlashingCollision()) {
             // don't update the game objects if a collision is flashing, just draw the in-game elements
@@ -120,7 +120,7 @@ export class Game {
             // draw the frame
             GraphicsUtil.drawInGameElements();
             // update the time survived this game and increase difficulty
-            this.gameState.incrementFrameCount(this.hazardManager);
+            this.gameState.incrementFrameCount();
         }
     }
     // resets the game objects
