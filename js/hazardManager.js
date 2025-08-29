@@ -111,7 +111,7 @@ export class HazardManager {
     // updates the difficulty of hazards logarithmically based on the time survived
     updateDifficulty(numMinutesSurvived) {
         let difficultyFactor = logBase(numMinutesSurvived + 1, HAZ_GEN_INITS.difficultyLogBase);
-        this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * 2;
+        this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * HAZ_GEN_INITS.difficultyDensityFactor;
         this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
     }
     // destroys active hazards

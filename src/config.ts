@@ -7,7 +7,7 @@ export const enum GamePhase {
 
 // game configuration constants
 export const GAME_CONFIG = {
-    backgroundColour: "lightgreen",
+    backgroundColour: "moccasin",
     letterboxColour: "black",
     fontColour: "black",
     menuFont: "25px Arial",
@@ -18,7 +18,7 @@ export const GAME_CONFIG = {
     VIRTUAL_HEIGHT: 954,
     collisionFlashFillColour: "white",
     collisionFlashBorderColour: "black",
-    flashingFramesDuration: 30,
+    flashingFramesDuration: 20,
     framesPerFlash: 4,
     pauseTitle: "Game Paused",
     pauseMessage: "Press Space to Continue"
@@ -51,10 +51,10 @@ export const PLAYER_INITS = {
     yspeed: 0,
     maxSpeed: 7.0,
     accel: 0.25,
-    health3Colour: "green",
+    health3Colour: "yellowgreen",
     health2Colour: "olive",
     health1Colour: "saddlebrown",
-    borderColour: "black",
+    borderColour: "#102000",
     num_lives: 3,
 };
 
@@ -64,9 +64,10 @@ export const HAZ_GEN_INITS = {
     h: 50,
     speed: 4,
     density: 0.02,
-    fillColour: "red",
-    borderColour: "darkred",
+    fillColour: "#FF1E00",
+    borderColour: "#2B0000",
     difficultyLogBase: 3,
+    difficultyDensityFactor: 2.2,
     sizeModInitTransFrames: 60,
     sizeModDecayFrames: 900,
 };
@@ -103,16 +104,16 @@ export const MOD_GEN_INITS = {
         density: 0.00037, // 0.0008 is a good start
         speed: 9,
         radius: 25,
-        fillColour: "gold",
-        outlineColour: "yellow",
+        fillColour: "#FFDF10",
+        outlineColour: "goldenrod",
         description: "Grants temporary invincibility"
     },
     [MODIFIER_TYPE.ICE_RINK]: {
         density: 0.0065,
         speed: 5,
         radius: 80,
-        fillColour: "lightskyblue",
-        outlineColour: "skyblue",
+        fillColour: "mediumaquamarine",
+        outlineColour: "lightseagreen",
         description: "Creates a slippery ice rink"
     },
     [MODIFIER_TYPE.SHRINK_HAZ]: {
@@ -127,16 +128,16 @@ export const MOD_GEN_INITS = {
         density: 0.006,
         speed: 4,
         radius: 100,
-        fillColour: "darkred",
-        outlineColour: "maroon",
+        fillColour: "orangered",
+        outlineColour: "firebrick",
         description: "Enlarges hazards"
     },
     [MODIFIER_TYPE.EXTRA_LIFE]: {
         density: 0.00037,
         speed: 10,
         radius: 20,
-        fillColour: "lawngreen",
-        outlineColour: "darkgreen",
+        fillColour: "yellowgreen",
+        outlineColour: "olive",
         description: "Grants an extra life"
     }
 };
@@ -207,11 +208,11 @@ collisionMatrix[COLLISION_ROLE.OLD][MODIFIER_TYPE.ICE_RINK] = {
 // modifier effect constants
 export const MOD_EFFECT_CONFIG = {
     INVINCIBILITY: {
-        colour: "gold",
+        colour: "#FFDF10",
         frames: 900
     },
     ICE_RINK: {
-        colour: "skyblue",
+        colour: "mediumaquamarine",
         frames: 900,
         accel: 0.09
     },
@@ -249,17 +250,21 @@ export const MENU_CONFIG = {
     HTPTextColour: "black",
     HTPPlayerText: "Move your green player square with the arrow keys",
     HTPHazardText: "Avoid the red hazard squares",
-    HTP3LivesText: "You have 3 lives. Avoid hazards to keep them",
-    HTPPauseText: "Press space to Pause",
-    HTPObjectiveText: "SURVIVE AS LONG AS YOU CAN",
-    HTPObjectiveFont: "20px Arial",
+    HTP3LivesText: "You have 3 lives - avoid hazards to keep them",
+    HTPPauseText: "Press space to pause the game",
+    HTPObjectiveText: "Survive as long as you can",
+    HTPObjectiveFont: "bold 21px Arial",
     // modifier description font size and colour
     modExFont: "18px Arial",
     modExTextColour: "black",
     // start prompt font size, colour, and description
     startPrompt: "Press Enter to Start Game",
-    startPromptFont: "bold 20px Arial",
-    startPromptTextColour: "black"
+    startPromptFont: "20px Arial",
+    startPromptTextColour: "black",
+    titleTextColour: "black",
+    titleFont: "bold 36px Arial",
+    titleText: "Dodge the Squares",
+    titleYScale: 0.1
 };
 
 export const GAME_OVER_CONFIG = {

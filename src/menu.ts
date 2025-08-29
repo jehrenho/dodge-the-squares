@@ -120,6 +120,14 @@ export class Menu {
         Menu.HTPy = Menu.HTPStarty;
     }
 
+    // draws the title
+    static drawTitle() {
+        Menu.ctx.fillStyle = MENU_CONFIG.titleTextColour;
+        Menu.ctx.font = MENU_CONFIG.titleFont;
+        Menu.ctx.textAlign = "center";
+        Menu.ctx.fillText(MENU_CONFIG.titleText, Menu.centreX, MENU_CONFIG.titleYScale * GAME_CONFIG.VIRTUAL_HEIGHT);
+    }
+
     // draws the start game prompt
     static drawStartPrompt() {
         Menu.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
@@ -148,6 +156,7 @@ export class Menu {
 
     // draws the menu
     static draw(): void {
+        Menu.drawTitle();
         Menu.drawStartPrompt();
         Menu.drawHowToPlay();
         Menu.drawModifierExplanations();
