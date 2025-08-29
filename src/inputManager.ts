@@ -1,5 +1,5 @@
-import { Artist } from "./artist.js";
-import { InputEventType, Keys } from "./config.js";
+import { GraphicsUtil } from "./graphicsUtil.js";
+import { InputEventType, KEYS, Keys } from "./config.js";
 
 // manages keyboard input for the game
 export class InputManager {
@@ -18,13 +18,23 @@ export class InputManager {
 
     // handle window resize events
     onResize(event: Event): void {
-        Artist.ctx.canvas.width = window.innerWidth - 1;
-        Artist.ctx.canvas.height = window.innerHeight - 1;
+        GraphicsUtil.ctx.canvas.width = window.innerWidth - 1;
+        GraphicsUtil.ctx.canvas.height = window.innerHeight - 1;
     }
 
     // checks if a key is currently pressed
     isKeyPressed(key: Keys): boolean {
         return this.keyStates[key] === true;
+    }
+
+    // checks if the Enter key is currently pressed
+    isEnterPressed(): boolean {
+        return this.keyStates[KEYS.ENTER] === true;
+    }
+
+    // checks if the Space key is currently pressed
+    isSpaceJustPressed(): boolean {
+        return this.keyStates[KEYS.SPACE] === true && this.keyStatesLastFrame[KEYS.SPACE] === false;
     }
 
     // checks if a key was just released this frame
@@ -38,15 +48,26 @@ export class InputManager {
         this.keyStates[key] = false;
     }
 
-    // updates the state of the input manager
+    // sets the space key state to false to wait for the key to be released
+    waitForSpaceToRelease(): void {
+        this.keyStates[KEYS.SPACE] = false;
+    }
+
+    // updates the last frame key states for key rising/falling detection
     update(): void {
         for (const key in this.keyStates) {
             this.keyStatesLastFrame[key] = this.keyStates[key];
         }
     }
 
-    // starts listening for events
-    startListening(): void {
+    // initializes state and starts listening for events
+    init(): void {
+        // initialize key states
+        for (const keyName of Object.values(KEYS)) {
+            this.keyStates[keyName] = false;
+            this.keyStatesLastFrame[keyName] = false;
+        }
+
         // start keyboard listening
         window.addEventListener(InputEventType.KEYDOWN, this.onKeyDown.bind(this));
         window.addEventListener(InputEventType.KEYUP, this.onKeyUp.bind(this));

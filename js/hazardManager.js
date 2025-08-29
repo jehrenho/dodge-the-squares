@@ -1,37 +1,13 @@
 import { GAME_CONFIG, HAZ_GEN_INITS, MOD_EFFECT_CONFIG } from './config.js';
-import { VisibleShape } from './visibleShape.js';
-// represents a single hazard rectangle in the game
-export class Hazard extends VisibleShape {
-    constructor(x, y, w, h, colour, borderColour) {
-        super(x, y, colour, borderColour);
-        this.w = w;
-        this.h = h;
-        this.nominalw = HAZ_GEN_INITS.w;
-        this.nominalh = HAZ_GEN_INITS.h;
-    }
-    // sets the hazards position
-    setPositionByCentre(x, y) {
-        this.x = x - this.w / 2;
-        this.y = y - this.h / 2;
-    }
-    // draws the hazard on the canvas
-    draw(ctx) {
-        // Draw the hazard rectangle's fill colour
-        ctx.fillStyle = this.fillColour;
-        ctx.fillRect(this.x, this.y, this.w, this.h);
-        // Draw border
-        ctx.strokeStyle = this.borderColour;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(this.x, this.y, this.w, this.h);
-    }
-}
+import { Hazard } from './hazard.js';
 // helper logarithm function with a user specified base
 function logBase(x, base) {
     return Math.log(x) / Math.log(base);
 }
 // represents the collection of hazards in the game
 export class HazardManager {
-    constructor() {
+    constructor(gameState) {
+        this.gameState = gameState;
         this.hazardSpeed = HAZ_GEN_INITS.speed;
         this.hazardDensity = HAZ_GEN_INITS.density;
         this.fillColour = HAZ_GEN_INITS.fillColour;
@@ -99,6 +75,7 @@ export class HazardManager {
         this.generateNewHazards();
         this.moveHazards();
         this.updateHazardSizes();
+        this.updateDifficulty(this.gameState);
     }
     // applies a new size scale factor to all hazards 
     applySizeScaleFactor(scaleFactor) {
@@ -133,11 +110,13 @@ export class HazardManager {
             hazard.draw(ctx);
         }
     }
-    // updates the difficulty of hazards logarithmically based on the time survived
-    updateDifficulty(numMinutesSurvived) {
-        let difficultyFactor = logBase(numMinutesSurvived + 1, HAZ_GEN_INITS.difficultyLogBase);
-        this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * 2;
-        this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
+    // updates the difficulty of hazards logarithmically based on the time survived every second
+    updateDifficulty(gameState) {
+        if (gameState.getFramesSurvived() % GAME_CONFIG.fps === 0) {
+            let difficultyFactor = logBase(gameState.getMinutesSurvived() + 1, HAZ_GEN_INITS.difficultyLogBase);
+            this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * HAZ_GEN_INITS.difficultyDensityFactor;
+            this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
+        }
     }
     // destroys active hazards
     destroyHazards(inputHazards) {

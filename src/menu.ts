@@ -1,7 +1,7 @@
 import { GAME_CONFIG, ModifierType, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
 import { Player } from './player.js';
-import { HazardManager, Hazard } from './hazardManager.js';
-import { Artist } from './artist.js';
+import { Hazard } from './hazard.js'
+import { HazardManager } from './hazardManager.js';
 import { ModifierManager } from './modifierManager.js';
 
 // menu class for managing the game menu
@@ -120,6 +120,14 @@ export class Menu {
         Menu.HTPy = Menu.HTPStarty;
     }
 
+    // draws the title
+    static drawTitle() {
+        Menu.ctx.fillStyle = MENU_CONFIG.titleTextColour;
+        Menu.ctx.font = MENU_CONFIG.titleFont;
+        Menu.ctx.textAlign = "center";
+        Menu.ctx.fillText(MENU_CONFIG.titleText, Menu.centreX, MENU_CONFIG.titleYScale * GAME_CONFIG.VIRTUAL_HEIGHT);
+    }
+
     // draws the start game prompt
     static drawStartPrompt() {
         Menu.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
@@ -148,7 +156,7 @@ export class Menu {
 
     // draws the menu
     static draw(): void {
-        Artist.drawBackground();
+        Menu.drawTitle();
         Menu.drawStartPrompt();
         Menu.drawHowToPlay();
         Menu.drawModifierExplanations();

@@ -1,5 +1,4 @@
 import { GAME_CONFIG, MOD_GEN_INITS, HAZ_GEN_INITS, MENU_CONFIG } from './config.js';
-import { Artist } from './artist.js';
 // menu class for managing the game menu
 export class Menu {
     // initializes the menu based on the size of the window
@@ -88,6 +87,13 @@ export class Menu {
         // reset the Y position for the next frame
         Menu.HTPy = Menu.HTPStarty;
     }
+    // draws the title
+    static drawTitle() {
+        Menu.ctx.fillStyle = MENU_CONFIG.titleTextColour;
+        Menu.ctx.font = MENU_CONFIG.titleFont;
+        Menu.ctx.textAlign = "center";
+        Menu.ctx.fillText(MENU_CONFIG.titleText, Menu.centreX, MENU_CONFIG.titleYScale * GAME_CONFIG.VIRTUAL_HEIGHT);
+    }
     // draws the start game prompt
     static drawStartPrompt() {
         Menu.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
@@ -114,7 +120,7 @@ export class Menu {
     }
     // draws the menu
     static draw() {
-        Artist.drawBackground();
+        Menu.drawTitle();
         Menu.drawStartPrompt();
         Menu.drawHowToPlay();
         Menu.drawModifierExplanations();
