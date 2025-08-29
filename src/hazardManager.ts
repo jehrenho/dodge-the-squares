@@ -3,6 +3,7 @@ import { GAME_CONFIG,
     MOD_EFFECT_CONFIG } from './config.js';
 import { Player } from './player.js';
 import { Hazard } from './hazard.js';
+import { GameState } from './game.js';
 
 // helper logarithm function with a user specified base
 function logBase(x: number, base: number): number {
@@ -11,6 +12,7 @@ function logBase(x: number, base: number): number {
 
 // represents the collection of hazards in the game
 export class HazardManager {
+    gameState: GameState;
     hazardSpeed: number;
     hazardDensity: number;
     fillColour: string;
@@ -22,7 +24,8 @@ export class HazardManager {
     maxEnlargeFactor: number;
     hazards: Hazard[];
 
-    constructor () {
+    constructor (gameState: GameState) {
+        this.gameState = gameState;
         this.hazardSpeed = HAZ_GEN_INITS.speed;
         this.hazardDensity = HAZ_GEN_INITS.density;
         this.fillColour = HAZ_GEN_INITS.fillColour;
@@ -101,6 +104,7 @@ export class HazardManager {
         this.generateNewHazards();
         this.moveHazards();
         this.updateHazardSizes();
+        this.updateDifficulty(this.gameState);
     }
 
     // applies a new size scale factor to all hazards 
@@ -137,11 +141,13 @@ export class HazardManager {
         }
     }
 
-    // updates the difficulty of hazards logarithmically based on the time survived
-    updateDifficulty(numMinutesSurvived: number): void {
-        let difficultyFactor = logBase(numMinutesSurvived + 1, HAZ_GEN_INITS.difficultyLogBase);
-        this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * HAZ_GEN_INITS.difficultyDensityFactor;
-        this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
+    // updates the difficulty of hazards logarithmically based on the time survived every second
+    updateDifficulty(gameState: GameState): void {
+        if (gameState.getFramesSurvived() % GAME_CONFIG.fps === 0) {
+            let difficultyFactor = logBase(gameState.getMinutesSurvived() + 1, HAZ_GEN_INITS.difficultyLogBase);
+            this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * HAZ_GEN_INITS.difficultyDensityFactor;
+            this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
+        }
     }
 
     // destroys active hazards

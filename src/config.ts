@@ -21,7 +21,9 @@ export const GAME_CONFIG = {
     flashingFramesDuration: 20,
     framesPerFlash: 4,
     pauseTitle: "Game Paused",
-    pauseMessage: "Press Space to Continue"
+    pauseMessage: "Press Space to Continue",
+    fps: 60,
+    fpm: 3600
 };
 
 // input event types
