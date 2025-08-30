@@ -1,0 +1,102 @@
+import { MODIFIER_TYPE, ModifierType, MOD_EFFECT_CONFIG, EWOF_CONFIG } from "./entities-config.js";
+
+// defines the base class for all effects
+export abstract class Effect {
+    protected framesRemaining: number;
+    private type: ModifierType;
+    private WOindex1!: number;
+    private WOindex2!: number;
+    private WOflashMaxFrames!: number;
+    private WOflashMinFrames!: number;
+    constructor(modifierType: ModifierType) {
+        this.type = modifierType;
+        this.framesRemaining = 0;
+        this.resetWearOffFlash();
+    }
+    abstract reset(): void;
+
+    // decrements the frames remaining for the effect
+    update(): void {
+        this.framesRemaining--;
+    }
+
+    // returns the number of frames remaining for the effect
+    getFramesRemaining(): number {
+        return this.framesRemaining;
+    }
+
+    // returns true is the player colour should be flashing (because it is wearing off) given the frames remaining
+    isWearOffFlashing(): boolean {
+        if (this.framesRemaining >= this.WOflashMaxFrames) {
+            // the effect is not flashing yet
+            return false;
+        } else if (this.framesRemaining < this.WOflashMinFrames) {
+            // a single flash just ended, update the flash max/min window for the next flash
+            this.WOindex2++;
+            this.updateWearOffFlash();
+            return false;
+        } else {
+            // the effect is currently flashing
+            return true;
+        }
+    }
+
+    // updates the frame window max/min for the wear off flash effect based on the frames remaining on the effect
+    updateWearOffFlash(): void {
+        // sets the flash window max/min
+        this.WOflashMaxFrames = EWOF_CONFIG.starts[this.WOindex1] - this.WOindex2 * EWOF_CONFIG.frequencies[this.WOindex1];
+        this.WOflashMinFrames = this.WOflashMaxFrames - EWOF_CONFIG.numFramesPerFlash;
+        if (this.WOflashMinFrames <= EWOF_CONFIG.starts[this.WOindex1 + 1]) {
+            // increases the flashing frequency
+            this.WOindex1++;
+            this.WOindex2 = 0;
+            this.updateWearOffFlash();
+        }
+    }
+
+    // returns the type of the effect
+    getType(): ModifierType {
+        return this.type;
+    }
+
+    // deactivates the effect immediately
+    deactivate(): void {
+        this.framesRemaining = 0;
+    }
+
+    // checks if the effect is expired
+    isExpired(): boolean {
+        return this.framesRemaining <= 0;
+    }
+
+    // resets the wear off flashing state
+    resetWearOffFlash(): void {
+        this.WOindex1 = 0;
+        this.WOindex2 = 0;
+        this.updateWearOffFlash();
+    }
+}
+
+// Invincibility effect class
+export class InvincibilityEffect extends Effect {
+    constructor() {
+        super(MODIFIER_TYPE.INVINCIBILITY);
+        this.reset();
+    }
+    reset(): void {
+        this.framesRemaining = MOD_EFFECT_CONFIG.INVINCIBILITY.frames;
+        this.resetWearOffFlash();
+    }
+}
+
+// Ice Rink effect class
+export class IceRinkEffect extends Effect {
+    constructor() {
+        super(MODIFIER_TYPE.ICE_RINK);
+        this.reset();
+    }
+    reset(): void {
+        this.framesRemaining = MOD_EFFECT_CONFIG.ICE_RINK.frames;
+        this.resetWearOffFlash();
+    }
+}
