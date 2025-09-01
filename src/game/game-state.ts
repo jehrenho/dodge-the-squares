@@ -6,12 +6,14 @@ export class GameState {
   private phase: GamePhase;
   private readonly fps: number;
   private readonly fpm: number;
+  private paused: boolean;
 
   constructor () {
     this.numFramesThisGame = 0;
     this.phase = GamePhase.MENU;
     this.fps = GAME_STATE_CONFIG.fps;
     this.fpm = GAME_STATE_CONFIG.fpm;
+    this.paused = false;
   }
 
   // increments the frame count and updates the time survived
@@ -39,9 +41,18 @@ export class GameState {
     return this.phase;
   }
 
+  // returns whether the game is paused
+  isPaused(): boolean {
+    return this.paused;
+  }
+
   // sets the current game phase
   setPhase(phase: GamePhase): void {
     this.phase = phase;
+  }
+
+  setPaused(paused: boolean): void {
+    this.paused = paused;
   }
 
   // resets the game timer

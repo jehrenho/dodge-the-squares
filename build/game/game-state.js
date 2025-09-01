@@ -6,6 +6,7 @@ export class GameState {
         this.phase = 0 /* GamePhase.MENU */;
         this.fps = GAME_STATE_CONFIG.fps;
         this.fpm = GAME_STATE_CONFIG.fpm;
+        this.paused = false;
     }
     // increments the frame count and updates the time survived
     incrementFrameCount() {
@@ -27,9 +28,16 @@ export class GameState {
     getPhase() {
         return this.phase;
     }
+    // returns whether the game is paused
+    isPaused() {
+        return this.paused;
+    }
     // sets the current game phase
     setPhase(phase) {
         this.phase = phase;
+    }
+    setPaused(paused) {
+        this.paused = paused;
     }
     // resets the game timer
     reset() {

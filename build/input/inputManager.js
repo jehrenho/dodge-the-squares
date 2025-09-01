@@ -1,10 +1,20 @@
-import { GraphicsUtil } from "../graphics/graphicsUtil.js";
 import { InputEventType, KEYS } from "../game/game-config.js";
 // manages keyboard input for the game
 export class InputManager {
-    constructor() {
+    constructor(graphics) {
         this.keyStates = {};
         this.keyStatesLastFrame = {};
+        this.graphics = graphics;
+        // initialize key states
+        for (const keyName of Object.values(KEYS)) {
+            this.keyStates[keyName] = false;
+            this.keyStatesLastFrame[keyName] = false;
+        }
+        // start keyboard listening
+        window.addEventListener(InputEventType.KEYDOWN, this.onKeyDown.bind(this));
+        window.addEventListener(InputEventType.KEYUP, this.onKeyUp.bind(this));
+        // start listening for window resizes
+        window.addEventListener(InputEventType.RESIZE, this.onResize.bind(this));
     }
     // handles key down events
     onKeyDown(event) {
@@ -18,8 +28,7 @@ export class InputManager {
     }
     // handle window resize events
     onResize(event) {
-        GraphicsUtil.ctx.canvas.width = window.innerWidth - 1;
-        GraphicsUtil.ctx.canvas.height = window.innerHeight - 1;
+        this.graphics.setCanvasDimensions(window.innerWidth - 1, window.innerHeight - 1);
     }
     // checks if a key is currently pressed
     isKeyPressed(key) {
@@ -54,18 +63,5 @@ export class InputManager {
         for (const key in this.keyStates) {
             this.keyStatesLastFrame[key] = this.keyStates[key];
         }
-    }
-    // initializes state and starts listening for events
-    init() {
-        // initialize key states
-        for (const keyName of Object.values(KEYS)) {
-            this.keyStates[keyName] = false;
-            this.keyStatesLastFrame[keyName] = false;
-        }
-        // start keyboard listening
-        window.addEventListener(InputEventType.KEYDOWN, this.onKeyDown.bind(this));
-        window.addEventListener(InputEventType.KEYUP, this.onKeyUp.bind(this));
-        // start listening for window resizes
-        window.addEventListener(InputEventType.RESIZE, this.onResize.bind(this));
     }
 }
