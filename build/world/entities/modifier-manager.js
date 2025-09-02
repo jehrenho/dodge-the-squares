@@ -1,5 +1,5 @@
 import { MODIFIER_TYPE, MOD_GEN_INITS } from './entities-config.js';
-import { GAME_CONFIG } from '../../game/game-config.js';
+import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
 import { Modifier } from './modifier.js';
 // manages a group of modifier circles of the same type (e.g., all invincibility modifiers)
 class ModifierGroup {
@@ -39,9 +39,9 @@ export class ModifierManager {
             rand = Math.random();
             if (rand < modg.density) {
                 // map the new modifier location to the canvas dimensions in pixels
-                const newModifierY = ((GAME_CONFIG.VIRTUAL_HEIGHT + modg.radius) * rand) / modg.density;
+                const newModifierY = ((SCALING_CONFIG.VIRTUAL_HEIGHT + modg.radius) * rand) / modg.density;
                 // create a new modifier just to the right of the canvas boundry
-                modg.modifiers.push(new Modifier(modg.modifierType, GAME_CONFIG.VIRTUAL_WIDTH + modg.radius, newModifierY - modg.radius, modg.radius, modg.fillColour, modg.outlineColour));
+                modg.modifiers.push(new Modifier(modg.modifierType, SCALING_CONFIG.VIRTUAL_WIDTH + modg.radius, newModifierY - modg.radius, modg.radius, modg.fillColour, modg.outlineColour));
             }
         }
     }

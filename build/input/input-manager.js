@@ -1,4 +1,4 @@
-import { InputEventType, KEYS } from "../game/game-config.js";
+import { InputEventType, KEYS } from './input-config.js';
 // manages keyboard input for the game
 export class InputManager {
     constructor(graphics) {

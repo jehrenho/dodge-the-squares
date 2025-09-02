@@ -1,5 +1,5 @@
 import { PLAYER_INITS, } from './entities-config.js';
-import { GAME_CONFIG } from '../../game/game-config.js';
+import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
 import { VisibleShape } from './visibleShape.js';
 // represents the player square and it's state
 export class Player extends VisibleShape {
@@ -50,16 +50,16 @@ export class Player extends VisibleShape {
             this.y = 0;
             this.yspeed = 0;
         }
-        if (this.y > GAME_CONFIG.VIRTUAL_HEIGHT - this.height) {
-            this.y = GAME_CONFIG.VIRTUAL_HEIGHT - this.height;
+        if (this.y > SCALING_CONFIG.VIRTUAL_HEIGHT - this.height) {
+            this.y = SCALING_CONFIG.VIRTUAL_HEIGHT - this.height;
             this.yspeed = 0;
         }
         if (this.x < 0) {
             this.x = 0;
             this.xspeed = 0;
         }
-        if (this.x > GAME_CONFIG.VIRTUAL_WIDTH - this.width) {
-            this.x = GAME_CONFIG.VIRTUAL_WIDTH - this.width;
+        if (this.x > SCALING_CONFIG.VIRTUAL_WIDTH - this.width) {
+            this.x = SCALING_CONFIG.VIRTUAL_WIDTH - this.width;
             this.xspeed = 0;
         }
     }

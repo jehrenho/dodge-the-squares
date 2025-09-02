@@ -1,6 +1,6 @@
 // world.ts
 import { GameState } from '../game/game-state.js';
-import { InputManager } from '../input/inputManager.js';
+import { InputManager } from '../input/input-manager.js';
 import { Player } from './entities/player.js';
 import { HazardManager } from './entities/hazard-manager.js';
 import { ModifierManager } from './entities/modifier-manager.js';

@@ -1,147 +1,149 @@
-import { GAME_CONFIG, MENU_CONFIG } from '../game/game-config.js';
+import { SCALING_CONFIG, MENU_CONFIG } from './graphics-config.js';
 import { MOD_GEN_INITS } from '../world/entities/entities-config.js';
 // menu class for managing the game menu
 export class Menu {
     // initializes the menu based on the size of the window
-    static init(ctx, player, hazardManager, modifierManager) {
+    constructor(ctx, player, hazardManager, modifierManager) {
+        this.menuHazard = null;
+        this.player = null;
+        this.hazardManager = null;
+        this.modifierManager = null;
+        // variables used to position the menu elements
+        this.centreX = 0;
+        this.centreY = 0;
+        this.HTPx = 0;
+        this.HTPGapY = 0;
+        this.HTPStarty = 0;
+        this.modExStartX = 0;
+        this.modExStartY = 0;
+        this.modExGapY = 0;
         // save references to the main game objects for encapsulation
-        Menu.ctx = ctx;
-        Menu.player = player;
-        Menu.hazardManager = hazardManager;
-        Menu.modifierManager = modifierManager;
-        // find the centre dimensions of the canvas
-        Menu.centreX = GAME_CONFIG.VIRTUAL_WIDTH / 2;
-        Menu.centreY = GAME_CONFIG.VIRTUAL_HEIGHT / 2;
-        // initialize the how to play section
-        let totalHTPHeight = MENU_CONFIG.HTPVerSizeFactor * GAME_CONFIG.VIRTUAL_HEIGHT;
-        Menu.HTPGapY = totalHTPHeight / (MENU_CONFIG.numHTPInstructions - 1);
-        Menu.HTPx = GAME_CONFIG.VIRTUAL_WIDTH * MENU_CONFIG.HTPHorCentreFactor;
-        Menu.HTPStarty = Menu.centreY - (totalHTPHeight / 2);
-        Menu.HTPy = Menu.HTPStarty;
-        // initialize the modifier explanation section
-        let totalModExHeight = MENU_CONFIG.modExVertSizeFactor * GAME_CONFIG.VIRTUAL_HEIGHT;
-        Menu.modExGapY = totalModExHeight / (Object.keys(MOD_GEN_INITS).length - 1);
-        Menu.modExStartY = Menu.centreY - (totalModExHeight / 2);
-        Menu.modExStartX = GAME_CONFIG.VIRTUAL_WIDTH * MENU_CONFIG.modExHorCentreFactor;
-        // create the menu objects that come alive when the game starts
-        Menu.createMenuObjects();
+        this.ctx = ctx;
+        this.player = player;
+        this.hazardManager = hazardManager;
+        this.modifierManager = modifierManager;
+        this.virtualWidth = SCALING_CONFIG.VIRTUAL_WIDTH;
+        this.virtualHeight = SCALING_CONFIG.VIRTUAL_HEIGHT;
+        this.calculatePositioning();
+        this.createMenuEntities();
     }
-    // creates the menu objects that are live when the game starts
-    static createMenuObjects() {
+    // calculates the positioning of the menu elements
+    calculatePositioning() {
+        // find the centre dimensions of the virtual canvas
+        this.centreX = this.virtualWidth / 2;
+        this.centreY = this.virtualHeight / 2;
+        // initialize the how to play section
+        let totalHTPHeight = MENU_CONFIG.HTPVerSizeFactor * this.virtualHeight;
+        this.HTPGapY = totalHTPHeight / (MENU_CONFIG.numHTPInstructions - 1);
+        this.HTPx = this.virtualWidth * MENU_CONFIG.HTPHorCentreFactor;
+        this.HTPStarty = this.centreY - (totalHTPHeight / 2);
+        // initialize the modifier explanation section
+        let totalModExHeight = MENU_CONFIG.modExVertSizeFactor * this.virtualHeight;
+        this.modExGapY = totalModExHeight / (Object.keys(MOD_GEN_INITS).length - 1);
+        this.modExStartY = this.centreY - (totalModExHeight / 2);
+        this.modExStartX = this.virtualWidth * MENU_CONFIG.modExHorCentreFactor;
+    }
+    // creates the menu entities that come alive when the game starts
+    createMenuEntities() {
         // create menu hazard
-        if (!Menu.hazardManager)
+        if (!this.hazardManager)
             throw new Error("Menu.hazardManager has not been initialized!");
         else
-            Menu.menuHazard = Menu.hazardManager.createMenuHazard();
+            this.menuHazard = this.hazardManager.createMenuHazard();
         // create the menu modifiers
-        if (!Menu.modifierManager)
+        if (!this.modifierManager)
             throw new Error("Menu.modifierManager has not been initialized!");
         else {
             let i = 0;
             for (const [modifierType, config] of Object.entries(MOD_GEN_INITS)) {
-                Menu.modifierManager.createModifier(modifierType, Menu.modExStartX, Menu.modExStartY + i * Menu.modExGapY);
+                this.modifierManager.createModifier(modifierType, this.modExStartX, this.modExStartY + i * this.modExGapY);
                 i++;
             }
         }
     }
     // draws the how to play instructions
-    static drawHowToPlay() {
+    drawHowToPlay() {
+        let y = this.HTPStarty;
         // draw the title
-        Menu.ctx.font = MENU_CONFIG.HTPTitleFont;
-        Menu.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
-        Menu.ctx.textAlign = "center";
-        Menu.ctx.fillText(MENU_CONFIG.HTPTitle, Menu.HTPx, Menu.HTPy);
-        Menu.HTPy += Menu.HTPGapY;
+        this.ctx.font = MENU_CONFIG.HTPTitleFont;
+        this.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(MENU_CONFIG.HTPTitle, this.HTPx, y);
+        y += this.HTPGapY;
         // draw the player square
-        if (!Menu.player)
+        if (!this.player)
             throw new Error("Menu.player has not been initialized!");
         else {
-            Menu.player.setPositionByCentre(Menu.HTPx, Menu.HTPy - MENU_CONFIG.HTPPlayerDiscYOffset);
-            Menu.player.draw(Menu.ctx);
+            this.player.setPositionByCentre(this.HTPx, y - MENU_CONFIG.HTPPlayerDiscYOffset);
+            this.player.draw(this.ctx);
         }
         // draw the player controls description
-        Menu.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
-        Menu.ctx.font = MENU_CONFIG.HTPTextFont;
-        Menu.ctx.fillText(MENU_CONFIG.HTPPlayerText, Menu.HTPx, Menu.HTPy + MENU_CONFIG.HTPPlayerDiscYOffset);
-        Menu.HTPy += Menu.HTPGapY;
+        this.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
+        this.ctx.font = MENU_CONFIG.HTPTextFont;
+        this.ctx.fillText(MENU_CONFIG.HTPPlayerText, this.HTPx, y + MENU_CONFIG.HTPPlayerDiscYOffset);
+        y += this.HTPGapY;
         // draw a hazard square and description
-        if (!Menu.menuHazard)
+        if (!this.menuHazard)
             throw new Error("Menu.menuHazard has not been initialized!");
         else {
-            Menu.menuHazard.setPositionByCentre(Menu.HTPx, Menu.HTPy - MENU_CONFIG.HTPHazardDiscYOffset);
-            Menu.menuHazard.draw(Menu.ctx);
+            this.menuHazard.setPositionByCentre(this.HTPx, y - MENU_CONFIG.HTPHazardDiscYOffset);
+            this.menuHazard.draw(this.ctx);
         }
-        Menu.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
-        Menu.ctx.font = MENU_CONFIG.HTPTextFont;
-        Menu.ctx.fillText(MENU_CONFIG.HTPHazardText, Menu.HTPx, Menu.HTPy + MENU_CONFIG.HTPHazardDiscYOffset);
-        Menu.HTPy += Menu.HTPGapY;
+        this.ctx.fillStyle = MENU_CONFIG.HTPTextColour;
+        this.ctx.font = MENU_CONFIG.HTPTextFont;
+        this.ctx.fillText(MENU_CONFIG.HTPHazardText, this.HTPx, y + MENU_CONFIG.HTPHazardDiscYOffset);
+        y += this.HTPGapY;
         // draw the 3 lives explenation
-        Menu.ctx.fillText(MENU_CONFIG.HTP3LivesText, Menu.HTPx, Menu.HTPy);
-        Menu.HTPy += Menu.HTPGapY;
+        this.ctx.fillText(MENU_CONFIG.HTP3LivesText, this.HTPx, y);
+        y += this.HTPGapY;
         // draw the pause instruction
-        Menu.ctx.fillText(MENU_CONFIG.HTPPauseText, Menu.HTPx, Menu.HTPy);
-        Menu.HTPy += Menu.HTPGapY;
+        this.ctx.fillText(MENU_CONFIG.HTPPauseText, this.HTPx, y);
+        y += this.HTPGapY;
         // draw the game objective description
-        Menu.ctx.font = MENU_CONFIG.HTPObjectiveFont;
-        Menu.ctx.fillText(MENU_CONFIG.HTPObjectiveText, Menu.HTPx, Menu.HTPy);
-        Menu.HTPy += Menu.HTPGapY;
-        // reset the Y position for the next frame
-        Menu.HTPy = Menu.HTPStarty;
+        this.ctx.font = MENU_CONFIG.HTPObjectiveFont;
+        this.ctx.fillText(MENU_CONFIG.HTPObjectiveText, this.HTPx, y);
+        y += this.HTPGapY;
     }
     // draws the title
-    static drawTitle() {
-        Menu.ctx.fillStyle = MENU_CONFIG.titleTextColour;
-        Menu.ctx.font = MENU_CONFIG.titleFont;
-        Menu.ctx.textAlign = "center";
-        Menu.ctx.fillText(MENU_CONFIG.titleText, Menu.centreX, MENU_CONFIG.titleYScale * GAME_CONFIG.VIRTUAL_HEIGHT);
+    drawTitle() {
+        this.ctx.fillStyle = MENU_CONFIG.titleTextColour;
+        this.ctx.font = MENU_CONFIG.titleFont;
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(MENU_CONFIG.titleText, this.centreX, MENU_CONFIG.titleYScale * this.virtualHeight);
     }
     // draws the start game prompt
-    static drawStartPrompt() {
-        Menu.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
-        Menu.ctx.font = MENU_CONFIG.startPromptFont;
-        Menu.ctx.textAlign = "center";
-        Menu.ctx.fillText(MENU_CONFIG.startPrompt, Menu.centreX, Menu.centreY);
+    drawStartPrompt() {
+        this.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
+        this.ctx.font = MENU_CONFIG.startPromptFont;
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(MENU_CONFIG.startPrompt, this.centreX, this.centreY);
     }
     // draws the menu modifiers and their descriptions
-    static drawModifierExplanations() {
+    drawModifierExplanations() {
         // draw the menu modifiers
-        if (!Menu.modifierManager)
+        if (!this.modifierManager)
             throw new Error("Menu.modifierManager has not been initialized!");
         else
-            Menu.modifierManager.drawModifiers(Menu.ctx);
+            this.modifierManager.drawModifiers(this.ctx);
         // draw the descriptions
-        Menu.ctx.font = MENU_CONFIG.modExFont;
-        Menu.ctx.fillStyle = MENU_CONFIG.modExTextColour;
-        Menu.ctx.textAlign = "left";
+        this.ctx.font = MENU_CONFIG.modExFont;
+        this.ctx.fillStyle = MENU_CONFIG.modExTextColour;
+        this.ctx.textAlign = "left";
         let i = 0;
         for (const [modifierType, config] of Object.entries(MOD_GEN_INITS)) {
-            Menu.ctx.fillText(config.description, Menu.modExStartX + MENU_CONFIG.modExDescriptionXOffset, Menu.modExStartY + i * Menu.modExGapY + 7);
+            this.ctx.fillText(config.description, this.modExStartX + MENU_CONFIG.modExDescriptionXOffset, this.modExStartY + i * this.modExGapY + 7);
             i++;
         }
     }
     // draws the menu
-    static draw() {
-        Menu.drawTitle();
-        Menu.drawStartPrompt();
-        Menu.drawHowToPlay();
-        Menu.drawModifierExplanations();
+    draw() {
+        this.drawTitle();
+        this.drawStartPrompt();
+        this.drawHowToPlay();
+        this.drawModifierExplanations();
     }
     // resets the menu
-    static reset() {
-        Menu.createMenuObjects();
+    reset() {
+        this.createMenuEntities();
     }
 }
-Menu.menuHazard = null;
-Menu.player = null;
-Menu.hazardManager = null;
-Menu.modifierManager = null;
-// variables used to position the menu elements
-Menu.centreX = 0;
-Menu.centreY = 0;
-Menu.HTPx = 0;
-Menu.HTPy = 0;
-Menu.HTPGapY = 0;
-Menu.HTPStarty = 0;
-Menu.modExStartX = 0;
-Menu.modExStartY = 0;
-Menu.modExGapY = 0;

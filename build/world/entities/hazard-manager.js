@@ -1,5 +1,5 @@
 import { HAZ_GEN_INITS, MOD_EFFECT_CONFIG } from './entities-config.js';
-import { GAME_CONFIG } from '../../game/game-config.js';
+import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
 import { Hazard } from './hazard.js';
 import { GAME_STATE_CONFIG } from '../../game/game-config.js';
 // helper logarithm function with a user specified base
@@ -38,9 +38,9 @@ export class HazardManager {
         const rand = Math.random();
         if (rand < this.hazardDensity) {
             // map the new rectangle location to the canvas dimensions in pixels
-            const newHazardy = ((GAME_CONFIG.VIRTUAL_HEIGHT + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
+            const newHazardy = ((SCALING_CONFIG.VIRTUAL_HEIGHT + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
             // create a new hazard
-            this.createHazard(GAME_CONFIG.VIRTUAL_WIDTH, newHazardy - HAZ_GEN_INITS.h, HAZ_GEN_INITS.w * this.currentSizeFactor, HAZ_GEN_INITS.h * this.currentSizeFactor, this.fillColour, this.borderColour);
+            this.createHazard(SCALING_CONFIG.VIRTUAL_WIDTH, newHazardy - HAZ_GEN_INITS.h, HAZ_GEN_INITS.w * this.currentSizeFactor, HAZ_GEN_INITS.h * this.currentSizeFactor, this.fillColour, this.borderColour);
         }
     }
     // moves all hazards to the left, destroys hazards that have moved off screen, and sets their size

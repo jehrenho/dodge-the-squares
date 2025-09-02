@@ -1,7 +1,7 @@
 import { GamePhase } from './game-config.js';
 import { GameState } from './game-state.js';
-import { InputManager } from '../input/inputManager.js';
-import { Graphics } from '../graphics/graphicsUtil.js';
+import { InputManager } from '../input/input-manager.js';
+import { Graphics } from '../graphics/graphics.js';
 import { World } from '../world/world.js';
 
 // represents a single game instance

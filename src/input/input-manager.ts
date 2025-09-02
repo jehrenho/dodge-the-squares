@@ -1,6 +1,5 @@
-import { Graphics } from "../graphics/graphicsUtil.js";
-import { InputEventType, KEYS, Keys } from "../game/game-config.js";
-import { MovementInput } from './input-config.js';
+import { Graphics } from "../graphics/graphics.js";
+import { MovementInput, InputEventType, KEYS, Keys } from './input-config.js';
 
 // manages keyboard input for the game
 export class InputManager {
