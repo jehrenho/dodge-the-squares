@@ -46,35 +46,51 @@ This project demonstrates:
 
 ## File Structure
 
-src/
-├── game/
-│   ├── game-config.ts            # Game configuration constants
-│   ├── game-state.ts             # Tracks current game state (time, score, etc.)
-│   └── game.ts                   # Main game loop and orchestration
-├── graphics/
-│   ├── graphics-config.ts        # Graphics-related configuration (colors, fonts, dimensions)
-│   ├── graphics.ts               # Graphics renderer
-│   ├── menu.ts                   # Menu rendering and logic
-│   └── viewport.ts               # Handles canvas scaling and viewport adjustments
-├── input/
-│   ├── input-config.ts           # Key/mouse bindings and input settings
-│   └── input-manager.ts          # Processes and manages user input
-└── world/
-    ├── collision/
-    │   ├── collision-config.ts   # Collision-related constants and settings
-    │   ├── collision-flasher.ts  # Handles collision visual effects
-    │   └── collision-manager.ts  # Manages collision detection
-    ├── entities/
-    │   ├── effect-manager.ts     # Handles visual effects for entities
-    │   ├── effect.ts             # Single effect class
-    │   ├── entities-config.ts    # Entity-specific constants
-    │   ├── hazard-manager.ts     # Manages hazards
-    │   ├── hazard.ts             # Hazard entity
-    │   ├── modifier-manager.ts   # Manages modifiers (power-ups/debuffs)
-    │   ├── modifier.ts           # Modifier entity
-    │   ├── player.ts             # Player entity
-    │   └── visibleShape.ts       # Base class for drawable shapes/entities
-    └── world.ts                  # World-level orchestration
+DODGE/
+├── client/                                 # Front-end source code and public assets
+│   ├── public/                             # Static files served to the browser
+│   │   ├── dist/                           # Bundled JS output from Rollup
+│   │   └── index.html                      # Main HTML entry point
+│   └── src/                                # TypeScript source files
+│       ├── game/                           # Core game logic
+│       │   ├── game-config.ts              # Game configuration constants
+│       │   ├── game-states.ts              # Tracks current game state (time, score, etc.)
+│       │   └── game.ts                     # Main game loop and orchestration
+│       ├── graphics/                       # Graphics rendering and UI
+│       │   ├── graphics-config.ts          # Graphics-related configuration (colors, fonts, dimensions)
+│       │   ├── graphics.ts                 # Graphics renderer
+│       │   ├── menu.ts                     # Menu rendering and logic
+│       │   └── viewport.ts                 # Handles canvas scaling and viewport adjustments
+│       ├── input/                          # Input handling
+│       │   ├── input-config.ts             # Key/mouse bindings and input settings
+│       │   └── input-manager.ts            # Processes and manages user input
+│       └── world/                          # Game world entities and mechanics
+│           ├── collision/                  # Collision handling
+│           │   ├── collision-config.ts     # Collision-related constants and settings
+│           │   ├── collision-flasher.ts    # Handles collision visual effects
+│           │   └── collision-manager.ts    # Manages collision detection
+│           ├── entities/                   # In game objects
+│           │   ├── effect-manager.ts       # Handles visual effects for entities
+│           │   ├── effect.ts               # Single effect class
+│           │   ├── entities-config.ts      # Entity-specific constants
+│           │   ├── hazard-manager.ts       # Manages hazards
+│           │   ├── hazard.ts               # Hazard entity
+│           │   ├── modifier-manager.ts     # Manages modifiers (power-ups/debuffs)
+│           │   ├── modifier.ts             # Modifier entity
+│           │   ├── player.ts               # Player entity
+│           │   └── visibleShape.ts         # Base class for drawable shapes/entities
+│           └── world.ts                    # World-level orchestration
+├── server/                                 # Back-end server code
+│   ├── dist/                               # Compiled JS output
+│   └── src/                                # TypeScript source files
+│       ├── config.ts                       # Server configuration constants
+│       └── index.ts                        # Server entry point
+├── package.json                            # npm dependencies and scripts
+├── package-lock.json                       # Exact npm package versions
+├── rollup.config.js                        # Front-end Rollup bundler configuration
+├── tsconfig.json                           # TypeScript configuration for the project
+├── server/tsconfig.json                    # TypeScript configuration for the server
+└── README.md                               # Project documentation (this file)
 
 ---
 
