@@ -46,20 +46,35 @@ This project demonstrates:
 
 ## File Structure
 
-- `game.ts` — main game loop & game state  
-- `graphicsUtil.ts` — rendering logic  
-- `menu.ts` — menu generation  
-- `visibleShape.ts` — abstract base class for the player, hazards, and modifiers
-- `player.ts` — player state & movement  
-- `hazard.ts` — hazard state & movement
-- `modifier.ts` — modifier state & movement
-- `hazardManager.ts` — hazard creation & management  
-- `modifierManager.ts` — modifier creation & management  
-- `modifierEffect.ts` — modifier effect logic  
-- `collisionFlasher.ts` — collision animations  
-- `collisionUtils.ts` — collision logic  
-- `input.ts` — input handling  
-- `config.ts` — configuration constants & collision matrix  
+src/
+├── game/
+│   ├── game-config.ts            # Game configuration constants
+│   ├── game-state.ts             # Tracks current game state (time, score, etc.)
+│   └── game.ts                   # Main game loop and orchestration
+├── graphics/
+│   ├── graphics-config.ts        # Graphics-related configuration (colors, fonts, dimensions)
+│   ├── graphics.ts               # Graphics renderer
+│   ├── menu.ts                   # Menu rendering and logic
+│   └── viewport.ts               # Handles canvas scaling and viewport adjustments
+├── input/
+│   ├── input-config.ts           # Key/mouse bindings and input settings
+│   └── input-manager.ts          # Processes and manages user input
+└── world/
+    ├── collision/
+    │   ├── collision-config.ts   # Collision-related constants and settings
+    │   ├── collision-flasher.ts  # Handles collision visual effects
+    │   └── collision-manager.ts  # Manages collision detection
+    ├── entities/
+    │   ├── effect-manager.ts     # Handles visual effects for entities
+    │   ├── effect.ts             # Single effect class
+    │   ├── entities-config.ts    # Entity-specific constants
+    │   ├── hazard-manager.ts     # Manages hazards
+    │   ├── hazard.ts             # Hazard entity
+    │   ├── modifier-manager.ts   # Manages modifiers (power-ups/debuffs)
+    │   ├── modifier.ts           # Modifier entity
+    │   ├── player.ts             # Player entity
+    │   └── visibleShape.ts       # Base class for drawable shapes/entities
+    └── world.ts                  # World-level orchestration
 
 ---
 
@@ -91,6 +106,9 @@ Every frame, the game checks whether the **player square** collides with any of 
 - **Circle–AABB** → for player–modifier collisions 
 
 This ensures fast, reliable collision checks even as the number of hazards and modifiers increases.
+
+### Scaling
+One of the main challenges I faced while developing this project was not planning for modularity early on. Initially, I wrote large, tightly coupled files without considering how to keep modules short, simple, and isolated. This made the code harder to maintain and extend. As the project grew, I had to refactor significant portions to improve encapsulation and decoupling, which ultimately led to a cleaner, more modular structure.
 
 ---
 
