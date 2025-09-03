@@ -1,12 +1,10 @@
-// world.ts
 import { GameState } from '../game/game-state.js';
-import { InputManager } from '../input/input-manager.js';
+import { MovementInput } from '../input/input-config.js';
 import { Player } from './entities/player.js';
 import { HazardManager } from './entities/hazard-manager.js';
 import { ModifierManager } from './entities/modifier-manager.js';
 import { EffectManager } from './entities/effect-manager.js';
 import { CollisionManager } from './collision/collision-manager.js';
-import { MovementInput } from '../input/input-config.js';
 
 // represents the game world where entities exist and interact
 export class World {
@@ -25,23 +23,10 @@ export class World {
         this.player, this.hazardManager, this.modifierManager, this.effectManager);
   }
 
-  // updates the entities in the game world
-  private updateEntities(movementInput: MovementInput): void {
-    this.player.updatePosition(movementInput);
-    this.hazardManager.updateHazards();
-    this.modifierManager.updateModifiers();
-    this.effectManager.updateEffects();
-    this.collisionManager.resolveModifierCollisions();
-    this.effectManager.applyEffects();
-    this.collisionManager.resolveHazardCollisions();
-  }
-
-  // updates the game world
   update(movementInput: MovementInput): void {
     // update the collision manager if it's flashing a collision
     if (this.collisionManager.isFlashingCollision()) {
         this.collisionManager.update();
-    // otherwise update all the game entities
     } else {
         this.updateEntities(movementInput);
     }
@@ -59,7 +44,10 @@ export class World {
     return this.modifierManager;
   }
 
-  // resets the game world to the beginning of game state
+  isPlayerDead(): boolean {
+    return this.player.isDead() && !this.collisionManager.isFlashingCollision();
+  }
+
   reset(): void {
     this.player.reset();
     this.hazardManager.reset();
@@ -67,8 +55,14 @@ export class World {
     this.effectManager.reset();
   }
 
-  // returns true if the player is dead
-  isPlayerDead(): boolean {
-    return this.player.isDead() && !this.collisionManager.isFlashingCollision();
+  // moves, generates, and destroys entities in the game world
+  private updateEntities(movementInput: MovementInput): void {
+    this.player.updatePosition(movementInput);
+    this.hazardManager.updateHazards();
+    this.modifierManager.updatePositions();
+    this.effectManager.updateEffects();
+    this.collisionManager.resolveModifierCollisions();
+    this.effectManager.applyEffects();
+    this.collisionManager.resolveHazardCollisions();
   }
 }

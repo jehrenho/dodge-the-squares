@@ -1,4 +1,4 @@
-// a generic class for the common properties of all hazard, all modifiers, and the player
+// generic class for the common properties of all hazards, all modifiers, and the player
 export abstract class VisibleShape {
     protected x: number;
     protected y: number;
@@ -7,6 +7,7 @@ export abstract class VisibleShape {
     protected defaultFillColour: string;
     protected defaultBorderColour: string;
     private killFlag: boolean;
+    
     constructor(x: number, y: number, defaultFillColour: string, defaultBorderColour: string) {
         this.x = x;
         this.y = y;
@@ -17,34 +18,33 @@ export abstract class VisibleShape {
         this.killFlag = false;
     }
 
-    // sets the fill and border colour
     setColour(fillColour: string, borderColour: string): void {
         this.fillColour = fillColour;
         this.borderColour = borderColour;
     }
-
-    // resets the fill and border colour to the default
+    
     setDefaultColour(): void {
         this.fillColour = this.defaultFillColour;
         this.borderColour = this.defaultBorderColour;
     }
 
-    // sets the x coordinate of the shape
     setX(x: number): void {
         this.x = x;
     }
 
-    // sets the y coordinate of the shape
     setY(y: number): void {
         this.y = y;
     }
 
-    // gets the x coordinate of the shape
+    // tells managers to destroy this shape
+    setToKill(): void {
+        this.killFlag = true;
+    }
+
     getX(): number {
         return this.x;
     }
 
-    // gets the y coordinate of the shape
     getY(): number {
         return this.y;
     }
@@ -55,11 +55,6 @@ export abstract class VisibleShape {
 
     getBorderColour(): string {
         return this.borderColour;
-    }
-
-    // raises a flag that a manager should remove this shape
-    setToKill(): void {
-        this.killFlag = true;
     }
 
     // checks if the shape is marked for removal

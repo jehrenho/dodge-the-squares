@@ -1,19 +1,17 @@
 import { SCALING_CONFIG, MENU_CONFIG } from './graphics-config.js';
-import { ModifierType, MOD_GEN_INITS } from '../world/entities/entities-config.js'
+import { ModifierType, MOD_GEN_CONFIG } from '../world/entities/entities-config.js'
 import { Player } from '../world/entities/player.js';
 import { Hazard } from '../world/entities/hazard.js'
 import { HazardManager } from '../world/entities/hazard-manager.js';
 import { ModifierManager } from '../world/entities/modifier-manager.js';
 
-// menu class for managing the game menu
+// menu class for creating the game menu
 export class Menu {
-    private ctx: CanvasRenderingContext2D;
+    private readonly ctx: CanvasRenderingContext2D;
     private menuHazard: Hazard | null = null;
     private player: Player | null = null;
     private hazardManager: HazardManager | null = null;
     private modifierManager: ModifierManager | null = null;
-
-    // variables used to position the menu elements
     private centreX: number = 0;
     private centreY: number = 0;
     private HTPx: number = 0;
@@ -22,43 +20,47 @@ export class Menu {
     private modExStartX: number = 0;
     private modExStartY: number = 0;
     private modExGapY: number = 0;
-    private readonly virtualWidth: number;
-    private readonly virtualHeight: number;
 
-    // initializes the menu based on the size of the window
     constructor(ctx: CanvasRenderingContext2D, player: Player, hazardManager: HazardManager, modifierManager: ModifierManager) {
-        // save references to the main game objects for encapsulation
         this.ctx = ctx;
         this.player = player;
         this.hazardManager = hazardManager;
         this.modifierManager = modifierManager;
-        this.virtualWidth = SCALING_CONFIG.VIRTUAL_WIDTH;
-        this.virtualHeight = SCALING_CONFIG.VIRTUAL_HEIGHT;
-
         this.calculatePositioning();
         this.createMenuEntities();
     }
 
-    // calculates the positioning of the menu elements
+    draw(): void {
+        this.drawTitle();
+        this.drawStartPrompt();
+        this.drawHowToPlay();
+        this.drawModifierExplanations();
+    }
+
+    reset(): void {
+        this.createMenuEntities();
+    }
+
+    // calculates the positioning of the menu elements in the virtual frame dimensions
     private calculatePositioning(): void {
         // find the centre dimensions of the virtual canvas
-        this.centreX = this.virtualWidth / 2;
-        this.centreY = this.virtualHeight / 2;
+        this.centreX = SCALING_CONFIG.virtualWidth / 2;
+        this.centreY = SCALING_CONFIG.virtualHeight / 2;
 
         // initialize the how to play section
-        let totalHTPHeight: number = MENU_CONFIG.HTPVerSizeFactor * this.virtualHeight;
+        let totalHTPHeight: number = MENU_CONFIG.HTPVerSizeFactor * SCALING_CONFIG.virtualHeight;
         this.HTPGapY = totalHTPHeight / (MENU_CONFIG.numHTPInstructions - 1);
-        this.HTPx = this.virtualWidth * MENU_CONFIG.HTPHorCentreFactor;
+        this.HTPx = SCALING_CONFIG.virtualWidth * MENU_CONFIG.HTPHorCentreFactor;
         this.HTPStarty = this.centreY - (totalHTPHeight / 2);
 
         // initialize the modifier explanation section
-        let totalModExHeight: number = MENU_CONFIG.modExVertSizeFactor * this.virtualHeight;
-        this.modExGapY = totalModExHeight / (Object.keys(MOD_GEN_INITS).length - 1);
+        let totalModExHeight: number = MENU_CONFIG.modExVertSizeFactor * SCALING_CONFIG.virtualHeight;
+        this.modExGapY = totalModExHeight / (Object.keys(MOD_GEN_CONFIG).length - 1);
         this.modExStartY = this.centreY - (totalModExHeight / 2);
-        this.modExStartX = this.virtualWidth * MENU_CONFIG.modExHorCentreFactor;
+        this.modExStartX = SCALING_CONFIG.virtualWidth * MENU_CONFIG.modExHorCentreFactor;
     }
 
-    // creates the menu entities that come alive when the game starts
+    // creates the entities that come alive when the game starts
     private createMenuEntities() {
         // create menu hazard
         if (!this.hazardManager) throw new Error("Menu.hazardManager has not been initialized!");
@@ -67,7 +69,7 @@ export class Menu {
         if (!this.modifierManager) throw new Error("Menu.modifierManager has not been initialized!");
         else {
             let i = 0;
-            for (const [modifierType, config] of Object.entries(MOD_GEN_INITS)) {
+            for (const [modifierType, config] of Object.entries(MOD_GEN_CONFIG)) {
                 this.modifierManager.createModifier(modifierType as ModifierType,
                     this.modExStartX, this.modExStartY + i * this.modExGapY);
                 i++
@@ -124,22 +126,6 @@ export class Menu {
         y += this.HTPGapY;
     }
 
-    // draws the title
-    private drawTitle() {
-        this.ctx.fillStyle = MENU_CONFIG.titleTextColour;
-        this.ctx.font = MENU_CONFIG.titleFont;
-        this.ctx.textAlign = "center";
-        this.ctx.fillText(MENU_CONFIG.titleText, this.centreX, MENU_CONFIG.titleYScale * this.virtualHeight);
-    }
-
-    // draws the start game prompt
-    private drawStartPrompt() {
-        this.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
-        this.ctx.font = MENU_CONFIG.startPromptFont;
-        this.ctx.textAlign = "center";
-        this.ctx.fillText(MENU_CONFIG.startPrompt, this.centreX, this.centreY);
-    }
-
     // draws the menu modifiers and their descriptions
     private drawModifierExplanations() {
         // draw the menu modifiers
@@ -150,7 +136,7 @@ export class Menu {
         this.ctx.fillStyle = MENU_CONFIG.modExTextColour;
         this.ctx.textAlign = "left";
         let i = 0;
-        for (const [modifierType, config] of Object.entries(MOD_GEN_INITS)) {
+        for (const [modifierType, config] of Object.entries(MOD_GEN_CONFIG)) {
             this.ctx.fillText(config.description,
                 this.modExStartX + MENU_CONFIG.modExDescriptionXOffset,
                 this.modExStartY + i * this.modExGapY + 7);
@@ -158,16 +144,17 @@ export class Menu {
         }
     }
 
-    // draws the menu
-    draw(): void {
-        this.drawTitle();
-        this.drawStartPrompt();
-        this.drawHowToPlay();
-        this.drawModifierExplanations();
+    private drawTitle() {
+        this.ctx.fillStyle = MENU_CONFIG.titleTextColour;
+        this.ctx.font = MENU_CONFIG.titleFont;
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(MENU_CONFIG.titleText, this.centreX, MENU_CONFIG.titleYScale * SCALING_CONFIG.virtualHeight);
     }
 
-    // resets the menu
-    reset(): void {
-        this.createMenuEntities();
+    private drawStartPrompt() {
+        this.ctx.fillStyle = MENU_CONFIG.startPromptTextColour;
+        this.ctx.font = MENU_CONFIG.startPromptFont;
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(MENU_CONFIG.startPrompt, this.centreX, this.centreY);
     }
 }

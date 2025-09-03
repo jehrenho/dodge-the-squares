@@ -8,24 +8,16 @@ export abstract class Effect {
     private WOindex2!: number;
     private WOflashMaxFrames!: number;
     private WOflashMinFrames!: number;
+
     constructor(modifierType: ModifierType) {
         this.type = modifierType;
         this.framesRemaining = 0;
         this.resetWearOffFlash();
     }
+    
     abstract reset(): void;
 
-    // decrements the frames remaining for the effect
-    update(): void {
-        this.framesRemaining--;
-    }
-
-    // returns the number of frames remaining for the effect
-    getFramesRemaining(): number {
-        return this.framesRemaining;
-    }
-
-    // returns true is the player colour should be flashing (because it is wearing off) given the frames remaining
+    // returns true is the player colour should be the flash colour because it is wearing off
     isWearOffFlashing(): boolean {
         if (this.framesRemaining >= this.WOflashMaxFrames) {
             // the effect is not flashing yet
@@ -41,7 +33,7 @@ export abstract class Effect {
         }
     }
 
-    // updates the frame window max/min for the wear off flash effect based on the frames remaining on the effect
+    // updates the frame window max/min for the wear off flash effect
     updateWearOffFlash(): void {
         // sets the flash window max/min
         this.WOflashMaxFrames = EWOF_CONFIG.starts[this.WOindex1] - this.WOindex2 * EWOF_CONFIG.frequencies[this.WOindex1];
@@ -54,22 +46,26 @@ export abstract class Effect {
         }
     }
 
-    // returns the type of the effect
+    update(): void {
+        this.framesRemaining--;
+    }
+
+    getFramesRemaining(): number {
+        return this.framesRemaining;
+    }
+
     getType(): ModifierType {
         return this.type;
     }
 
-    // deactivates the effect immediately
     deactivate(): void {
         this.framesRemaining = 0;
     }
 
-    // checks if the effect is expired
     isExpired(): boolean {
         return this.framesRemaining <= 0;
     }
 
-    // resets the wear off flashing state
     resetWearOffFlash(): void {
         this.WOindex1 = 0;
         this.WOindex2 = 0;

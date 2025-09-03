@@ -16,37 +16,30 @@ export class GameState {
     this.paused = false;
   }
 
-  // increments the frame count and updates the time survived
   incrementFrameCount(): void {
     this.numFramesThisGame++;
   }
 
-  // returns the number of frames survived
   getFramesSurvived(): number {
     return this.numFramesThisGame;
   }
 
-  // returns the number of seconds survived
   getSecondsSurvived(): number {
     return this.numFramesThisGame / this.fps;
   }
 
-  // returns the number of minutes survived
   getMinutesSurvived(): number {
     return this.numFramesThisGame / this.fpm;
   }
 
-  // returns the current game phase
   getPhase(): GamePhase {
     return this.phase;
   }
 
-  // returns whether the game is paused
   isPaused(): boolean {
     return this.paused;
   }
 
-  // sets the current game phase
   setPhase(phase: GamePhase): void {
     this.phase = phase;
   }
@@ -55,7 +48,6 @@ export class GameState {
     this.paused = paused;
   }
 
-  // resets the game timer
   reset(): void {
     this.numFramesThisGame = 0;
     this.phase = GamePhase.MENU;

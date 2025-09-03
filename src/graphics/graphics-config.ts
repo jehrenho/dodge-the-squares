@@ -1,3 +1,11 @@
+export const SCALING_CONFIG = {
+    virtualWidth: 1912,
+    virtualHeight: 954,
+};
+
+export const VIEWPORT_CONFIG = {
+    letterboxColour: "black"
+};
 
 export const BACKGROUND_CONFIG = {
     backgroundColour: "moccasin",
@@ -8,10 +16,6 @@ export const STATUS_BAR_CONFIG = {
     font: "25px Arial"
 };
 
-export const VIEWPORT_CONFIG = {
-    letterboxColour: "black"
-};
-
 export const PAUSE_CONFIG = {
     fontColour: "black",
     titleFont: "32px Arial",
@@ -20,24 +24,15 @@ export const PAUSE_CONFIG = {
     pauseMessage: "Press Space to Continue"
 };
 
-export const SCALING_CONFIG = {
-    VIRTUAL_WIDTH: 1912,
-    VIRTUAL_HEIGHT: 954,
-};
-
 export const MENU_CONFIG = {
-    // How to Play constants
     HTPHorCentreFactor: 0.22, // aligns the how to play section horizontally
     HTPVerSizeFactor: 0.7, // sets the vertical size for the how to play section
     HTPPlayerDiscYOffset: 25, // set how far apart the player and player description is
     HTPHazardDiscYOffset: 30, // set how far apart the hazard and hazard description is
     numHTPInstructions: 6, // sets the how to play instruction spacing
-
-    // modifier explanation constants
     modExHorCentreFactor: 0.74, // aligns the modifier explanation section horizontally
     modExVertSizeFactor: 0.7, // sets the vertical size for the modifier explanation section
     modExDescriptionXOffset: 140, // sets the horizontal offset for the modifier description text
-    
     HTPTitle: "How to Play",
     HTPTitleFont: "bold 26px Arial",
     HTPTextFont: "18px Arial",

@@ -1,20 +1,14 @@
-// player configuration constants
-export const PLAYER_INITS = {
-    x: 200,
-    y: 160,
+export const PLAYER_CONFIG = {
     width: 30,
     height: 30,
-    xspeed: 0,
-    yspeed: 0,
     maxSpeed: 7.0,
-    accel: 0.25,
+    defaultAccel: 0.25,
     health3Colour: "yellowgreen",
     health2Colour: "olive",
     health1Colour: "saddlebrown",
     borderColour: "#102000",
     num_lives: 3,
 };
-// modifier type constants
 export const MODIFIER_TYPE = {
     INVINCIBILITY: "INVINCIBILITY",
     ICE_RINK: "ICE_RINK",
@@ -22,8 +16,7 @@ export const MODIFIER_TYPE = {
     ENLARGE_HAZ: "ENLARGE_HAZ",
     EXTRA_LIFE: "EXTRA_LIFE"
 };
-// hazard generation constants
-export const HAZ_GEN_INITS = {
+export const HAZ_GEN_CONFIG = {
     w: 50,
     h: 50,
     speed: 4,
@@ -35,7 +28,6 @@ export const HAZ_GEN_INITS = {
     sizeModInitTransFrames: 60,
     sizeModDecayFrames: 900,
 };
-// modifier effect constants
 export const MOD_EFFECT_CONFIG = {
     INVINCIBILITY: {
         colour: "#FFDF10",
@@ -56,13 +48,12 @@ export const MOD_EFFECT_CONFIG = {
 // effect wear off flash constants
 export const EWOF_CONFIG = {
     numFramesPerFlash: 4,
-    starts: [240, 180, 120, 60], // frame counts for when to start flashing
-    frequencies: [60, 30, 15, 8]
+    starts: [240, 180, 120, 60], // frame counts for when to start flashing at specific frequencies
+    frequencies: [60, 30, 15, 8] // flash frames per flash
 };
-// modifier generation constants
-export const MOD_GEN_INITS = {
+export const MOD_GEN_CONFIG = {
     [MODIFIER_TYPE.INVINCIBILITY]: {
-        density: 0.00037, // 0.0008 is a good start
+        density: 0.00037,
         speed: 9,
         radius: 25,
         fillColour: "#FFDF10",
@@ -113,20 +104,17 @@ export const COLLISION_ROLE = {
     NEW: "NEW",
     OLD: "OLD"
 };
-// declare the collision matrix object used to store action values
 export const collisionMatrix = {};
-// initialize the collision matrix with default values
+// initialize the collision action matrix with default values
 for (const role of Object.values(COLLISION_ROLE)) {
     collisionMatrix[role] = {};
     for (const oldType of Object.values(MODIFIER_TYPE)) {
         collisionMatrix[role][oldType] = {};
         for (const newType of Object.values(MODIFIER_TYPE)) {
-            // Default rule = IGNORE
             collisionMatrix[role][oldType][newType] = COLLISION_ACTION.ERROR;
         }
     }
 }
-// --- Collision-Action Matrix Values ---
 // What happens to new effects when invincibility is active
 collisionMatrix[COLLISION_ROLE.NEW][MODIFIER_TYPE.INVINCIBILITY] = {
     [MODIFIER_TYPE.INVINCIBILITY]: COLLISION_ACTION.DESTROY, // reactivate the old invincibility

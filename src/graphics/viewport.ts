@@ -1,7 +1,8 @@
 import { SCALING_CONFIG, VIEWPORT_CONFIG } from './graphics-config.js';
 
+// viewport class for managing the visible area of the game
 export class Viewport {
-    ctx: CanvasRenderingContext2D;
+    private readonly ctx: CanvasRenderingContext2D;
     private readonly virtualWidth: number;
     private readonly virtualHeight: number;
     private scale: number;
@@ -12,8 +13,8 @@ export class Viewport {
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
-        this.virtualWidth = SCALING_CONFIG.VIRTUAL_WIDTH;
-        this.virtualHeight = SCALING_CONFIG.VIRTUAL_HEIGHT;
+        this.virtualWidth = SCALING_CONFIG.virtualWidth;
+        this.virtualHeight = SCALING_CONFIG.virtualHeight;
         this.scale = 0;
         this.gameWidth = 0;
         this.gameHeight = 0;
@@ -46,7 +47,7 @@ export class Viewport {
         this.offsetY = (this.ctx.canvas.height - this.gameHeight) / 2;
     }
 
-    // scales and centres the context to fit perfectly in the middle of the window
+    // scales and centres the context to fit in the middle of the window
     private applyTransform(): void {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.translate(this.offsetX, this.offsetY);

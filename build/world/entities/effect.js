@@ -6,15 +6,7 @@ export class Effect {
         this.framesRemaining = 0;
         this.resetWearOffFlash();
     }
-    // decrements the frames remaining for the effect
-    update() {
-        this.framesRemaining--;
-    }
-    // returns the number of frames remaining for the effect
-    getFramesRemaining() {
-        return this.framesRemaining;
-    }
-    // returns true is the player colour should be flashing (because it is wearing off) given the frames remaining
+    // returns true is the player colour should be the flash colour because it is wearing off
     isWearOffFlashing() {
         if (this.framesRemaining >= this.WOflashMaxFrames) {
             // the effect is not flashing yet
@@ -31,7 +23,7 @@ export class Effect {
             return true;
         }
     }
-    // updates the frame window max/min for the wear off flash effect based on the frames remaining on the effect
+    // updates the frame window max/min for the wear off flash effect
     updateWearOffFlash() {
         // sets the flash window max/min
         this.WOflashMaxFrames = EWOF_CONFIG.starts[this.WOindex1] - this.WOindex2 * EWOF_CONFIG.frequencies[this.WOindex1];
@@ -43,19 +35,21 @@ export class Effect {
             this.updateWearOffFlash();
         }
     }
-    // returns the type of the effect
+    update() {
+        this.framesRemaining--;
+    }
+    getFramesRemaining() {
+        return this.framesRemaining;
+    }
     getType() {
         return this.type;
     }
-    // deactivates the effect immediately
     deactivate() {
         this.framesRemaining = 0;
     }
-    // checks if the effect is expired
     isExpired() {
         return this.framesRemaining <= 0;
     }
-    // resets the wear off flashing state
     resetWearOffFlash() {
         this.WOindex1 = 0;
         this.WOindex2 = 0;

@@ -2,7 +2,7 @@ import { STATUS_BAR_CONFIG, BACKGROUND_CONFIG, GAME_OVER_CONFIG, PAUSE_CONFIG } 
 import { SCALING_CONFIG } from './graphics-config.js';
 import { Menu } from './menu.js';
 import { Viewport } from './viewport.js';
-// Manages the canvas context and draws all game elements
+// manages the canvas context and draws all game elements
 export class Graphics {
     constructor(gameState, player, hazardManager, modifierManager) {
         this.gameState = gameState;
@@ -19,8 +19,7 @@ export class Graphics {
         this.viewport = new Viewport(this.ctx);
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        this.virtualWidth = SCALING_CONFIG.VIRTUAL_WIDTH;
-        this.virtualHeight = SCALING_CONFIG.VIRTUAL_HEIGHT;
+        ;
     }
     // clears the canvas and sets up window scaling to the current window size
     prepToDrawFrame() {
@@ -33,7 +32,7 @@ export class Graphics {
     // draws the game background
     drawBackground() {
         this.ctx.fillStyle = BACKGROUND_CONFIG.backgroundColour;
-        this.ctx.fillRect(0, 0, this.virtualWidth, this.virtualHeight);
+        this.ctx.fillRect(0, 0, SCALING_CONFIG.virtualWidth, SCALING_CONFIG.virtualHeight);
     }
     // draws the in-game text
     drawInGameText() {
@@ -55,8 +54,8 @@ export class Graphics {
         this.ctx.fillStyle = PAUSE_CONFIG.fontColour;
         this.ctx.font = PAUSE_CONFIG.titleFont;
         this.ctx.textAlign = "center";
-        this.ctx.fillText(PAUSE_CONFIG.pauseTitle, this.virtualWidth / 2, this.virtualHeight / 2);
-        this.ctx.fillText(PAUSE_CONFIG.pauseMessage, this.virtualWidth / 2, this.virtualHeight / 2 + 40);
+        this.ctx.fillText(PAUSE_CONFIG.pauseTitle, SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2);
+        this.ctx.fillText(PAUSE_CONFIG.pauseMessage, SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2 + 40);
     }
     // draws the game over screen
     drawGameOver() {
@@ -65,13 +64,13 @@ export class Graphics {
         this.ctx.fillStyle = GAME_OVER_CONFIG.fontColour;
         this.ctx.font = GAME_OVER_CONFIG.titleFont;
         this.ctx.textAlign = "center";
-        this.ctx.fillText(GAME_OVER_CONFIG.gameOverTitle, this.virtualWidth / 2, this.virtualHeight / 2);
+        this.ctx.fillText(GAME_OVER_CONFIG.gameOverTitle, SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2);
         // draws the game over time survived message
         this.ctx.font = GAME_OVER_CONFIG.messagingFont;
-        this.ctx.fillText(GAME_OVER_CONFIG.gameOverMessage.replace("{time}", this.gameState.getSecondsSurvived().toFixed(2)), this.virtualWidth / 2, this.virtualHeight / 2 + 40);
+        this.ctx.fillText(GAME_OVER_CONFIG.gameOverMessage.replace("{time}", this.gameState.getSecondsSurvived().toFixed(2)), SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2 + 40);
         // draws the game over prompt
         this.ctx.font = GAME_OVER_CONFIG.promptFont;
-        this.ctx.fillText(GAME_OVER_CONFIG.gameOverPrompt, this.virtualWidth / 2, this.virtualHeight / 2 + 80);
+        this.ctx.fillText(GAME_OVER_CONFIG.gameOverPrompt, SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2 + 80);
     }
     // draws the menu
     drawMenu() {

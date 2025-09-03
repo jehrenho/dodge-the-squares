@@ -1,5 +1,6 @@
 import { CollisionFlasher } from './collision-flasher.js';
 import { COLLISION_MANAGER_CONFIG } from './collision-config.js';
+// manages all collision detection and resolution in the game
 export class CollisionManager {
     constructor(player, hazardManager, modifierManager, effectManager) {
         this.player = player;
@@ -8,8 +9,6 @@ export class CollisionManager {
         this.effectManager = effectManager;
         this.collisionFlasher = new CollisionFlasher();
         this.shapesToFlash = [];
-        this.flashFillColour = COLLISION_MANAGER_CONFIG.flashFillColour;
-        this.flashBorderColour = COLLISION_MANAGER_CONFIG.flashBorderColour;
     }
     // detects new player-modifier collisions and takes the appropriate actions associated with the collided modifiers
     resolveModifierCollisions() {
@@ -40,12 +39,11 @@ export class CollisionManager {
             }
         }
     }
-    // flashes the player and hazards
+    // starts the flashing effect that occurs when the player collides with something
     startFlashingCollision() {
         this.collisionFlasher.startFlashing();
         this.updateCollisionColour();
     }
-    // updates the flash colour of any colliding objects
     update() {
         if (this.collisionFlasher.isFlashing()) {
             this.collisionFlasher.update();
@@ -56,6 +54,10 @@ export class CollisionManager {
             this.setFlashShapesToDefaultColour();
             this.shapesToFlash = [];
         }
+    }
+    // signals to the world it shouldn't update entity positions for a moment to emphasize a collision
+    isFlashingCollision() {
+        return this.collisionFlasher.isFlashing();
     }
     // sets the flash shapes to their default colours
     setFlashShapesToDefaultColour() {
@@ -68,16 +70,12 @@ export class CollisionManager {
         if (this.collisionFlasher.isFlashOn()) {
             // set the collided objects to the flash colour
             for (const shape of this.shapesToFlash) {
-                shape.setColour(this.flashFillColour, this.flashBorderColour);
+                shape.setColour(COLLISION_MANAGER_CONFIG.flashFillColour, COLLISION_MANAGER_CONFIG.flashBorderColour);
             }
         }
         else {
             // set the collided objects to their default colour
             this.setFlashShapesToDefaultColour();
         }
-    }
-    // returns true if a collision is currently being flashed
-    isFlashingCollision() {
-        return this.collisionFlasher.isFlashing();
     }
 }

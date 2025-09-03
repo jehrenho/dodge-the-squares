@@ -3,8 +3,8 @@ import { ModifierType } from './entities-config.js';
 
 // represents an individual modifier circle in the game
 export class Modifier extends VisibleShape {
-    private modifierType: ModifierType;
-    private radius: number;
+    private readonly modifierType: ModifierType;
+    private readonly radius: number;
 
     constructor(modifierType: ModifierType, 
         x: number, 
@@ -17,7 +17,6 @@ export class Modifier extends VisibleShape {
         this.radius = radius;
     }
 
-    // getters/setters
     setX(x: number): void {
         this.x = x;
     }
@@ -38,19 +37,17 @@ export class Modifier extends VisibleShape {
         return this.radius;
     }
 
-    // returns the type of the modifier
     getType(): ModifierType {
         return this.modifierType;
     }
 
-    // draws the modifier on the canvas
     draw(ctx: CanvasRenderingContext2D, fillColour: string): void {
-        // Draw fill
+        // draw fill
         ctx.fillStyle = fillColour;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
-        // Draw outline
+        // draw outline
         ctx.strokeStyle = this.borderColour;
         ctx.lineWidth = 1;
         ctx.stroke();

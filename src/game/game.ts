@@ -18,8 +18,11 @@ export class Game {
     this.inputManager = new InputManager(this.graphics);
   }
 
-  // updates the game
-  update(): void {
+  start(): void {
+    requestAnimationFrame(this.gameLoop.bind(this));
+  }
+
+  private update(): void {
     this.inputManager.update();
 
     switch (this.gameState.getPhase()) {
@@ -58,8 +61,7 @@ export class Game {
 
   }
 
-  // renders the game
-  render(): void {
+  private render(): void {
     this.graphics.prepToDrawFrame();
 
     switch (this.gameState.getPhase()) {
@@ -67,7 +69,6 @@ export class Game {
         this.graphics.drawMenu();
         break;
       case GamePhase.INGAME:
-        // draw the pause menu if the game is paused
         if (this.gameState.isPaused()) {
           this.graphics.drawGamePaused();
         } else {
@@ -82,26 +83,18 @@ export class Game {
     this.graphics.finishDrawingFrame();
   }
 
-  // the main game loop: generates a single frame in the game
-  gameLoop(): void {
+  private gameLoop(): void {
     this.update();
     this.render();
     requestAnimationFrame(this.gameLoop.bind(this));
   }
 
-  // resets the game objects
-  resetGame(): void {
+  private resetGame(): void {
     this.gameState.reset();
     this.world.reset();
     this.graphics.reset();
   }
-
-  // start the game loop
-  start(): void {
-    requestAnimationFrame(this.gameLoop.bind(this));
-  }
 }
 
-// run the game
 const game = new Game();
 game.start();

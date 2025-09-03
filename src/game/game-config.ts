@@ -1,4 +1,3 @@
-// game phases
 export const enum GamePhase { 
     MENU,
     INGAME,

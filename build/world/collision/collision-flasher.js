@@ -14,7 +14,6 @@ export class CollisionFlasher {
         this.framesRemainingThisFlash = this.framesPerFlash;
         this.flashOn = true;
     }
-    // flashes the colours of the flashing objects
     update() {
         if (this.isFlashing()) {
             if (this.framesRemainingThisFlash == 0) {

@@ -1,79 +1,36 @@
-import { PLAYER_INITS,
- } from './entities-config.js';
+import { PLAYER_CONFIG } from './entities-config.js';
 import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
 import { VisibleShape } from './visibleShape.js';
 import { MovementInput } from '../../input/input-config.js';
 
 // represents the player square and it's state
 export class Player extends VisibleShape {
-    private width: number;
-    private height: number;
+    private readonly width: number;
+    private readonly height: number;
+    private readonly maxSpeed: number;
+    private readonly defaultAccel: number;
     private xspeed: number;
     private yspeed: number;
-    private maxSpeed: number;
     private accel: number;
-    private defaultAccel: number;
     private invincibility: boolean;
     private health: number;
 
     constructor() {
-        super(0, 0, PLAYER_INITS.health3Colour, PLAYER_INITS.borderColour);
-        this.width = PLAYER_INITS.width;
-        this.height = PLAYER_INITS.height;
-        this.xspeed = PLAYER_INITS.xspeed;
-        this.yspeed = PLAYER_INITS.yspeed;
-        this.maxSpeed = PLAYER_INITS.maxSpeed;
-        this.defaultAccel = PLAYER_INITS.accel;
+        super(0, 0, PLAYER_CONFIG.health3Colour, PLAYER_CONFIG.borderColour);
+        this.width = PLAYER_CONFIG.width;
+        this.height = PLAYER_CONFIG.height;
+        this.maxSpeed = PLAYER_CONFIG.maxSpeed;
+        this.defaultAccel = PLAYER_CONFIG.defaultAccel;
+        this.health = PLAYER_CONFIG.num_lives;
+        this.xspeed = 0;
+        this.yspeed = 0;
         this.accel = this.defaultAccel;
         this.invincibility = false;
-        this.health = PLAYER_INITS.num_lives;
-    }
-
-    // handles player input and updates it's speed accordingly
-    handleInput(movementInput: MovementInput): void {
-        // increase speed if the arrow keys are pressed
-        if (movementInput.up && this.yspeed > -this.maxSpeed)    this.yspeed -= this.accel;
-        if (movementInput.down && this.yspeed < this.maxSpeed)  this.yspeed += this.accel;
-        if (movementInput.left && this.xspeed > -this.maxSpeed)  this.xspeed -= this.accel;
-        if (movementInput.right && this.xspeed < this.maxSpeed) this.xspeed += this.accel;
-
-        // decrease speed when the arrow keys are released
-        if (!movementInput.up && !movementInput.down && this.yspeed != 0) {
-            if (this.yspeed > this.accel) this.yspeed -= this.accel;
-            else if (this.yspeed < -this.accel) this.yspeed += this.accel;
-            else this.yspeed = 0;
-        }
-        if (!movementInput.left && !movementInput.right && this.xspeed != 0) {
-            if (this.xspeed > this.accel) this.xspeed -= this.accel;
-            else if (this.xspeed < -this.accel) this.xspeed += this.accel;
-            else this.xspeed = 0;
-        }
-    }
-
-    // ensures the player stays within the canvas boundaries
-    enforceBoundaries(): void {
-        if (this.y < 0) {
-            this.y = 0;
-            this.yspeed = 0;
-        }
-        if (this.y > SCALING_CONFIG.VIRTUAL_HEIGHT - this.height) {
-            this.y = SCALING_CONFIG.VIRTUAL_HEIGHT - this.height;
-            this.yspeed = 0;
-        } 
-        if (this.x < 0) {
-            this.x = 0;
-            this.xspeed = 0;
-        }
-        if (this.x > SCALING_CONFIG.VIRTUAL_WIDTH - this.width) {
-            this.x = SCALING_CONFIG.VIRTUAL_WIDTH - this.width;
-            this.xspeed = 0;
-        } 
     }
 
     // update the player position based on speed, accel, and input
     updatePosition(movementInput: MovementInput): void {
         this.handleInput(movementInput);
-        // change the rectangle position based on it's speed
         this.y += this.yspeed;
         this.x += this.xspeed;
         this.enforceBoundaries();
@@ -96,14 +53,28 @@ export class Player extends VisibleShape {
         }
     }
 
-    // updates the player's health
+    // set the player's default colour based on it's health
+    setDefaultColourByHealth() {
+        if (this.health >= 3) {
+            this.defaultFillColour = PLAYER_CONFIG.health3Colour;
+        } else if (this.health === 2) {
+            this.defaultFillColour = PLAYER_CONFIG.health2Colour;
+        } else {
+            this.defaultFillColour = PLAYER_CONFIG.health1Colour;
+        }
+    }
+
+    setPositionByCentre(x: number, y: number): void {
+        this.x = x - this.width / 2;
+        this.y = y - this.height / 2;
+    }
+
     modifyHealth(amount: number): void {
         this.health += amount;
         // cap health at a maximum
-        if (this.health > PLAYER_INITS.num_lives) this.health = PLAYER_INITS.num_lives;
+        if (this.health > PLAYER_CONFIG.num_lives) this.health = PLAYER_CONFIG.num_lives;
     }
 
-    // getters/setters
     getWidth(): number {
         return this.width;
     }
@@ -112,56 +83,73 @@ export class Player extends VisibleShape {
         return this.height;
     }
 
-    // set the player's default colour based on it's health
-    setDefaultColourByHealth() {
-        if (this.health >= 3) {
-            this.defaultFillColour = PLAYER_INITS.health3Colour;
-        } else if (this.health === 2) {
-            this.defaultFillColour = PLAYER_INITS.health2Colour;
-        } else {
-            this.defaultFillColour = PLAYER_INITS.health1Colour;
-        }
-    }
-
-    // sets the player position
-    setPositionByCentre(x: number, y: number): void {
-        this.x = x - this.width / 2;
-        this.y = y - this.height / 2;
-    }
-
-    // checks if the player is invincible
     isInvincible(): boolean {
         return this.invincibility;
     }
 
-    // checks if the player is dead
     isDead(): boolean {
         return this.health <= 0;
     }
 
-    // draw the player rectangle on the canvas
     draw(ctx: CanvasRenderingContext2D): void {
-        // Draw the player rectangle's fill colour
+        // draw fill
         ctx.fillStyle = this.fillColour;
         ctx.fillRect(this.x, this.y, this.width, this.height);
-
-        // Draw border
+        // draw border
         ctx.strokeStyle = this.borderColour;
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 
-    // reset the player to the initial state
     reset(): void {
-        this.x = PLAYER_INITS.x;
-        this.y = PLAYER_INITS.y;
-        this.xspeed = PLAYER_INITS.xspeed;
-        this.yspeed = PLAYER_INITS.yspeed;
-        this.health = PLAYER_INITS.num_lives;
-        this.invincibility = false;
+        this.xspeed = 0;
+        this.yspeed = 0;
         this.accel = this.defaultAccel;
+        this.invincibility = false;
+        this.health = PLAYER_CONFIG.num_lives;
         this.setDefaultColourByHealth();
         this.fillColour = this.defaultFillColour;
         this.borderColour = this.defaultBorderColour;
+    }
+
+    // reads the movement input and updates it's speed accordingly
+    private handleInput(movementInput: MovementInput): void {
+        // increase speed if the arrow keys are pressed
+        if (movementInput.up && this.yspeed > -this.maxSpeed)    this.yspeed -= this.accel;
+        if (movementInput.down && this.yspeed < this.maxSpeed)  this.yspeed += this.accel;
+        if (movementInput.left && this.xspeed > -this.maxSpeed)  this.xspeed -= this.accel;
+        if (movementInput.right && this.xspeed < this.maxSpeed) this.xspeed += this.accel;
+
+        // decrease speed when the arrow keys are released
+        if (!movementInput.up && !movementInput.down && this.yspeed != 0) {
+            if (this.yspeed > this.accel) this.yspeed -= this.accel;
+            else if (this.yspeed < -this.accel) this.yspeed += this.accel;
+            else this.yspeed = 0;
+        }
+        if (!movementInput.left && !movementInput.right && this.xspeed != 0) {
+            if (this.xspeed > this.accel) this.xspeed -= this.accel;
+            else if (this.xspeed < -this.accel) this.xspeed += this.accel;
+            else this.xspeed = 0;
+        }
+    }
+
+    // ensures the player stays within the canvas boundaries
+    private enforceBoundaries(): void {
+        if (this.y < 0) {
+            this.y = 0;
+            this.yspeed = 0;
+        }
+        if (this.y > SCALING_CONFIG.virtualHeight - this.height) {
+            this.y = SCALING_CONFIG.virtualHeight - this.height;
+            this.yspeed = 0;
+        } 
+        if (this.x < 0) {
+            this.x = 0;
+            this.xspeed = 0;
+        }
+        if (this.x > SCALING_CONFIG.virtualWidth - this.width) {
+            this.x = SCALING_CONFIG.virtualWidth - this.width;
+            this.xspeed = 0;
+        } 
     }
 }

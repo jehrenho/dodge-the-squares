@@ -12,22 +12,10 @@ export class World {
         this.effectManager = new EffectManager(this.player, this.hazardManager);
         this.collisionManager = new CollisionManager(this.player, this.hazardManager, this.modifierManager, this.effectManager);
     }
-    // updates the entities in the game world
-    updateEntities(movementInput) {
-        this.player.updatePosition(movementInput);
-        this.hazardManager.updateHazards();
-        this.modifierManager.updateModifiers();
-        this.effectManager.updateEffects();
-        this.collisionManager.resolveModifierCollisions();
-        this.effectManager.applyEffects();
-        this.collisionManager.resolveHazardCollisions();
-    }
-    // updates the game world
     update(movementInput) {
         // update the collision manager if it's flashing a collision
         if (this.collisionManager.isFlashingCollision()) {
             this.collisionManager.update();
-            // otherwise update all the game entities
         }
         else {
             this.updateEntities(movementInput);
@@ -42,15 +30,23 @@ export class World {
     getModifierManager() {
         return this.modifierManager;
     }
-    // resets the game world to the beginning of game state
+    isPlayerDead() {
+        return this.player.isDead() && !this.collisionManager.isFlashingCollision();
+    }
     reset() {
         this.player.reset();
         this.hazardManager.reset();
         this.modifierManager.reset();
         this.effectManager.reset();
     }
-    // returns true if the player is dead
-    isPlayerDead() {
-        return this.player.isDead() && !this.collisionManager.isFlashingCollision();
+    // moves, generates, and destroys entities in the game world
+    updateEntities(movementInput) {
+        this.player.updatePosition(movementInput);
+        this.hazardManager.updateHazards();
+        this.modifierManager.updatePositions();
+        this.effectManager.updateEffects();
+        this.collisionManager.resolveModifierCollisions();
+        this.effectManager.applyEffects();
+        this.collisionManager.resolveHazardCollisions();
     }
 }

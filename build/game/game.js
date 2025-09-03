@@ -10,7 +10,9 @@ export class Game {
         this.graphics = new Graphics(this.gameState, this.world.getPlayer(), this.world.getHazardManager(), this.world.getModifierManager());
         this.inputManager = new InputManager(this.graphics);
     }
-    // updates the game
+    start() {
+        requestAnimationFrame(this.gameLoop.bind(this));
+    }
     update() {
         this.inputManager.update();
         switch (this.gameState.getPhase()) {
@@ -49,7 +51,6 @@ export class Game {
                 break;
         }
     }
-    // renders the game
     render() {
         this.graphics.prepToDrawFrame();
         switch (this.gameState.getPhase()) {
@@ -57,7 +58,6 @@ export class Game {
                 this.graphics.drawMenu();
                 break;
             case 1 /* GamePhase.INGAME */:
-                // draw the pause menu if the game is paused
                 if (this.gameState.isPaused()) {
                     this.graphics.drawGamePaused();
                 }
@@ -71,23 +71,16 @@ export class Game {
         }
         this.graphics.finishDrawingFrame();
     }
-    // the main game loop: generates a single frame in the game
     gameLoop() {
         this.update();
         this.render();
         requestAnimationFrame(this.gameLoop.bind(this));
     }
-    // resets the game objects
     resetGame() {
         this.gameState.reset();
         this.world.reset();
         this.graphics.reset();
     }
-    // start the game loop
-    start() {
-        requestAnimationFrame(this.gameLoop.bind(this));
-    }
 }
-// run the game
 const game = new Game();
 game.start();

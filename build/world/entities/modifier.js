@@ -6,7 +6,6 @@ export class Modifier extends VisibleShape {
         this.modifierType = modifierType;
         this.radius = radius;
     }
-    // getters/setters
     setX(x) {
         this.x = x;
     }
@@ -22,18 +21,16 @@ export class Modifier extends VisibleShape {
     getRadius() {
         return this.radius;
     }
-    // returns the type of the modifier
     getType() {
         return this.modifierType;
     }
-    // draws the modifier on the canvas
     draw(ctx, fillColour) {
-        // Draw fill
+        // draw fill
         ctx.fillStyle = fillColour;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
-        // Draw outline
+        // draw outline
         ctx.strokeStyle = this.borderColour;
         ctx.lineWidth = 1;
         ctx.stroke();

@@ -1,114 +1,46 @@
-import { HAZ_GEN_INITS, 
-    MOD_EFFECT_CONFIG } from './entities-config.js';
+import { HAZ_GEN_CONFIG, MOD_EFFECT_CONFIG } from './entities-config.js';
 import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
 import { Player } from './player.js';
 import { Hazard } from './hazard.js';
-import { GameState, } from '../../game/game-state.js';
+import { GameState } from '../../game/game-state.js';
 import { GAME_STATE_CONFIG } from '../../game/game-config.js';
 
-// helper logarithm function with a user specified base
-function logBase(x: number, base: number): number {
-    return Math.log(x) / Math.log(base);
-}
-
-// represents the collection of hazards in the game
+// manages all hazards in the game
 export class HazardManager {
-    gameState: GameState;
-    hazardSpeed: number;
-    hazardDensity: number;
-    fillColour: string;
-    borderColour: string;
-    currentSizeFactor: number;
-    targetSizeFactor: number;
-    rateOfSizeFactorChange: number;
-    minShrinkFactor: number;
-    maxEnlargeFactor: number;
-    hazards: Hazard[];
+    private readonly gameState: GameState;
+    private readonly minShrinkFactor: number;
+    private readonly maxEnlargeFactor: number;
+    private hazardSpeed: number;
+    private hazardDensity: number;
+    private currentSizeFactor: number;
+    private targetSizeFactor: number;
+    private rateOfSizeFactorChange: number;
+    private hazards: Hazard[];
 
     constructor (gameState: GameState) {
         this.gameState = gameState;
-        this.hazardSpeed = HAZ_GEN_INITS.speed;
-        this.hazardDensity = HAZ_GEN_INITS.density;
-        this.fillColour = HAZ_GEN_INITS.fillColour;
-        this.borderColour = HAZ_GEN_INITS.borderColour;
+        this.minShrinkFactor = MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor;
+        this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
+        this.hazardSpeed = HAZ_GEN_CONFIG.speed;
+        this.hazardDensity = HAZ_GEN_CONFIG.density;
         this.currentSizeFactor = 1.0;
         this.targetSizeFactor = 1.0;
         this.rateOfSizeFactorChange = 0;
-        this.minShrinkFactor = MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor;
-        this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
         this.hazards = [];
     }
 
-    // creates a new hazard given it's center position
-    createHazard(x: number, y: number, w: number, h: number, colour: string, borderColour: string): Hazard {
-        const hazard = new Hazard(x, y, w, h, colour, borderColour);
+    createHazard(x: number, y: number, w: number, h: number): Hazard {
+        const hazard = new Hazard(x, y, w, h, HAZ_GEN_CONFIG.fillColour, HAZ_GEN_CONFIG.borderColour);
         this.hazards.push(hazard);
         return hazard;
     }
 
     // creates the hazard on the menu screen
     createMenuHazard(): Hazard {
-        const hazard = new Hazard(0, 0, HAZ_GEN_INITS.w, HAZ_GEN_INITS.h, 
-            HAZ_GEN_INITS.fillColour, HAZ_GEN_INITS.borderColour);
-        this.hazards.push(hazard);
-        return hazard;
+        return this.createHazard(0, 0, HAZ_GEN_CONFIG.w, HAZ_GEN_CONFIG.h);
     }
 
-    // generates new hazards based on the hazard density
-    generateNewHazards(): void {
-        const rand = Math.random();
-        if (rand < this.hazardDensity) {
-            // map the new rectangle location to the canvas dimensions in pixels
-            const newHazardy = ((SCALING_CONFIG.VIRTUAL_HEIGHT + HAZ_GEN_INITS.h) * rand) / this.hazardDensity;
-            // create a new hazard
-            this.createHazard(SCALING_CONFIG.VIRTUAL_WIDTH, 
-                newHazardy - HAZ_GEN_INITS.h, 
-                HAZ_GEN_INITS.w * this.currentSizeFactor, 
-                HAZ_GEN_INITS.h * this.currentSizeFactor, 
-                this.fillColour, 
-                this.borderColour
-            );
-        }
-    }
-
-    // moves all hazards to the left, destroys hazards that have moved off screen, and sets their size
-    moveHazards(): void {
-        for (let i = this.hazards.length - 1; i >= 0; i--) {
-            this.hazards[i].setX(this.hazards[i].getX() - this.hazardSpeed);
-            // remove rectangles that have moved off the left side of the canvas
-            if (this.hazards[i].getX() < -this.hazards[i].getWidth() || this.hazards[i].isTimeToKill()) {
-                this.hazards.splice(i, 1);
-                continue;
-            } 
-
-            // update the size of the hazards if we need to
-            if (this.rateOfSizeFactorChange === 0) continue;
-            this.hazards[i].setWidth(this.hazards[i].getNominalWidth() * this.currentSizeFactor);
-            this.hazards[i].setHeight(this.hazards[i].getNominalHeight() * this.currentSizeFactor);
-        }
-    }
-
-    // updates the size of the hazards
-    updateHazardSizes() {
-        // check if we have reached the target size
-        if ((this.rateOfSizeFactorChange > 0 && this.currentSizeFactor > this.targetSizeFactor)
-        || (this.rateOfSizeFactorChange < 0 && this.currentSizeFactor < this.targetSizeFactor)) {
-            if (this.targetSizeFactor != 1) {
-                // a new size is now active, decay back to the initial size
-                this.currentSizeFactor = this.targetSizeFactor;
-                this.targetSizeFactor = 1;
-                this.rateOfSizeFactorChange = (this.targetSizeFactor - this.currentSizeFactor) / HAZ_GEN_INITS.sizeModDecayFrames;
-            }
-            else {
-                // initial size has been reached
-                this.currentSizeFactor = 1;
-                this.rateOfSizeFactorChange = 0;
-            }
-        }
-        this.currentSizeFactor += this.rateOfSizeFactorChange;
-    }
-
-    // generates new hazards, destroys old ones, and moves all hazards
+    // generates new hazards, destroys old ones, and moves all active hazards
     updateHazards(): void {
         this.generateNewHazards();
         this.moveHazards();
@@ -116,7 +48,7 @@ export class HazardManager {
         this.updateDifficulty(this.gameState);
     }
 
-    // applies a new size scale factor to all hazards 
+    // grows and shrinks the hazards
     applySizeScaleFactor(scaleFactor: number): void {
         this.targetSizeFactor = this.currentSizeFactor * scaleFactor;
         if (this.targetSizeFactor < this.minShrinkFactor) {
@@ -125,7 +57,7 @@ export class HazardManager {
             this.targetSizeFactor = this.maxEnlargeFactor;
         }
         // calculate the rate of size change given the target size factor and the initial transition frames
-        this.rateOfSizeFactorChange = (this.targetSizeFactor - this.currentSizeFactor) / HAZ_GEN_INITS.sizeModInitTransFrames;
+        this.rateOfSizeFactorChange = (this.targetSizeFactor - this.currentSizeFactor) / HAZ_GEN_CONFIG.sizeModInitTransFrames;
     }
 
     // detects collisions between the player and hazards
@@ -142,24 +74,12 @@ export class HazardManager {
         return collisions;
     }
 
-    // draws all hazards on the canvas
     draw(ctx:CanvasRenderingContext2D): void {
-        ctx.fillStyle = this.fillColour;
         for (let hazard of this.hazards){
             hazard.draw(ctx);
         }
     }
 
-    // updates the difficulty of hazards logarithmically based on the time survived every second
-    updateDifficulty(gameState: GameState): void {
-        if (gameState.getFramesSurvived() % GAME_STATE_CONFIG.fps === 0) {
-            let difficultyFactor = logBase(gameState.getMinutesSurvived() + 1, HAZ_GEN_INITS.difficultyLogBase);
-            this.hazardDensity = HAZ_GEN_INITS.density * (difficultyFactor + 1) * HAZ_GEN_INITS.difficultyDensityFactor;
-            this.hazardSpeed = HAZ_GEN_INITS.speed * (difficultyFactor + 1);
-        }
-    }
-
-    // destroys active hazards
     destroyHazards(inputHazards: Hazard[]) {
         for (let haz of this.hazards) {
             for (let inputHaz of inputHazards) {
@@ -172,15 +92,77 @@ export class HazardManager {
         }
     }
 
-    // resets all hazards (clears them)
     reset(): void {
-        this.hazardSpeed = HAZ_GEN_INITS.speed;
-        this.hazardDensity = HAZ_GEN_INITS.density;
-        this.minShrinkFactor = MOD_EFFECT_CONFIG.SHRINK_HAZ.scaleFactor;
-        this.maxEnlargeFactor = MOD_EFFECT_CONFIG.ENLARGE_HAZ.scaleFactor;
+        this.hazardSpeed = HAZ_GEN_CONFIG.speed;
+        this.hazardDensity = HAZ_GEN_CONFIG.density;
         this.currentSizeFactor = 1.0;
         this.targetSizeFactor = 1.0;
         this.rateOfSizeFactorChange = 0;
         this.hazards = [];
+    }
+
+    // generates new hazards based on the hazard density
+    private generateNewHazards(): void {
+        const rand = Math.random();
+        if (rand < this.hazardDensity) {
+            // map the new rectangle location to the canvas dimensions in pixels
+            const newHazardy = ((SCALING_CONFIG.virtualHeight + HAZ_GEN_CONFIG.h) * rand) / this.hazardDensity;
+            // create a new hazard
+            this.createHazard(SCALING_CONFIG.virtualWidth, 
+                newHazardy - HAZ_GEN_CONFIG.h, 
+                HAZ_GEN_CONFIG.w * this.currentSizeFactor, 
+                HAZ_GEN_CONFIG.h * this.currentSizeFactor
+            );
+        }
+    }
+
+    // moves all hazards to the left, destroys hazards that have moved off screen, and sets their size
+    private moveHazards(): void {
+        for (let i = this.hazards.length - 1; i >= 0; i--) {
+            this.hazards[i].setX(this.hazards[i].getX() - this.hazardSpeed);
+            // remove rectangles that have moved off the left side of the canvas
+            if (this.hazards[i].getX() < -this.hazards[i].getWidth() || this.hazards[i].isTimeToKill()) {
+                this.hazards.splice(i, 1);
+                continue;
+            } 
+
+            // update the size of the hazards if we need to
+            if (this.rateOfSizeFactorChange === 0) continue;
+            this.hazards[i].setWidth(this.hazards[i].getNominalWidth() * this.currentSizeFactor);
+            this.hazards[i].setHeight(this.hazards[i].getNominalHeight() * this.currentSizeFactor);
+        }
+    }
+
+    // updates the size of the hazards
+    private updateHazardSizes() {
+        // check if we have reached the target size
+        if ((this.rateOfSizeFactorChange > 0 && this.currentSizeFactor > this.targetSizeFactor)
+        || (this.rateOfSizeFactorChange < 0 && this.currentSizeFactor < this.targetSizeFactor)) {
+            if (this.targetSizeFactor != 1) {
+                // a new size is now active, decay back to the initial size
+                this.currentSizeFactor = this.targetSizeFactor;
+                this.targetSizeFactor = 1;
+                this.rateOfSizeFactorChange = (this.targetSizeFactor - this.currentSizeFactor) / HAZ_GEN_CONFIG.sizeModDecayFrames;
+            }
+            else {
+                // initial size has been reached
+                this.currentSizeFactor = 1;
+                this.rateOfSizeFactorChange = 0;
+            }
+        }
+        this.currentSizeFactor += this.rateOfSizeFactorChange;
+    }
+
+    // updates the difficulty of the game by making the hazards faster and more numerous
+    private updateDifficulty(gameState: GameState): void {
+        if (gameState.getFramesSurvived() % GAME_STATE_CONFIG.fps === 0) {
+            // calculate the difficulty factor
+            const minutesSurvived = gameState.getMinutesSurvived() + 1;
+            const logBase = (x: number, base: number) => Math.log(x) / Math.log(base);
+            const difficultyFactor = logBase(minutesSurvived, HAZ_GEN_CONFIG.difficultyLogBase);
+            // update the hazard density and speed based on the difficulty factor
+            this.hazardDensity = HAZ_GEN_CONFIG.density * (difficultyFactor + 1) * HAZ_GEN_CONFIG.difficultyDensityFactor;
+            this.hazardSpeed = HAZ_GEN_CONFIG.speed * (difficultyFactor + 1);
+        }
     }
 }

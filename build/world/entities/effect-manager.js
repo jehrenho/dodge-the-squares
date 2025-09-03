@@ -1,45 +1,13 @@
 import { InvincibilityEffect, IceRinkEffect } from './effect.js';
 import { MODIFIER_TYPE, collisionMatrix, COLLISION_ROLE, COLLISION_ACTION, MOD_EFFECT_CONFIG } from './entities-config.js';
+// manages all active effects and effect interactions in the game
 export class EffectManager {
     constructor(player, hazardManager) {
         this.activeEffects = [];
         this.player = player;
         this.hazardManager = hazardManager;
     }
-    // updates all active effects and removes expired effects
-    updateEffects() {
-        for (let i = this.activeEffects.length - 1; i >= 0; i--) {
-            const effect = this.activeEffects[i];
-            effect.update();
-            if (effect.isExpired()) {
-                this.activeEffects.splice(i, 1);
-            }
-        }
-    }
-    // sets the player properties based on the currently active effects
-    applyEffects() {
-        let isInvincible = false;
-        let accelFactor = 1;
-        let fillColour = null;
-        let borderColour = null;
-        // set the player's abilities and colour based on it's active effects
-        for (let effect of this.activeEffects) {
-            if (effect.getType() === MODIFIER_TYPE.INVINCIBILITY) {
-                isInvincible = true;
-                fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
-            }
-            else if (effect.getType() === MODIFIER_TYPE.ICE_RINK) {
-                fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
-                accelFactor = MOD_EFFECT_CONFIG.ICE_RINK.accelFactor;
-            }
-            // set the player's colour to default if the effect is currently flashing because it is wearing off
-            if (effect.isWearOffFlashing()) {
-                fillColour = null;
-            }
-        }
-        this.player.applyEffects(isInvincible, accelFactor, fillColour, borderColour);
-    }
-    // handles logic for applying and resolving modifier effect collisions
+    // determines the appropriate action for a new modifier collision
     actOnModifierCollision(newModifierType) {
         // activate the effect if there are no other active effects
         if (this.activeEffects.length === 0) {
@@ -77,7 +45,42 @@ export class EffectManager {
             }
         }
     }
-    // activates new effects
+    // sets the player's properties based on the currently active effects
+    applyEffects() {
+        let isInvincible = false;
+        let accelFactor = 1;
+        let fillColour = null;
+        let borderColour = null;
+        // set the player's abilities and colour based on it's active effects
+        for (let effect of this.activeEffects) {
+            if (effect.getType() === MODIFIER_TYPE.INVINCIBILITY) {
+                isInvincible = true;
+                fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
+            }
+            else if (effect.getType() === MODIFIER_TYPE.ICE_RINK) {
+                fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
+                accelFactor = MOD_EFFECT_CONFIG.ICE_RINK.accelFactor;
+            }
+            // set the player's colour to default if the effect is currently flashing because it is wearing off
+            if (effect.isWearOffFlashing()) {
+                fillColour = null;
+            }
+        }
+        this.player.applyEffects(isInvincible, accelFactor, fillColour, borderColour);
+    }
+    updateEffects() {
+        for (let i = this.activeEffects.length - 1; i >= 0; i--) {
+            const effect = this.activeEffects[i];
+            effect.update();
+            if (effect.isExpired()) {
+                this.activeEffects.splice(i, 1);
+            }
+        }
+    }
+    // resets the active effects
+    reset() {
+        this.activeEffects = [];
+    }
     activateEffect(type) {
         switch (type) {
             case MODIFIER_TYPE.SHRINK_HAZ:
@@ -101,9 +104,5 @@ export class EffectManager {
                 console.error(`Unexpected modifier type: ${type}`);
                 break;
         }
-    }
-    // resets the active effects
-    reset() {
-        this.activeEffects = [];
     }
 }

@@ -1,5 +1,4 @@
 ;
-// input event types
 export var InputEventType;
 (function (InputEventType) {
     InputEventType["KEYDOWN"] = "keydown";
@@ -7,7 +6,6 @@ export var InputEventType;
     InputEventType["RESIZE"] = "resize";
 })(InputEventType || (InputEventType = {}));
 ;
-// keyboard keys
 export const KEYS = {
     UP: "ArrowUp",
     DOWN: "ArrowDown",
