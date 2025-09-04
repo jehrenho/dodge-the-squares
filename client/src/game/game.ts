@@ -3,6 +3,7 @@ import { GameState } from './game-state.js';
 import { InputManager } from '../input/input-manager.js';
 import { Graphics } from '../graphics/graphics.js';
 import { World } from '../world/world.js';
+import { ScoreApi } from '../score/score-api.js';
 
 // represents a single game instance
 export class Game {
@@ -10,12 +11,14 @@ export class Game {
   private readonly inputManager: InputManager;
   private readonly world: World;
   private readonly graphics: Graphics;
+  private readonly scoreApi: ScoreApi;
 
   constructor() {
     this.gameState = new GameState();
     this.world = new World(this.gameState);
     this.graphics = new Graphics(this.gameState, this.world.getPlayer(), this.world.getHazardManager(), this.world.getModifierManager());
     this.inputManager = new InputManager(this.graphics);
+    this.scoreApi = new ScoreApi(this.gameState);
   }
 
   start(): void {
@@ -47,6 +50,7 @@ export class Game {
           this.gameState.incrementFrameCount();
           if (this.world.isPlayerDead()) {
             this.gameState.setPhase(GamePhase.GAMEOVER);
+            this.scoreApi.fetchRank(this.gameState.getFramesSurvived());
           }
         }
         break;
@@ -58,7 +62,6 @@ export class Game {
         }
         break;
     }
-
   }
 
   private render(): void {

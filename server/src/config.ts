@@ -3,8 +3,4 @@ export const CONFIG = {
   PUBLIC_DIR: '../../client/public'
 };
 
-export interface Score {
-  name: string;
-  score: number;
-  date: Date;
-}
+export const ANONYMOUS_PLAYER_NAME = 'Anonymous';

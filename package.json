@@ -4,31 +4,41 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm-run-all --parallel watch server",
+    "clean": "rimraf client/public/dist client/src/common server/dist server/src/common",
+    "c": "npm run clean",
+    "mkdir": "mkdirp server/src/common client/src/common",
+    "md": "npm run mkdir",
+    "copy:common": "cp -r common/src/* server/src/common && cp -r common/src/* client/src/common",
+    "tidy:common": "npm-run-all clean mkdir copy:common",
+    "cc": "npm run copy:common",
+    "tc": "npm run tidy:common",
     "build:client": "rollup -c",
-    "build:client:watch": "rollup -c -w",
     "build:server": "tsc -p server/tsconfig.json",
-    "build": "npm run build:server && npm run build:client",
+    "build": "npm-run-all tidy:common build:server build:client",
     "bc": "npm run build:client",
-    "bcw": "npm run build:client:watch",
     "bs": "npm run build:server",
     "b": "npm run build",
     "server": "node server/dist/index.js",
-    "s": "npm run server"
+    "s": "npm run server",
+    "buildandrun": "npm-run-all clean mkdir copy:common build:client build:server server",
+    "br": "npm run buildandrun"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "postgresql": "^0.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.0",
+    "mkdirp": "^3.0.1",
     "nodemon": "^3.1.10",
     "npm-run-all": "^4.1.5",
+    "rimraf": "^6.0.1",
     "rollup": "^4.50.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.9.2"
