@@ -71,15 +71,13 @@ export class Database {
     // fetch scores around the user (5 above + 5 below, including the user)
     // Note: adjust the SQL to ensure you fetch enough rows; here we do a simple range
     const aroundRes = await this.pool.query(
-      'SELECT id, name, score, created_at, ' +
-      '(SELECT COUNT(*) + 1 FROM scores s2 WHERE s2.score > s1.score) AS rank ' +
-      'FROM scores s1 ' +
-      'WHERE score <= $1 + 100000 AND score >= $1 - 100000 ' + // range to capture surrounding scores
-      'ORDER BY score DESC ' +
-      'LIMIT 11',
-      [userRankedScore.score]
+      'WITH ranked AS '
+      + '(SELECT id, name, score, created_at, RANK() OVER (ORDER BY score DESC) AS rank FROM scores) '
+      + 'SELECT * FROM ranked WHERE rank BETWEEN '
+      + '(SELECT rank - 3 FROM ranked WHERE id = $1) AND (SELECT rank + 3 FROM ranked WHERE id = $1) '
+      + 'ORDER BY rank;',
+      [userRankedScore.id]
     );
-
     // map the "around user" rows to RankedScore objects
     const aroundUser: RankedScore[] = aroundRes.rows.map(function(row) {
       return {
@@ -90,7 +88,6 @@ export class Database {
         createdAt: row.created_at.toISOString()
       };
     });
-
     return aroundUser;
   }
 

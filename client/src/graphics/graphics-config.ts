@@ -61,5 +61,18 @@ export const GAME_OVER_CONFIG = {
     messagingFont: "26px Arial",
     gameOverMessage: "You Survived for: {time}s",
     promptFont: "20px Arial",
-    gameOverPrompt: "Press Enter to continue"
+    gameOverPrompt: "Press Enter to continue",
+    tableTitleFont: "29px Arial",
+    tableHeaderFont: "22px Arial",
+    tableHighScoreFont: "21px Arial",
+    tableRowFont: "18px Arial",
+    tableFontColour: "black",
+    tablePlayerFontColour: "green",
+    leaderboardTitle: "Leaderboard",
+    rowSpacing: 40,
+    titleSpacing: 22,
+    headerSpacing: 5,
+    columnSpacing: 165,
+    windowWidthFactor: 0.2,
+    numTopScores: 3
 };
