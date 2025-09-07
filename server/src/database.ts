@@ -1,6 +1,5 @@
 import { Pool } from "pg";
-import { ANONYMOUS_PLAYER_NAME } from './config.js';
-import { RankData, RankedScore } from './common/common-config.js';
+import { RankData, RankedScore, ANONYMOUS_PLAYER_NAME } from './common/common-config.js';
 
 export class Database {
   private readonly pool: Pool;
@@ -43,6 +42,20 @@ export class Database {
         leaderboard: leaderboard
     };
     return rankData;
+  }
+
+  // adds a player name to the database
+  async addPlayerName(playerName: string, userScoreId: number): Promise<boolean> {
+    try {
+      await this.pool.query(
+        "UPDATE scores SET name = $1 WHERE id = $2",
+        [playerName, userScoreId]
+      );
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   }
 
   // gets the user's score from the database

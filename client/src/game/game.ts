@@ -16,9 +16,10 @@ export class Game {
   constructor() {
     this.gameState = new GameState();
     this.world = new World(this.gameState);
-    this.graphics = new Graphics(this.gameState, this.world.getPlayer(), this.world.getHazardManager(), this.world.getModifierManager());
-    this.inputManager = new InputManager(this.graphics);
-    this.scoreApi = new ScoreApi(this.gameState);
+    this.inputManager = new InputManager();
+    this.scoreApi = new ScoreApi();
+    this.graphics = new Graphics(this.gameState, this.inputManager, this.world.getPlayer(), 
+    this.world.getHazardManager(), this.world.getModifierManager(), this.scoreApi);
   }
 
   start(): void {
@@ -55,7 +56,7 @@ export class Game {
         }
         break;
       case GamePhase.GAMEOVER:
-        if (this.inputManager.isEnterPressed()) {
+        if (this.graphics.isStartNewGame()) {
           this.resetGame();
           this.gameState.setPhase(GamePhase.MENU);
           this.inputManager.waitForEnterToRise();
@@ -96,6 +97,7 @@ export class Game {
     this.gameState.reset();
     this.world.reset();
     this.graphics.reset();
+    this.scoreApi.reset();
   }
 }
 

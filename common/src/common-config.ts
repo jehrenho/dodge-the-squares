@@ -16,3 +16,5 @@ export interface RankData {
   aroundUser: RankedScore[];  // 5 above + user + 5 below (up to 11 rows)
   leaderboard: RankedScore[]; // top 10 scores
 }
+
+export const ANONYMOUS_PLAYER_NAME = 'Anonymous';

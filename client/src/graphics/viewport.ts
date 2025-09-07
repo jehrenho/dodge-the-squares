@@ -36,6 +36,20 @@ export class Viewport {
         this.drawLetterBoxBars();
     }
 
+    getScale(): number {
+        return this.scale;
+    }
+
+    worldToScreenX(worldX: number): number {
+        const screenX = worldX * this.scale + this.offsetX;
+        return screenX;
+    }
+
+    worldToScreenY(worldY: number): number {
+        const screenY = worldY * this.scale + this.offsetY;
+        return screenY;
+    }
+
     // calculates the dimensions and scale of the game based on the current window size
     private calculateViewPort(): void {
         const windowScaleX = this.ctx.canvas.width / this.virtualWidth;

@@ -1,18 +1,17 @@
-import { Graphics } from '../graphics/graphics.js';
 import { MovementInput, InputEventType, KEYS, Keys } from './input-config.js';
 
 // manages keyboard input for the game
 export class InputManager {
     private keyStates: Record<string, boolean> = {};
     private keyStatesLastFrame: Record<string, boolean> = {};
-    private graphics: Graphics;
+    private windowResize: boolean;
 
-    constructor(graphics: Graphics) {
-        this.graphics = graphics;
+    constructor() {
         for (const keyName of Object.values(KEYS)) {
             this.keyStates[keyName] = false;
             this.keyStatesLastFrame[keyName] = false;
         }
+        this.windowResize = true;
         window.addEventListener(InputEventType.KEYDOWN, this.onKeyDown.bind(this));
         window.addEventListener(InputEventType.KEYUP, this.onKeyUp.bind(this));
         window.addEventListener(InputEventType.RESIZE, this.onResize.bind(this));
@@ -30,6 +29,15 @@ export class InputManager {
 
     isSpacePressed(): boolean {
         return this.isKeyPressed(KEYS.SPACE);
+    }
+
+    // signals the graphics module to adjust the canvas size because the window size changed
+    isWindowResized(): boolean {
+        if (this.windowResize) {
+            this.windowResize = false;
+            return true;
+        }
+        return false;
     }
 
     // ensures the space key is released before the next press is registered
@@ -70,7 +78,7 @@ export class InputManager {
 
     // handle window resize events
     private onResize(event: Event): void {
-        this.graphics.setCanvasDimensions(window.innerWidth - 1, window.innerHeight - 1);
+        this.windowResize = true;
     }
 }
 
