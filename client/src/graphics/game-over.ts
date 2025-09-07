@@ -31,6 +31,7 @@ export class GameOver {
 
     draw(): void {
         this.drawTitleMessagePrompt();
+        // to do: add press enter to continue message if server can't be reached for rank data
         this.rankData = this.scoreApi.getRankData();
         if (this.rankData && this.rankData.leaderboard && this.rankData.userRankedScore && this.rankData.aroundUser) {
             this.drawLeaderboard();
