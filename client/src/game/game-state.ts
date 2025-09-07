@@ -1,6 +1,6 @@
 import { GamePhase, GAME_STATE_CONFIG } from './game-config.js';
 
-// stores and manages the game phase and game timer
+// stores and manages information about the current game
 export class GameState {
   private numFramesThisGame: number;
   private phase: GamePhase;

@@ -4,39 +4,55 @@ import { Player } from '../world/entities/player.js';
 import { HazardManager } from '../world/entities/hazard-manager.js';
 import { ModifierManager } from '../world/entities/modifier-manager.js';
 import { Menu } from './menu.js';
+import { GameOver } from './game-over.js'
 import { GameState } from '../game/game-state.js';
 import { Viewport } from './viewport.js';
+import { InputManager } from '../input/input-manager.js';
+import { ScoreApi } from '../score/score-api.js';
 
 // manages the canvas context and draws all game elements
 export class Graphics {
-  private readonly ctx: CanvasRenderingContext2D;
   private readonly gameState: GameState;
+  private readonly inputManager: InputManager;
   private readonly player: Player;
   private readonly hazardManager: HazardManager;
   private readonly modifierManager: ModifierManager;
-  private readonly menu: Menu;
+  private readonly scoreApi: ScoreApi;
   private readonly viewport: Viewport;
+  private readonly menu: Menu;
+  private readonly gameOver: GameOver;
+  private readonly ctx: CanvasRenderingContext2D;
 
   constructor(gameState: GameState, 
+    inputManager: InputManager,
     player: Player, 
     hazardManager: HazardManager, 
-    modifierManager: ModifierManager) {
+    modifierManager: ModifierManager,
+    scoreApi: ScoreApi
+  ) {
     this.gameState = gameState;
+    this.inputManager = inputManager;
     this.player = player;
     this.hazardManager = hazardManager;
     this.modifierManager = modifierManager;
+    this.scoreApi = scoreApi;
+    // get the canvas context
     const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
     if (!canvas) throw new Error("Canvas element with id 'gameCanvas' not found.");
     this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     if (!this.ctx) throw new Error("2D context not available.");
-    this.menu = new Menu(this.ctx, player, hazardManager, modifierManager);
     this.viewport = new Viewport(this.ctx);
+    this.menu = new Menu(this.ctx, player, hazardManager, modifierManager);
+    this.gameOver = new GameOver(this.ctx, gameState, this.viewport, inputManager, this.scoreApi);
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;;
+    canvas.height = window.innerHeight;
   }
 
   // clears the canvas and sets up window scaling to the current window size
   prepToDrawFrame(): void {
+    if (this.inputManager.isWindowResized()) {
+      this.setCanvasDimensions(window.innerWidth, window.innerHeight);
+    }
     this.viewport.startFrame();
   }
 
@@ -80,18 +96,11 @@ export class Graphics {
   // draws the game over screen
   drawGameOver(): void {
     this.drawBackground();
-    // draws the game over title
-    this.ctx.fillStyle = GAME_OVER_CONFIG.fontColour;
-    this.ctx.font = GAME_OVER_CONFIG.titleFont;
-    this.ctx.textAlign = "center";
-    this.ctx.fillText(GAME_OVER_CONFIG.gameOverTitle, SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2);
-    // draws the game over time survived message
-    this.ctx.font = GAME_OVER_CONFIG.messagingFont;
-    this.ctx.fillText(GAME_OVER_CONFIG.gameOverMessage.replace("{time}", this.gameState.getSecondsSurvived().toFixed(2)),
-      SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2 + 40);
-    // draws the game over prompt
-    this.ctx.font = GAME_OVER_CONFIG.promptFont;
-    this.ctx.fillText(GAME_OVER_CONFIG.gameOverPrompt, SCALING_CONFIG.virtualWidth / 2, SCALING_CONFIG.virtualHeight / 2 + 80);
+    this.gameOver.draw();
+  }
+
+  isStartNewGame(): boolean {
+    return this.gameOver.isStartNewGame();
   }
 
   // draws the menu
