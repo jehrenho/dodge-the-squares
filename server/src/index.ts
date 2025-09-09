@@ -1,5 +1,7 @@
 import { Server } from './server.js';
 import { CONFIG } from './config.js';
 
-const server = new Server(CONFIG.PORT, CONFIG.PUBLIC_DIR);
+const PORT = parseInt(process.env.PORT || '3000', 10);
+
+const server = new Server(PORT, CONFIG.PUBLIC_DIR);
 server.start();

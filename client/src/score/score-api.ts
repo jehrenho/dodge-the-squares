@@ -1,4 +1,4 @@
-import { API_BASE } from './score-api-config.js';
+import { BASE_URL } from './score-api-config.js';
 import { POST_TYPE, RankData, RankedScore } from '../common/common-config.js';
 
 export class ScoreApi {
@@ -16,7 +16,7 @@ export class ScoreApi {
     async fetchRank(numFramesSurvived: number): Promise<RankData | null> {
         try {
             // create the request
-            const request: Request = new Request(`${API_BASE}/scores`);
+            const request: Request = new Request(`${BASE_URL}/scores`);
             const options: RequestInit = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -48,7 +48,7 @@ export class ScoreApi {
     async submitName(name: string, rankedScore: RankedScore): Promise<void> {
         try {
             // create the request
-            const request: Request = new Request(`${API_BASE}/scores`);
+            const request: Request = new Request(`${BASE_URL}/scores`);
             const options: RequestInit = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
