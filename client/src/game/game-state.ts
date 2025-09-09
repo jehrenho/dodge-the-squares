@@ -4,15 +4,11 @@ import { GamePhase, GAME_STATE_CONFIG } from './game-config.js';
 export class GameState {
   private numFramesThisGame: number;
   private phase: GamePhase;
-  private readonly fps: number;
-  private readonly fpm: number;
   private paused: boolean;
 
   constructor () {
     this.numFramesThisGame = 0;
     this.phase = GamePhase.MENU;
-    this.fps = GAME_STATE_CONFIG.fps;
-    this.fpm = GAME_STATE_CONFIG.fpm;
     this.paused = false;
   }
 
@@ -20,16 +16,20 @@ export class GameState {
     this.numFramesThisGame++;
   }
 
+  pauseTimer(): void {
+    this.numFramesThisGame -= 1;
+  }
+
   getFramesSurvived(): number {
     return this.numFramesThisGame;
   }
 
   getSecondsSurvived(): number {
-    return this.numFramesThisGame / this.fps;
+    return this.numFramesThisGame / GAME_STATE_CONFIG.fps;
   }
 
   getMinutesSurvived(): number {
-    return this.numFramesThisGame / this.fpm;
+    return this.numFramesThisGame / GAME_STATE_CONFIG.fpm;
   }
 
   getPhase(): GamePhase {
@@ -44,8 +44,8 @@ export class GameState {
     this.phase = phase;
   }
 
-  setPaused(paused: boolean): void {
-    this.paused = paused;
+  togglePaused(): void {
+    this.paused = !this.paused;
   }
 
   reset(): void {

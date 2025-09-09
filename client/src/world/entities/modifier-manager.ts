@@ -1,7 +1,9 @@
-import { ModifierType, MODIFIER_TYPE, MOD_GEN_CONFIG } from './entities-config.js';
-import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
+import { ModifierType, MODIFIER_TYPE } from './entities-config.js';
+import { MOD_GEN_CONFIG } from './entities-config.js';
+import { VIRTUAL_SCREEN } from '../../graphics/graphics-config.js';
 import { Player } from './player.js';
 import { Modifier } from './modifier.js';
+import { ModifierRenderData } from '../../graphics/render-data.js';
 
 // manages a group of modifier circles of the same type (e.g., all invincibility modifiers)
 class ModifierGroup {
@@ -9,22 +11,16 @@ class ModifierGroup {
     speed: number;
     density: number;
     radius: number;
-    fillColour: string;
-    outlineColour: string;
     modifiers: Modifier[];
 
     constructor(modifierType: ModifierType, 
         speed: number,  
         density: number,
-        radius: number, 
-        fillColour: string,
-        outlineColour: string) {
+        radius: number) {
         this.modifierType = modifierType;
         this.speed = speed;
         this.density = density;
         this.radius = radius;
-        this.fillColour = fillColour;
-        this.outlineColour = outlineColour;
         this.modifiers = [];
     }
 }
@@ -41,40 +37,30 @@ export class ModifierManager {
             MOD_GEN_CONFIG.INVINCIBILITY.speed, 
             MOD_GEN_CONFIG.INVINCIBILITY.density, 
             MOD_GEN_CONFIG.INVINCIBILITY.radius,
-            MOD_GEN_CONFIG.INVINCIBILITY.fillColour,
-            MOD_GEN_CONFIG.INVINCIBILITY.outlineColour
         ));
         this.modifierGroups.push(new ModifierGroup(
             MODIFIER_TYPE.ICE_RINK, 
             MOD_GEN_CONFIG.ICE_RINK.speed, 
             MOD_GEN_CONFIG.ICE_RINK.density, 
-            MOD_GEN_CONFIG.ICE_RINK.radius,
-            MOD_GEN_CONFIG.ICE_RINK.fillColour,
-            MOD_GEN_CONFIG.ICE_RINK.outlineColour
+            MOD_GEN_CONFIG.ICE_RINK.radius
         ));
         this.modifierGroups.push(new ModifierGroup(
             MODIFIER_TYPE.SHRINK_HAZ,
             MOD_GEN_CONFIG.SHRINK_HAZ.speed,
             MOD_GEN_CONFIG.SHRINK_HAZ.density,
-            MOD_GEN_CONFIG.SHRINK_HAZ.radius,
-            MOD_GEN_CONFIG.SHRINK_HAZ.fillColour,
-            MOD_GEN_CONFIG.SHRINK_HAZ.outlineColour
+            MOD_GEN_CONFIG.SHRINK_HAZ.radius
         ));
         this.modifierGroups.push(new ModifierGroup(
             MODIFIER_TYPE.ENLARGE_HAZ,
             MOD_GEN_CONFIG.ENLARGE_HAZ.speed,
             MOD_GEN_CONFIG.ENLARGE_HAZ.density,
-            MOD_GEN_CONFIG.ENLARGE_HAZ.radius,
-            MOD_GEN_CONFIG.ENLARGE_HAZ.fillColour,
-            MOD_GEN_CONFIG.ENLARGE_HAZ.outlineColour
+            MOD_GEN_CONFIG.ENLARGE_HAZ.radius
         ));
         this.modifierGroups.push(new ModifierGroup(
             MODIFIER_TYPE.EXTRA_LIFE,
             MOD_GEN_CONFIG.EXTRA_LIFE.speed,
             MOD_GEN_CONFIG.EXTRA_LIFE.density,
-            MOD_GEN_CONFIG.EXTRA_LIFE.radius,
-            MOD_GEN_CONFIG.EXTRA_LIFE.fillColour,
-            MOD_GEN_CONFIG.EXTRA_LIFE.outlineColour
+            MOD_GEN_CONFIG.EXTRA_LIFE.radius
         ));
     }
 
@@ -82,7 +68,7 @@ export class ModifierManager {
     createModifier(type: ModifierType, x: number, y: number): void {
         const modGroup = this.modifierGroups.find(group => group.modifierType === type);
         if (modGroup) {
-            const newModifier = new Modifier(type, x, y, modGroup.radius, modGroup.fillColour, modGroup.outlineColour);
+            const newModifier = new Modifier(type, x, y, modGroup.radius);
             modGroup.modifiers.push(newModifier);
         }
     }
@@ -123,13 +109,14 @@ export class ModifierManager {
         return collisions;
     }
 
-    // draws all modifiers on the canvas
-    drawModifiers(ctx: CanvasRenderingContext2D): void {
+    getRenderData(): ModifierRenderData[] {
+        const renderData: ModifierRenderData[] = [];
         for (let modg of this.modifierGroups) {
             for (let mod of modg.modifiers) {
-                mod.draw(ctx, mod.getFillColour());
+                renderData.push(mod.getRenderData());
             }
         }
+        return renderData;
     }
 
     // destroys modifiers that are currently active
@@ -159,14 +146,12 @@ export class ModifierManager {
             rand = Math.random();
             if (rand < modg.density) {
                 // map the new modifier location to the canvas dimensions in pixels
-                const newModifierY = ((SCALING_CONFIG.virtualHeight + modg.radius) * rand) / modg.density;
+                const newModifierY = ((VIRTUAL_SCREEN.height + modg.radius) * rand) / modg.density;
                 // create a new modifier just to the right of the canvas boundry
                 modg.modifiers.push(new Modifier(modg.modifierType,
-                    SCALING_CONFIG.virtualWidth + modg.radius,
+                    VIRTUAL_SCREEN.width + modg.radius,
                     newModifierY - modg.radius,
-                    modg.radius,
-                    modg.fillColour,
-                    modg.outlineColour
+                    modg.radius
                 ));
             }   
         }

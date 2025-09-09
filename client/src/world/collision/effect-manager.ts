@@ -1,7 +1,8 @@
+import { MODIFIER_TYPE, ModifierType } from '../entities/entities-config.js';
 import { Effect, InvincibilityEffect, IceRinkEffect } from './effect.js';
-import { MODIFIER_TYPE, ModifierType, collisionMatrix, COLLISION_ROLE, COLLISION_ACTION, MOD_EFFECT_CONFIG } from './entities-config.js';
-import { Player } from './player.js';
-import { HazardManager } from './hazard-manager.js';
+import { collisionMatrix, COLLISION_ROLE, COLLISION_ACTION, MOD_EFFECT_CONFIG } from '../entities/entities-config.js';
+import { Player } from '../entities/player.js';
+import { HazardManager } from '../entities/hazard-manager.js';
 
 // manages all active effects and effect interactions in the game
 export class EffectManager {
@@ -15,7 +16,7 @@ export class EffectManager {
         this.hazardManager = hazardManager;
     }
 
-    // determines the appropriate action for a new modifier collision
+    // resolves effect interactions when a player-modifier collision occurs using the collision matrix
     actOnModifierCollision(newModifierType: ModifierType): void {
         // activate the effect if there are no other active effects
         if (this.activeEffects.length === 0) {
@@ -58,24 +59,22 @@ export class EffectManager {
     applyEffects(): void {
         let isInvincible: boolean = false;
         let accelFactor: number = 1;
-        let fillColour: string | null = null;
-        let borderColour: string | null = null;
 
         // set the player's abilities and colour based on it's active effects
         for (let effect of this.activeEffects) {
             if (effect.getType() === MODIFIER_TYPE.INVINCIBILITY) {
                 isInvincible = true;
-                fillColour = MOD_EFFECT_CONFIG.INVINCIBILITY.colour;
             } else if (effect.getType() === MODIFIER_TYPE.ICE_RINK) {
-                fillColour = MOD_EFFECT_CONFIG.ICE_RINK.colour;
                 accelFactor = MOD_EFFECT_CONFIG.ICE_RINK.accelFactor;
             }
             // set the player's colour to default if the effect is currently flashing because it is wearing off
             if (effect.isWearOffFlashing()) {
-                fillColour = null;
+                this.player.setWearOffColourOverride(true);
+            } else {
+                this.player.setWearOffColourOverride(false);
             }
         }
-        this.player.applyEffects(isInvincible, accelFactor, fillColour, borderColour);
+        this.player.applyEffects(isInvincible, accelFactor);
     }
 
     updateEffects(): void {
@@ -105,16 +104,15 @@ export class EffectManager {
                 this.player.modifyHealth(1);
                 break;
             case MODIFIER_TYPE.INVINCIBILITY:
-                const invincibilityEffect = new InvincibilityEffect();
-                this.activeEffects.push(invincibilityEffect);
+                this.activeEffects.push(new InvincibilityEffect());
                 break;
             case MODIFIER_TYPE.ICE_RINK:
-                const iceRinkEffect = new IceRinkEffect();
-                this.activeEffects.push(iceRinkEffect);
+                this.activeEffects.push(new IceRinkEffect());
                 break;
             default:
                 console.error(`Unexpected modifier type: ${type}`);
                 break;
         }
+        return;
     }
 }

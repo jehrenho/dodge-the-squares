@@ -3,11 +3,18 @@ export const PLAYER_CONFIG = {
     height: 30,
     maxSpeed: 7.0,
     defaultAccel: 0.25,
-    health3Colour: "yellowgreen",
-    health2Colour: "olive",
-    health1Colour: "saddlebrown",
-    borderColour: "#102000",
     num_lives: 3,
+};
+
+export const HAZ_GEN_CONFIG = {
+    w: 50,
+    h: 50,
+    speed: 4,
+    density: 0.02,
+    difficultyLogBase: 3,
+    difficultyDensityFactor: 2.2,
+    sizeModInitTransFrames: 60,
+    sizeModDecayFrames: 900,
 };
 
 export const MODIFIER_TYPE = {
@@ -17,28 +24,14 @@ export const MODIFIER_TYPE = {
   ENLARGE_HAZ: "ENLARGE_HAZ",
   EXTRA_LIFE: "EXTRA_LIFE"
 } as const;
-export type ModifierType = typeof MODIFIER_TYPE[keyof typeof MODIFIER_TYPE];
 
-export const HAZ_GEN_CONFIG = {
-    w: 50,
-    h: 50,
-    speed: 4,
-    density: 0.02,
-    fillColour: "#FF1E00",
-    borderColour: "#2B0000",
-    difficultyLogBase: 3,
-    difficultyDensityFactor: 2.2,
-    sizeModInitTransFrames: 60,
-    sizeModDecayFrames: 900,
-};
+export type ModifierType = typeof MODIFIER_TYPE[keyof typeof MODIFIER_TYPE];
 
 export const MOD_EFFECT_CONFIG = {
     INVINCIBILITY: {
-        colour: "#FFDF10",
         frames: 900
     },
     ICE_RINK: {
-        colour: "mediumaquamarine",
         frames: 900,
         accelFactor: 0.36
     },
@@ -62,40 +55,30 @@ export const MOD_GEN_CONFIG = {
         density: 0.00037,
         speed: 9,
         radius: 25,
-        fillColour: "#FFDF10",
-        outlineColour: "goldenrod",
         description: "Grants temporary invincibility"
     },
     [MODIFIER_TYPE.ICE_RINK]: {
         density: 0.0065,
         speed: 5,
         radius: 80,
-        fillColour: "mediumaquamarine",
-        outlineColour: "lightseagreen",
         description: "Creates a slippery ice rink"
     },
     [MODIFIER_TYPE.SHRINK_HAZ]: {
         density: 0.002,
         speed: 6.0,
         radius: 30,
-        fillColour: "coral",
-        outlineColour: "indianred",
         description: "Shrinks hazards"
     },
     [MODIFIER_TYPE.ENLARGE_HAZ]: {
         density: 0.006,
         speed: 4,
         radius: 100,
-        fillColour: "orangered",
-        outlineColour: "firebrick",
         description: "Enlarges hazards"
     },
     [MODIFIER_TYPE.EXTRA_LIFE]: {
         density: 0.00037,
         speed: 10,
         radius: 20,
-        fillColour: "yellowgreen",
-        outlineColour: "olive",
         description: "Grants an extra life"
     }
 };

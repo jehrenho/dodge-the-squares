@@ -2,16 +2,10 @@ import { API_BASE } from './score-api-config.js';
 import { POST_TYPE, RankData, RankedScore } from '../common/common-config.js';
 
 export class ScoreApi {
-    private rankData: RankData | null;
     private nameSubmitted: boolean;
 
     constructor() {
-        this.rankData = null;
         this.nameSubmitted = false;
-    }
-
-    getRankData(): RankData | null {
-        return this.rankData;
     }
 
     isNameSubmitted(): boolean {
@@ -19,7 +13,7 @@ export class ScoreApi {
     }
 
     // gets the ranking data for a player's score when their game ends
-    async fetchRank(numFramesSurvived: number): Promise<void> {
+    async fetchRank(numFramesSurvived: number): Promise<RankData | null> {
         try {
             // create the request
             const request: Request = new Request(`${API_BASE}/scores`);
@@ -38,15 +32,16 @@ export class ScoreApi {
             // handle non-OK HTTP codes
             if (!response.ok) {
                 console.error(`Server responded with ${response.status}: ${response.statusText}`);
-                return;
+                return null;
             }
 
             // parse JSON safely
-            this.rankData = await response.json() as RankData;
+            return await response.json() as RankData;
 
         } catch (err) {
             // handle network/runtime errors
             console.error("Network or parsing error in fetchRank:", err);
+            return null;
         }
     }
 
@@ -76,15 +71,16 @@ export class ScoreApi {
             // parse JSON safely
             console.log("Name submitted successfully");
             this.nameSubmitted = true;
+            return;
 
         } catch (err) {
             // handle network/runtime errors
             console.error("Network or parsing error in submitName:", err);
+            return;
         }
     }
 
     reset(): void {
-        this.rankData = null;
         this.nameSubmitted = false;
     }
 }

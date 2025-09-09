@@ -1,7 +1,8 @@
 import { PLAYER_CONFIG } from './entities-config.js';
-import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
+import { VIRTUAL_SCREEN } from '../../graphics/graphics-config.js';
 import { VisibleShape } from './visibleShape.js';
 import { MovementInput } from '../../input/input-config.js';
+import { PlayerRenderData } from '../../graphics/render-data.js';
 
 // represents the player square and it's state
 export class Player extends VisibleShape {
@@ -12,11 +13,13 @@ export class Player extends VisibleShape {
     private xspeed: number;
     private yspeed: number;
     private accel: number;
-    private invincibility: boolean;
     private health: number;
+    private invincibility: boolean;
+    private iceRink: boolean;
+    private wearOffColourOverride: boolean;
 
     constructor() {
-        super(0, 0, PLAYER_CONFIG.health3Colour, PLAYER_CONFIG.borderColour);
+        super(0, 0);
         this.width = PLAYER_CONFIG.width;
         this.height = PLAYER_CONFIG.height;
         this.maxSpeed = PLAYER_CONFIG.maxSpeed;
@@ -26,6 +29,8 @@ export class Player extends VisibleShape {
         this.yspeed = 0;
         this.accel = this.defaultAccel;
         this.invincibility = false;
+        this.iceRink = false;
+        this.wearOffColourOverride = false;
     }
 
     // update the player position based on speed, accel, and input
@@ -34,34 +39,21 @@ export class Player extends VisibleShape {
         this.y += this.yspeed;
         this.x += this.xspeed;
         this.enforceBoundaries();
-        this.setDefaultColourByHealth();
     }
 
     // applies the active effects to the player
-    applyEffects(isInvincible: boolean, accelFactor: number, fillColour: string | null, borderColour: string | null): void {
+    applyEffects(isInvincible: boolean, accelFactor: number): void {
         this.invincibility = isInvincible;
         this.accel = this.defaultAccel * accelFactor;
-        if (fillColour) {
-            this.fillColour = fillColour;
+        if (accelFactor === 1) {
+            this.iceRink = false;
         } else {
-            this.fillColour = this.defaultFillColour;
-        }
-        if (borderColour) {
-            this.borderColour = borderColour;
-        } else {
-            this.borderColour = this.defaultBorderColour;
+            this.iceRink = true;
         }
     }
 
-    // set the player's default colour based on it's health
-    setDefaultColourByHealth() {
-        if (this.health >= 3) {
-            this.defaultFillColour = PLAYER_CONFIG.health3Colour;
-        } else if (this.health === 2) {
-            this.defaultFillColour = PLAYER_CONFIG.health2Colour;
-        } else {
-            this.defaultFillColour = PLAYER_CONFIG.health1Colour;
-        }
+    setWearOffColourOverride(value: boolean): void {
+        this.wearOffColourOverride = value;
     }
 
     setPositionByCentre(x: number, y: number): void {
@@ -91,14 +83,17 @@ export class Player extends VisibleShape {
         return this.health <= 0;
     }
 
-    draw(ctx: CanvasRenderingContext2D): void {
-        // draw fill
-        ctx.fillStyle = this.fillColour;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        // draw border
-        ctx.strokeStyle = this.borderColour;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
+    getRenderData(): PlayerRenderData {
+        return {
+            type: 'player',
+            position: { x: this.x, y: this.y },
+            size: { width: this.width, height: this.height },
+            health: this.health,
+            invincible: this.invincibility,
+            iceRink: this.iceRink,
+            flashOn: this.flashOn,
+            wearOffColourOverride: this.wearOffColourOverride
+        };
     }
 
     reset(): void {
@@ -107,9 +102,6 @@ export class Player extends VisibleShape {
         this.accel = this.defaultAccel;
         this.invincibility = false;
         this.health = PLAYER_CONFIG.num_lives;
-        this.setDefaultColourByHealth();
-        this.fillColour = this.defaultFillColour;
-        this.borderColour = this.defaultBorderColour;
     }
 
     // reads the movement input and updates it's speed accordingly
@@ -139,16 +131,16 @@ export class Player extends VisibleShape {
             this.y = 0;
             this.yspeed = 0;
         }
-        if (this.y > SCALING_CONFIG.virtualHeight - this.height) {
-            this.y = SCALING_CONFIG.virtualHeight - this.height;
+        if (this.y > VIRTUAL_SCREEN.height - this.height) {
+            this.y = VIRTUAL_SCREEN.height - this.height;
             this.yspeed = 0;
         } 
         if (this.x < 0) {
             this.x = 0;
             this.xspeed = 0;
         }
-        if (this.x > SCALING_CONFIG.virtualWidth - this.width) {
-            this.x = SCALING_CONFIG.virtualWidth - this.width;
+        if (this.x > VIRTUAL_SCREEN.width - this.width) {
+            this.x = VIRTUAL_SCREEN.width - this.width;
             this.xspeed = 0;
         } 
     }
