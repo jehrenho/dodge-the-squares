@@ -1,18 +1,14 @@
 import { VisibleShape } from './visibleShape.js';
 import { ModifierType } from './entities-config.js';
+import { ModifierRenderData } from '../../graphics/render-data.js';
 
 // represents an individual modifier circle in the game
 export class Modifier extends VisibleShape {
     private readonly modifierType: ModifierType;
     private readonly radius: number;
 
-    constructor(modifierType: ModifierType, 
-        x: number, 
-        y: number, 
-        radius: number, 
-        fillColour: string, 
-        borderColour: string) {
-        super(x, y, fillColour, borderColour);
+    constructor(modifierType: ModifierType, x: number, y: number, radius: number) {
+        super(x, y);
         this.modifierType = modifierType;
         this.radius = radius;
     }
@@ -41,15 +37,13 @@ export class Modifier extends VisibleShape {
         return this.modifierType;
     }
 
-    draw(ctx: CanvasRenderingContext2D, fillColour: string): void {
-        // draw fill
-        ctx.fillStyle = fillColour;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        // draw outline
-        ctx.strokeStyle = this.borderColour;
-        ctx.lineWidth = 1;
-        ctx.stroke();
+    getRenderData(): ModifierRenderData {
+        return {
+            type: 'modifier',
+            modifierType: this.modifierType,
+            position: { x: this.x, y: this.y },
+            radius: this.radius,
+            flashOn: this.flashOn
+        };
     }
 }

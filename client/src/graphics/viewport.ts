@@ -1,4 +1,5 @@
-import { SCALING_CONFIG, VIEWPORT_CONFIG } from './graphics-config.js';
+import { VIRTUAL_SCREEN } from './graphics-config.js';
+import { VIEWPORT_CONFIG } from './colours.js';
 
 // viewport class for managing the visible area of the game
 export class Viewport {
@@ -13,8 +14,8 @@ export class Viewport {
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
-        this.virtualWidth = SCALING_CONFIG.virtualWidth;
-        this.virtualHeight = SCALING_CONFIG.virtualHeight;
+        this.virtualWidth = VIRTUAL_SCREEN.width;
+        this.virtualHeight = VIRTUAL_SCREEN.height;
         this.scale = 0;
         this.gameWidth = 0;
         this.gameHeight = 0;

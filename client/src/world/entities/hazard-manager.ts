@@ -1,9 +1,10 @@
 import { HAZ_GEN_CONFIG, MOD_EFFECT_CONFIG } from './entities-config.js';
-import { SCALING_CONFIG } from '../../graphics/graphics-config.js';
+import { VIRTUAL_SCREEN } from '../../graphics/graphics-config.js';
 import { Player } from './player.js';
 import { Hazard } from './hazard.js';
 import { GameState } from '../../game/game-state.js';
 import { GAME_STATE_CONFIG } from '../../game/game-config.js';
+import { HazardRenderData } from '../../graphics/render-data.js';
 
 // manages all hazards in the game
 export class HazardManager {
@@ -30,7 +31,7 @@ export class HazardManager {
     }
 
     createHazard(x: number, y: number, w: number, h: number): Hazard {
-        const hazard = new Hazard(x, y, w, h, HAZ_GEN_CONFIG.fillColour, HAZ_GEN_CONFIG.borderColour);
+        const hazard = new Hazard(x, y, w, h);
         this.hazards.push(hazard);
         return hazard;
     }
@@ -74,10 +75,12 @@ export class HazardManager {
         return collisions;
     }
 
-    draw(ctx:CanvasRenderingContext2D): void {
-        for (let hazard of this.hazards){
-            hazard.draw(ctx);
+    getRenderData(): HazardRenderData[] {
+        const renderData: HazardRenderData[] = [];
+        for (let hazard of this.hazards) {
+            renderData.push(hazard.getRenderData());
         }
+        return renderData;
     }
 
     destroyHazards(inputHazards: Hazard[]) {
@@ -106,9 +109,9 @@ export class HazardManager {
         const rand = Math.random();
         if (rand < this.hazardDensity) {
             // map the new rectangle location to the canvas dimensions in pixels
-            const newHazardy = ((SCALING_CONFIG.virtualHeight + HAZ_GEN_CONFIG.h) * rand) / this.hazardDensity;
+            const newHazardy = ((VIRTUAL_SCREEN.height + HAZ_GEN_CONFIG.h) * rand) / this.hazardDensity;
             // create a new hazard
-            this.createHazard(SCALING_CONFIG.virtualWidth, 
+            this.createHazard(VIRTUAL_SCREEN.width, 
                 newHazardy - HAZ_GEN_CONFIG.h, 
                 HAZ_GEN_CONFIG.w * this.currentSizeFactor, 
                 HAZ_GEN_CONFIG.h * this.currentSizeFactor

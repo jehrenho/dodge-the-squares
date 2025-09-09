@@ -4,11 +4,11 @@ import { Modifier } from '../entities/modifier.js';
 import { VisibleShape } from '../entities/visibleShape.js' 
 import { HazardManager } from '../entities/hazard-manager.js';
 import { ModifierManager } from '../entities/modifier-manager.js';
-import { EffectManager } from '../entities/effect-manager.js'
+import { EffectManager } from './effect-manager.js'
 import { CollisionFlasher } from './collision-flasher.js';
-import { COLLISION_MANAGER_CONFIG } from './collision-config.js';
 
-// manages all collision detection and resolution in the game
+// detects and flashes collisions
+// delegates all effect management to EffectManager
 export class CollisionManager {
   private readonly player: Player;
   private readonly hazardManager: HazardManager;
@@ -64,12 +64,12 @@ export class CollisionManager {
   }
 
   update(): void {
+    this.collisionFlasher.update();
     if (this.collisionFlasher.isFlashing()) {
-      this.collisionFlasher.update();
       this.updateCollisionColour();
     } else {
       // flashing stopped, reset shapes to flash
-      this.setFlashShapesToDefaultColour();
+      this.setFlashState(false);
       this.shapesToFlash = [];
     }
   }
@@ -79,23 +79,19 @@ export class CollisionManager {
     return this.collisionFlasher.isFlashing();
   }
 
-  // sets the flash shapes to their default colours
-  private setFlashShapesToDefaultColour(): void {
-    for (const shape of this.shapesToFlash) {
-      shape.setDefaultColour();
-    }
-  }
-
   // updates the colour of the flashing objects
   private updateCollisionColour(): void {
     if (this.collisionFlasher.isFlashOn()) {
-      // set the collided objects to the flash colour
-      for (const shape of this.shapesToFlash) {
-        shape.setColour(COLLISION_MANAGER_CONFIG.flashFillColour, COLLISION_MANAGER_CONFIG.flashBorderColour);
-      }
+      this.setFlashState(true);
     } else {
-      // set the collided objects to their default colour
-      this.setFlashShapesToDefaultColour();
+      this.setFlashState(false);
+    }
+  }
+
+  // sets whether the flash shapes should be the flash colour or not 
+  private setFlashState(isFlashing: boolean): void {
+    for (const shape of this.shapesToFlash) {
+      shape.setFlash(isFlashing);
     }
   }
 }

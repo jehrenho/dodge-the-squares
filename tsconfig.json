@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "target": "ES2017",
     "module": "ESNext",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["client/src"]
 }

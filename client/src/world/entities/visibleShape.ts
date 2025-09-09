@@ -2,30 +2,14 @@
 export abstract class VisibleShape {
     protected x: number;
     protected y: number;
-    protected fillColour: string;
-    protected borderColour: string;
-    protected defaultFillColour: string;
-    protected defaultBorderColour: string;
+    protected flashOn: boolean;
     private killFlag: boolean;
     
-    constructor(x: number, y: number, defaultFillColour: string, defaultBorderColour: string) {
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
-        this.defaultFillColour = defaultFillColour;
-        this.defaultBorderColour = defaultBorderColour;
-        this.fillColour = defaultFillColour;
-        this.borderColour = defaultBorderColour;
+        this.flashOn = false;
         this.killFlag = false;
-    }
-
-    setColour(fillColour: string, borderColour: string): void {
-        this.fillColour = fillColour;
-        this.borderColour = borderColour;
-    }
-    
-    setDefaultColour(): void {
-        this.fillColour = this.defaultFillColour;
-        this.borderColour = this.defaultBorderColour;
     }
 
     setX(x: number): void {
@@ -34,6 +18,10 @@ export abstract class VisibleShape {
 
     setY(y: number): void {
         this.y = y;
+    }
+
+    setFlash(flashOn: boolean): void {
+        this.flashOn = flashOn;
     }
 
     // tells managers to destroy this shape
@@ -47,14 +35,6 @@ export abstract class VisibleShape {
 
     getY(): number {
         return this.y;
-    }
-
-    getFillColour(): string {
-        return this.fillColour;
-    }
-
-    getBorderColour(): string {
-        return this.borderColour;
     }
 
     // checks if the shape is marked for removal
