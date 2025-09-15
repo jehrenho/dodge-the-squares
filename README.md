@@ -115,4 +115,5 @@ One of the main challenges I faced while developing this project was not plannin
   - Wave — sinusoidal hazard movement with gradual damping 
   - Shield — temporary hazard resistance 
 - Adjust modifier spawn frequency based on survival time. 
+
 - Leaderboard backend with score submission and display.
