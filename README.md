@@ -54,6 +54,7 @@ Dodge hazards, survive modifiers, and climb the **global leaderboard**!
 
 ## File Structure
 
+```
 DODGE/
 ├── client/
 │   ├── public/                 # Static files served to the browser
@@ -70,6 +71,7 @@ DODGE/
 │   ├── dist/                   # Compiled JavaScript output
 │   └── src/                    # Server source code (API endpoints, database logic)
 └── README.md                   # Project documentation
+```
 
 ---
 
@@ -117,3 +119,4 @@ One of the main challenges I faced while developing this project was not plannin
 - Adjust modifier spawn frequency based on survival time. 
 
 - Leaderboard backend with score submission and display.
+
