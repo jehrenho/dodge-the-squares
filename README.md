@@ -1,19 +1,25 @@
 # Dodge the Squares Game
 
-A browser-based game built with **TypeScript, JavaScript, HTML5 Canvas, and CSS**.  
-Players dodge hazards and adapt to dynamic modifiers while difficulty ramps up over time!
+🎮 **Full-Stack Browser Game**  
+Frontend: TypeScript, JavaScript, HTML5 Canvas, CSS  
+Backend: Node.js, Express, PostgreSQL  
 
-This project demonstrates:  
-- **Proficiency in TypeScript/JavaScript**  
-- **Object-oriented design and modular architecture**  
-- **Game loop and state management**  
-- **Problem-solving with scalable systems** (collision-action matrix)
+Dodge hazards, survive modifiers, and climb the **global leaderboard**!  
+
+[▶️ Play it in your browser](https://dodge-game-0ir9.onrender.com/)
 
 ---
 
-## 🎮 Play the Game!
+![Gameplay Screenshot](client/public/screenshots/screenshot1.png)
 
-[Play Dodge the Squares in your browser](https://jehrenho.github.io/dodge-game/)
+---
+
+**Key Highlights:**
+- **Full-Stack Development:** Frontend + backend integration with persistent leaderboards  
+- **RESTful API & Database:** Node.js/Express backend storing scores in PostgreSQL  
+- **Game Loop & State Management:** Smooth gameplay with dynamic difficulty  
+- **Clean, Modular Code:** Object-oriented design and scalable architecture  
+- **Deployment-Ready:** Backend and frontend fully deployable
 
 ---
 
@@ -32,65 +38,40 @@ This project demonstrates:
 - **Difficulty scaling:** Logarithmic increase in challenge over time  
 - **Pause/resume:** Spacebar toggles pause  
 - **Adaptive canvas:** Automatically resizes to fit the browser window  
+- **Global Leaderboard** Tracks player scores in real-time and ranks users on a worldwide leaderboard
 
 ---
 
 ## Technologies
 
 - TypeScript / JavaScript  
-- HTML5 Canvas  
-- CSS  
+- HTML5 Canvas and CSS
+- Node.js / Express
+- PostgreSQL
 - Git + Bash (via MinGW64) for version control  
 
 ---
 
 ## File Structure
 
+```
 DODGE/
-├── client/                                 # Front-end source code and public assets
-│   ├── public/                             # Static files served to the browser
-│   │   ├── dist/                           # Bundled JS output from Rollup
-│   │   └── index.html                      # Main HTML entry point
-│   └── src/                                # TypeScript source files
-│       ├── game/                           # Core game logic
-│       │   ├── game-config.ts              # Game configuration constants
-│       │   ├── game-states.ts              # Tracks current game state (time, score, etc.)
-│       │   └── game.ts                     # Main game loop and orchestration
-│       ├── graphics/                       # Graphics rendering and UI
-│       │   ├── graphics-config.ts          # Graphics-related configuration (colors, fonts, dimensions)
-│       │   ├── graphics.ts                 # Graphics renderer
-│       │   ├── menu.ts                     # Menu rendering and logic
-│       │   └── viewport.ts                 # Handles canvas scaling and viewport adjustments
-│       ├── input/                          # Input handling
-│       │   ├── input-config.ts             # Key/mouse bindings and input settings
-│       │   └── input-manager.ts            # Processes and manages user input
-│       └── world/                          # Game world entities and mechanics
-│           ├── collision/                  # Collision handling
-│           │   ├── collision-config.ts     # Collision-related constants and settings
-│           │   ├── collision-flasher.ts    # Handles collision visual effects
-│           │   └── collision-manager.ts    # Manages collision detection
-│           ├── entities/                   # In game objects
-│           │   ├── effect-manager.ts       # Handles visual effects for entities
-│           │   ├── effect.ts               # Single effect class
-│           │   ├── entities-config.ts      # Entity-specific constants
-│           │   ├── hazard-manager.ts       # Manages hazards
-│           │   ├── hazard.ts               # Hazard entity
-│           │   ├── modifier-manager.ts     # Manages modifiers (power-ups/debuffs)
-│           │   ├── modifier.ts             # Modifier entity
-│           │   ├── player.ts               # Player entity
-│           │   └── visibleShape.ts         # Base class for drawable shapes/entities
-│           └── world.ts                    # World-level orchestration
-├── server/                                 # Back-end server code
-│   ├── dist/                               # Compiled JS output
-│   └── src/                                # TypeScript source files
-│       ├── config.ts                       # Server configuration constants
-│       └── index.ts                        # Server entry point
-├── package.json                            # npm dependencies and scripts
-├── package-lock.json                       # Exact npm package versions
-├── rollup.config.js                        # Front-end Rollup bundler configuration
-├── tsconfig.json                           # TypeScript configuration for the project
-├── server/tsconfig.json                    # TypeScript configuration for the server
-└── README.md                               # Project documentation (this file)
+├── client/
+│   ├── public/                 # Static files served to the browser
+│   └── src/
+│       ├── game/               # Core game logic and mechanics
+│       ├── game-over/          # Game-over screen logic and graphics
+│       ├── graphics/           # Rendering engine, UI elements, and visual assets
+│       ├── input/              # Player input handling
+│       ├── menu/               # Menu navigation and screen logic
+│       └── world/              # Game world entities and environment
+│           ├── collision/      # Collision detection and handling
+│           └── entities/       # In-game objects and NPCs
+├── server/
+│   ├── dist/                   # Compiled JavaScript output
+│   └── src/                    # Server source code (API endpoints, database logic)
+└── README.md                   # Project documentation
+```
 
 ---
 
@@ -136,4 +117,6 @@ One of the main challenges I faced while developing this project was not plannin
   - Wave — sinusoidal hazard movement with gradual damping 
   - Shield — temporary hazard resistance 
 - Adjust modifier spawn frequency based on survival time. 
+
 - Leaderboard backend with score submission and display.
+
