@@ -108,7 +108,7 @@ export class GameOverRenderer {
         this.nameInput.style.transformOrigin = "center center";
         this.nameInput.style.fontSize = "24px";
         this.nameInput.style.display = "block";
-        this.nameInput.maxLength = 10;
+        this.nameInput.maxLength = 15;
         this.nameInput.focus();
     }
 

@@ -6,11 +6,8 @@ export class Database {
 
   constructor() {
     this.pool = new Pool({
-      user: "postgres",
-      host: "localhost",
-      database: "dodge",
-      password: "admin",
-      port: 5432, // default Postgres port
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
     });
   }
 
