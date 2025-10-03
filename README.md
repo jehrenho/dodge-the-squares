@@ -64,9 +64,9 @@ DODGE/
 │       ├── graphics/           # Rendering engine, UI elements, and visual assets
 │       ├── input/              # Player input handling
 │       ├── menu/               # Menu navigation and screen logic
-│       └── world/              # Game world entities and environment
+│       └── world/              # Game world entities and environment rules
 │           ├── collision/      # Collision detection and handling
-│           └── entities/       # In-game objects and NPCs
+│           └── entities/       # In-game objects
 ├── server/
 │   ├── dist/                   # Compiled JavaScript output
 │   └── src/                    # Server source code (API endpoints, database logic)
@@ -116,7 +116,4 @@ One of the main challenges I faced while developing this project was not plannin
   - Rain — randomize hazard speed with gradual damping 
   - Wave — sinusoidal hazard movement with gradual damping 
   - Shield — temporary hazard resistance 
-- Adjust modifier spawn frequency based on survival time. 
-
-- Leaderboard backend with score submission and display.
-
+- Adjust difficulty constants to improve gameplay
