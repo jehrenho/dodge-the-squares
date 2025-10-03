@@ -77,19 +77,3 @@ export class Spawner {
         this.avgSpeed = this.info.initAvgSpeed;
     }
 }
-
-/*
-// updates the difficulty of the game by making the hazards faster and more numerous
-    private updateDifficulty(gameState: GameState): void {
-        if (gameState.getFramesSurvived() % GAME_STATE_CONFIG.fps === 0) {
-            // calculate the difficulty factor
-            const minutesSurvived = gameState.getMinutesSurvived() + 1;
-            const logBase = (x: number, base: number) => Math.log(x) / Math.log(base);
-            const difficultyFactor = logBase(minutesSurvived, HAZ_GEN_CONFIG.difficultyLogBase);
-            // update the hazard density and speed based on the difficulty factor
-            this.hazardDensity = HAZ_GEN_CONFIG.density * (difficultyFactor + 1) * HAZ_GEN_CONFIG.difficultyDensityFactor;
-            this.hazardSpeed = HAZ_GEN_CONFIG.speed * (difficultyFactor + 1);
-        }
-    }
-
-*/
