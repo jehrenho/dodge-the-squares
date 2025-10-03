@@ -1,5 +1,5 @@
-import { MODIFIER_TYPE, ModifierType } from '../entities/entities-config.js';
-import { MOD_EFFECT_CONFIG, EWOF_CONFIG } from '../entities/entities-config.js';
+import { MODIFIER_TYPE, ModifierType } from '../entities/config/entities-config.js';
+import { MOD_EFFECT_CONFIG, EWOF_CONFIG } from '../entities/config/entities-config.js';
 
 // defines the base class for all effects
 export abstract class Effect {

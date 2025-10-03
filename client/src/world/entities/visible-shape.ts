@@ -2,12 +2,14 @@
 export abstract class VisibleShape {
     protected x: number;
     protected y: number;
+    protected xspeed: number;
     protected flashOn: boolean;
     private killFlag: boolean;
     
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
+        this.xspeed = 0;
         this.flashOn = false;
         this.killFlag = false;
     }

@@ -5,8 +5,9 @@ import { Player } from '../world/entities/player.js';
 import { Hazard } from '../world/entities/hazard.js'
 import { HazardManager } from '../world/entities/hazard-manager.js';
 import { ModifierManager } from '../world/entities/modifier-manager.js';
-import { ModifierType, MOD_GEN_CONFIG } from '../world/entities/entities-config.js';
 import { MenuRenderData } from '../graphics/render-data.js';
+import { SPAWNER_CONFIG } from '../world/entities/config/spawner-config.js';
+import { ModifierType, MODIFIER_TYPE } from '../world/entities/config/entities-config.js';
 
 // stages the menu elements for the game
 export class MenuStager {
@@ -58,7 +59,7 @@ export class MenuStager {
 
         // initialize the modifier explanation section
         const totalModExHeight: number = MENU_CONFIG.modExVertSizeFactor * VIRTUAL_SCREEN.height;
-        this.positioning.modExGapY = totalModExHeight / (Object.keys(MOD_GEN_CONFIG).length - 1);
+        this.positioning.modExGapY = totalModExHeight / (Object.keys(MODIFIER_TYPE).length - 1);
         this.positioning.modExStartY = this.positioning.centreY - (totalModExHeight / 2);
         this.positioning.modExStartX = VIRTUAL_SCREEN.width * MENU_CONFIG.modExHorCentreFactor;
     }
@@ -73,8 +74,8 @@ export class MenuStager {
         this.menuHazard.setPositionByCentre(this.positioning.HTPx, menuHazardY);
         // create the menu modifiers
         let i = 0;
-        for (const [modifierType, config] of Object.entries(MOD_GEN_CONFIG)) {
-            this.modifierManager.createModifier(modifierType as ModifierType,
+        for (const type of Object.values(MODIFIER_TYPE)) {
+            this.modifierManager.createModifier(type as ModifierType,
                 this.positioning.modExStartX, this.positioning.modExStartY + i * this.positioning.modExGapY);
             i++
         }

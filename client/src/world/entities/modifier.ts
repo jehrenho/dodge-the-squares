@@ -1,5 +1,5 @@
-import { VisibleShape } from './visibleShape.js';
-import { ModifierType } from './entities-config.js';
+import { VisibleShape } from './visible-shape.js';
+import { ModifierType } from './config/entities-config.js';
 import { ModifierRenderData } from '../../graphics/render-data.js';
 
 // represents an individual modifier circle in the game
@@ -7,10 +7,15 @@ export class Modifier extends VisibleShape {
     private readonly modifierType: ModifierType;
     private readonly radius: number;
 
-    constructor(modifierType: ModifierType, x: number, y: number, radius: number) {
+    constructor(modifierType: ModifierType, x: number, y: number, xspeed: number, radius: number) {
         super(x, y);
         this.modifierType = modifierType;
+        this.xspeed = xspeed;
         this.radius = radius;
+    }
+
+    updatePosition(): void {
+        this.x -= this.xspeed;
     }
 
     setX(x: number): void {

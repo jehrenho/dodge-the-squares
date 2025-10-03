@@ -1,7 +1,7 @@
 import { Player } from '../entities/player.js';
 import { Hazard } from '../entities/hazard.js';
 import { Modifier } from '../entities/modifier.js';
-import { VisibleShape } from '../entities/visibleShape.js' 
+import { VisibleShape } from '../entities/visible-shape.js' 
 import { HazardManager } from '../entities/hazard-manager.js';
 import { ModifierManager } from '../entities/modifier-manager.js';
 import { EffectManager } from './effect-manager.js'

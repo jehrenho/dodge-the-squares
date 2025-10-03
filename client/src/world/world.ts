@@ -9,18 +9,18 @@ import { RenderData } from '../graphics/render-data.js';
 
 // represents the game world where entities exist and interact
 export class World {
+  private readonly gameState: GameState;
   private readonly player: Player;
   private readonly hazardManager: HazardManager;
   private readonly modifierManager: ModifierManager;
   private readonly effectManager: EffectManager;
   private readonly collisionManager: CollisionManager;
-  private readonly gameState: GameState;
 
   constructor(gameState: GameState) {
     this.gameState = gameState;
     this.player = new Player();
     this.hazardManager = new HazardManager(gameState);
-    this.modifierManager = new ModifierManager();
+    this.modifierManager = new ModifierManager(gameState);
     this.effectManager = new EffectManager(this.player, this.hazardManager);
     this.collisionManager = new CollisionManager(
         this.player, this.hazardManager, this.modifierManager, this.effectManager);

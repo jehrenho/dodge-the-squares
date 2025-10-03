@@ -1,11 +1,12 @@
 import { VIRTUAL_SCREEN } from '../graphics/graphics-config.js';
 import { MENU_CONFIG } from './menu-config.js';
-import { ModifierType, MOD_GEN_CONFIG } from '../world/entities/entities-config.js'
 import { Player } from '../world/entities/player.js';
 import { Hazard } from '../world/entities/hazard.js'
 import { HazardManager } from '../world/entities/hazard-manager.js';
 import { ModifierManager } from '../world/entities/modifier-manager.js';
 import { RenderData, MenuRenderData } from '../graphics/render-data.js';
+import { SPAWNER_CONFIG } from '../world/entities/config/spawner-config.js';
+import { MODIFIER_TYPE, ModifierType } from '../world/entities/config/entities-config.js';
 
 // menu class for creating the game menu
 export class MenuRenderer {
@@ -95,8 +96,9 @@ export class MenuRenderer {
         this.ctx.fillStyle = MENU_CONFIG.modExTextColour;
         this.ctx.textAlign = "left";
         let i = 0;
-        for (const [modifierType, config] of Object.entries(MOD_GEN_CONFIG)) {
-            this.ctx.fillText(config.description,
+        for (const type of Object.values(MODIFIER_TYPE)) {
+            const spawnerInfo = SPAWNER_CONFIG[type as ModifierType];
+            this.ctx.fillText(spawnerInfo.description,
                 this.menuRenderData.modExStartX + MENU_CONFIG.modExDescriptionXOffset,
                 this.menuRenderData.modExStartY + i * this.menuRenderData.modExGapY + 7);
             i++
