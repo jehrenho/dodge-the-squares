@@ -1,6 +1,6 @@
-import { PLAYER_CONFIG } from './entities-config.js';
+import { PLAYER_CONFIG } from './config/entities-config.js';
 import { VIRTUAL_SCREEN } from '../../graphics/graphics-config.js';
-import { VisibleShape } from './visibleShape.js';
+import { VisibleShape } from './visible-shape.js';
 import { MovementInput } from '../../input/input-config.js';
 import { PlayerRenderData } from '../../graphics/render-data.js';
 
@@ -10,7 +10,6 @@ export class Player extends VisibleShape {
     private readonly height: number;
     private readonly maxSpeed: number;
     private readonly defaultAccel: number;
-    private xspeed: number;
     private yspeed: number;
     private accel: number;
     private health: number;
@@ -25,7 +24,6 @@ export class Player extends VisibleShape {
         this.maxSpeed = PLAYER_CONFIG.maxSpeed;
         this.defaultAccel = PLAYER_CONFIG.defaultAccel;
         this.health = PLAYER_CONFIG.num_lives;
-        this.xspeed = 0;
         this.yspeed = 0;
         this.accel = this.defaultAccel;
         this.invincibility = false;

@@ -1,6 +1,7 @@
-import { MODIFIER_TYPE, ModifierType } from '../entities/entities-config.js';
+import { MODIFIER_TYPE, ModifierType } from '../entities/config/entities-config.js';
 import { Effect, InvincibilityEffect, IceRinkEffect } from './effect.js';
-import { collisionMatrix, COLLISION_ROLE, COLLISION_ACTION, MOD_EFFECT_CONFIG } from '../entities/entities-config.js';
+import { collisionMatrix, COLLISION_ROLE, COLLISION_ACTION } from '../entities/config/collision-matrix.js';
+import { MOD_EFFECT_CONFIG } from '../entities/config/entities-config.js';
 import { Player } from '../entities/player.js';
 import { HazardManager } from '../entities/hazard-manager.js';
 

@@ -1,5 +1,4 @@
-import { VisibleShape } from './visibleShape.js';
-import { HAZ_GEN_CONFIG } from './entities-config.js'
+import { VisibleShape } from './visible-shape.js';
 import { HazardRenderData } from '../../graphics/render-data.js';
 
 // represents a single hazard rectangle in the game
@@ -9,13 +8,17 @@ export class Hazard extends VisibleShape {
     private width: number;
     private height: number;
 
-    constructor(x:number, y:number, 
-        width:number, height:number){
+    constructor(x:number, y:number, xspeed:number, width:number, height:number) {
         super(x, y);
-        this.nominalWidth = HAZ_GEN_CONFIG.w;
-        this.nominalHeight = HAZ_GEN_CONFIG.h;
+        this.nominalWidth = width;
+        this.nominalHeight = height;
         this.width = width;
         this.height = height;
+        this.xspeed = xspeed;
+    }
+
+    updatePosition(): void {
+        this.x -= this.xspeed;
     }
 
     setPositionByCentre(x: number, y: number): void {

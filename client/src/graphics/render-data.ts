@@ -1,4 +1,4 @@
-import { ModifierType } from '../world/entities/entities-config.js';
+import { ModifierType } from '../world/entities/config/entities-config.js';
 import { GameOverPhase } from '../game-over/game-over-config.js';
 import { RankData } from '../common/common-config.js'
 
